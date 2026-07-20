@@ -467,7 +467,7 @@ public final class SettingsManager {
         COMMANDS_MORE("commands.more", "more"), COMMANDS_ALLY("commands.ally", "ally"),
         COMMANDS_CLAN("commands.clan", "clan"), COMMANDS_ACCEPT("commands.accept", "accept"),
         COMMANDS_DENY("commands.deny", "deny"), COMMANDS_GLOBAL("commands.global", "global"),
-        COMMANDS_CLAN_CHAT("commands.clan_chat", "."), COMMANDS_FORCE_PRIORITY("commands.force-priority", true),
+        COMMANDS_CLAN_CHAT("commands.clan_chat", "u"), COMMANDS_FORCE_PRIORITY("commands.force-priority", true),
         /*
          * ================ > Economy Settings ================
          *

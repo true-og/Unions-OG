@@ -100,7 +100,7 @@ commands:
     accept: accept
     deny: deny
     global: global
-    clan_chat: "."
+    clan_chat: u
     force-priority: true
 economy:
     creation-price: 100.0

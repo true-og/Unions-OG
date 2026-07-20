@@ -25,9 +25,35 @@ public class ChatCommand extends BaseCommand {
 
     @Default
     @HelpSearchTags("chat")
-    public void sendMessage(ClanPlayer cp, @Name("message") String message) {
+    public void sendMessage(ClanPlayer cp, @Optional @Name("message") String message) {
+
+        if (message == null || message.isBlank()) {
+
+            toggle(cp);
+            return;
+
+        }
 
         chatManager.processChat(SPIGOT, CLAN, cp, message);
+
+    }
+
+    // Bare command flips the player in or out of the union chat channel.
+    private void toggle(ClanPlayer clanPlayer) {
+
+        if (clanPlayer.getChannel() == CLAN) {
+
+            clanPlayer.setChannel(NONE);
+            storageManager.updateClanPlayer(clanPlayer);
+            ChatBlock.sendMessage(clanPlayer, lang("left.clan.chat", clanPlayer));
+
+        } else {
+
+            clanPlayer.setChannel(CLAN);
+            storageManager.updateClanPlayer(clanPlayer);
+            ChatBlock.sendMessage(clanPlayer, lang("joined.clan.chat"));
+
+        }
 
     }
 
