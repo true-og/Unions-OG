@@ -115,23 +115,8 @@ economy:
     purchase-home-teleport-set: false
     home-regroup-price: 5.0
     purchase-home-regroup: false
-    discord-creation-price: 1000.0
-    purchase-discord-create: false
     unique-tax-on-regroup: true
     issuer-pays-regroup: true
-    money-per-kill: false
-    money-per-kill-kdr-multipier: 10
-    purchase-reset-kdr: true
-    reset-kdr-price: 10000.0
-    purchase-member-fee-set: false
-    member-fee-set-price: 1000.0
-    member-fee-enabled: false
-    member-fee-last-minute-change-interval: 8
-    max-member-fee: 200.0
-    upkeep: 200.0
-    upkeep-enabled: false
-    multiply-upkeep-by-clan-size: false
-    charge-upkeep-only-if-member-fee-enabled: true
     bank-log:
         enable: true
 kill-weights:
@@ -170,16 +155,6 @@ clan:
             permissions: [ bank.balance, bank.deposit, bank.withdraw ]
     default-rank: "recruit"
 
-tasks:
-    collect-upkeep:
-        hour: 1
-        minute: 30
-    collect-upkeep-warning:
-        hour: 12
-        minute: 0
-    collect-fee:
-        hour: 1
-        minute: 0
 page:
     untrusted-color: '8'
     clan-name-color: b

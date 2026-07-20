@@ -1,8 +1,8 @@
 name: Unions-OG
-main: net.sacredlabyrinth.phaed.simpleclans.SimpleClans
+main: net.trueog.unionsog.UnionsOG
 version: '${version}'
 softdepend:
-  - Vault
+  - DiamondBank-OG
   - PlaceholderAPI
   - Utilities-OG
   - MiniPlaceholders
@@ -16,351 +16,343 @@ api-version: '1.13'
 authors:
   - Phaed
   - RoinujNosde
-website: https://www.spigotmc.org/resources/simpleclans.71242/
+website: https://github.com/true-og/Unions-OG
 permissions:
-  simpleclans.admin.reload:
+  unionsog.admin.reload:
     description: Can reload configuration
-  simpleclans.admin.purge:
+  unionsog.admin.purge:
     description: Can purge a player
-  simpleclans.admin.promote:
+  unionsog.admin.promote:
     description: Can promote players to union leaders
-  simpleclans.admin.demote:
+  unionsog.admin.demote:
     description: Can demote union leaders to normal players
-  simpleclans.admin.permanent:
+  unionsog.admin.permanent:
     description: Can toggle union permanent status
-  simpleclans.admin.all-seeing-eye:
+  unionsog.admin.all-seeing-eye:
     description: Can see all union chats
-  simpleclans.admin.resetkdr:
+  unionsog.admin.resetkdr:
     description: Can reset player kdr (of all or just one)
-  simpleclans.admin.bank.status:
+  unionsog.admin.bank.status:
     description: Can check the balance of a union
-  simpleclans.admin.bank.take:
+  unionsog.admin.bank.take:
     description: Can take money from a union
-  simpleclans.admin.bank.give:
+  unionsog.admin.bank.give:
     description: Can give money to a union
-  simpleclans.admin.bank.set:
+  unionsog.admin.bank.set:
     description: Can set the balance of a union
-  simpleclans.mod.verify:
+  unionsog.mod.verify:
     description: Can verify unions
-  simpleclans.mod.ban:
+  unionsog.mod.ban:
     description: Can ban players from the entire plugin
-  simpleclans.mod.disband:
+  unionsog.mod.disband:
     description: Can disband any union
-  simpleclans.mod.kick:
+  unionsog.mod.kick:
     description: Can kick any player
-  simpleclans.mod.globalff:
+  unionsog.mod.globalff:
     description: Can turn off global friendly fire protection
-  simpleclans.mod.hometp:
+  unionsog.mod.hometp:
     description: Can teleport to all union homes
-  simpleclans.mod.bypass:
+  unionsog.mod.bypass:
     description: Can bypass restrictions
-  simpleclans.mod.nopvpinwar:
+  unionsog.mod.nopvpinwar:
     description: Can bypass pvp in wars
-  simpleclans.anyone.list:
+  unionsog.anyone.list:
     description: Can list unions
-  simpleclans.anyone.list.balance:
+  unionsog.anyone.list.balance:
     description: Can list unions by balance
-  simpleclans.anyone.profile:
+  unionsog.anyone.profile:
     description: Can view a union's profile
-  simpleclans.anyone.locale:
+  unionsog.anyone.locale:
     description: Can set his language
-  simpleclans.anyone.roster:
+  unionsog.anyone.roster:
     description: Can veiw a union's member list
-  simpleclans.anyone.lookup:
+  unionsog.anyone.lookup:
     description: Can lookup a player's info
-  simpleclans.anyone.leaderboard:
+  unionsog.anyone.leaderboard:
     description: Can view the leaderboard
-  simpleclans.anyone.alliances:
+  unionsog.anyone.alliances:
     description: Can view alliances by union
-  simpleclans.anyone.rivalries:
+  unionsog.anyone.rivalries:
     description: Can view rivalries by union
-  simpleclans.anyone.invite-toggle:
+  unionsog.anyone.invite-toggle:
     description: Can toggle invite on/off
-  simpleclans.other.kdr-exempt:
+  unionsog.other.kdr-exempt:
     description: The player's KDR is not affected on killing/dying
     default: false
-  simpleclans.member.profile:
+  unionsog.member.profile:
     description: Can view his own union's profile
-  simpleclans.member.roster:
+  unionsog.member.roster:
     description: Can view his own union's member list
-  simpleclans.member.bypass-fee:
-    description: Can bypass the member fee
-  simpleclans.member.lookup:
+  unionsog.member.lookup:
     description: Can view his own player info
-  simpleclans.member.vitals:
+  unionsog.member.vitals:
     description: Can view his union's vitals
-  simpleclans.member.coords:
+  unionsog.member.coords:
     description: Can view his union's coords
-  simpleclans.member.stats:
+  unionsog.member.stats:
     description: Can view his union stats
-  simpleclans.member.bb:
+  unionsog.member.bb:
     description: Can view his union's bulletin board
-  simpleclans.member.bb-add:
+  unionsog.member.bb-add:
     description: Can add to his union's bulletin board
-  simpleclans.member.bb-toggle:
+  unionsog.member.bb-toggle:
     description: Can toggle bb on/off
-  simpleclans.member.ff:
+  unionsog.member.ff:
     description: Can toggle his own friendly fire
-  simpleclans.member.resign:
+  unionsog.member.resign:
     description: Can resign from his union
-  simpleclans.member.ally:
+  unionsog.member.ally:
     description: Can use ally chat
-  simpleclans.member.chat:
+  unionsog.member.chat:
     description: Can use union chat
-  simpleclans.member.chat.color:
+  unionsog.member.chat.color:
     description: Can use colors in chat
-  simpleclans.member.chat.format:
+  unionsog.member.chat.format:
     description: Can use formats in chat
     default: false
-  simpleclans.member.can-join:
+  unionsog.member.can-join:
     description: Can join unions
-  simpleclans.member.home:
+  unionsog.member.home:
     description: Can tp to home base
-  simpleclans.vip.resetkdr:
+  unionsog.vip.resetkdr:
     description: Can reset his kdr
-  simpleclans.vip.teleport-delay:
+  unionsog.vip.teleport-delay:
     description: Bypasses the teleport delay
-  simpleclans.leader.create:
+  unionsog.leader.create:
     description: Can create unions
-  simpleclans.leader.verify:
+  unionsog.leader.verify:
     description: Can verify his union
-  simpleclans.leader.home-set:
+  unionsog.leader.home-set:
     description: Can set home base
-  simpleclans.leader.regroup.home:
+  unionsog.leader.regroup.home:
     description: Can tp entire union to homebase
-  simpleclans.leader.regroup.me:
+  unionsog.leader.regroup.me:
     description: Can tp their entire union to themself
-  simpleclans.leader.ally:
+  unionsog.leader.ally:
     description: Can ally his union with other unions
-  simpleclans.leader.rival:
+  unionsog.leader.rival:
     description: Can start a rivalry with another union
-  simpleclans.leader.modtag:
+  unionsog.leader.modtag:
     description: Can modify his union's tag
     children:
-      simpleclans.leader.color: true
-  simpleclans.leader.color:
+      unionsog.leader.color: true
+  unionsog.leader.color:
     description: Can set his union's color
-  simpleclans.leader.description:
+  unionsog.leader.description:
     description: Can modify his union's description
-  simpleclans.leader.bb-clear:
+  unionsog.leader.bb-clear:
     description: Can clear his union's bb
-  simpleclans.leader.setbanner:
+  unionsog.leader.setbanner:
     description: Can set his union's banner
-  simpleclans.leader.discord.create:
+  unionsog.leader.discord.create:
     description: Can create discord channel for his union
-  simpleclans.leader.rename:
+  unionsog.leader.rename:
     description: Can rename his union's name
     default: false
-  simpleclans.member.land:
+  unionsog.member.land:
     description: Can use land commands
-  simpleclans.member.kills:
+  unionsog.member.kills:
     description: Can view his and other's kills
-  simpleclans.member.tag-toggle:
+  unionsog.member.tag-toggle:
     description: Can hide his own union tag
-  simpleclans.member.fee-check:
-    description: Can check his union's fee
-  simpleclans.mod.bb-clear:
+  unionsog.mod.bb-clear:
     description: Can clear a union's bb
-  simpleclans.mod.rename:
+  unionsog.mod.rename:
     description: Can rename a union's name
-  simpleclans.mod.bb:
+  unionsog.mod.bb:
     description: Can view a union's bulletin board
-  simpleclans.mod.bb-add:
+  unionsog.mod.bb-add:
     description: Can add to a union's bulletin board
-  simpleclans.mod.mostkilled:
+  unionsog.mod.mostkilled:
     description: Can view his and other's unions mostkilled
-  simpleclans.mod.keep-items:
+  unionsog.mod.keep-items:
     description: Can keep items when teleporting home
-  simpleclans.mod.place:
+  unionsog.mod.place:
     description: Can manually place players in unions
-  simpleclans.mod.modtag:
+  unionsog.mod.modtag:
     description: Can change a union's tag
-  simpleclans.mod.staffgui:
+  unionsog.mod.staffgui:
     description: Can open the staff gui
-  simpleclans.mod.locale:
+  unionsog.mod.locale:
     description: Can set players language
-  simpleclans.leader.fee:
-    description: Can enable and set the union fee
-  simpleclans.leader.invite:
+  unionsog.leader.invite:
     description: Can invite players into his union
-  simpleclans.leader.kick:
+  unionsog.leader.kick:
     description: Can kick players form his tea,
-  simpleclans.leader.promote:
+  unionsog.leader.promote:
     description: Can promote players to union leaders
-  simpleclans.leader.promotable:
+  unionsog.leader.promotable:
     description: Can be promoted to union leader
-  simpleclans.leader.demote:
+  unionsog.leader.demote:
     description: Can demote union leaders to normal players
-  simpleclans.leader.ff:
+  unionsog.leader.ff:
     description: Can toggle his union's friendly fire
-  simpleclans.leader.disband:
+  unionsog.leader.disband:
     description: Can disband his own union
-  simpleclans.leader.settrust:
+  unionsog.leader.settrust:
     description: Can set trust levels for members
-  simpleclans.leader.war:
+  unionsog.leader.war:
     description: Can start wars
-  simpleclans.leader.coloredrank:
+  unionsog.leader.coloredrank:
     description: Can set colored ranks
     default: true
-  simpleclans.leader.coloredtag:
+  unionsog.leader.coloredtag:
     description: Can use color codes in tags
-  simpleclans.leader.rank.list:
+  unionsog.leader.rank.list:
     description: Can list the ranks
-  simpleclans.leader.rank.create:
+  unionsog.leader.rank.create:
     description: Can create a new rank
-  simpleclans.leader.rank.assign:
+  unionsog.leader.rank.assign:
     description: Can assign a rank to a user
-  simpleclans.leader.rank.unassign:
+  unionsog.leader.rank.unassign:
     description: Can unassign a player from a rank
-  simpleclans.leader.rank.delete:
+  unionsog.leader.rank.delete:
     description: Can delete a rank
-  simpleclans.leader.rank.permissions.available:
+  unionsog.leader.rank.permissions.available:
     description: Can list the available permissions
-  simpleclans.leader.rank.permissions.list:
+  unionsog.leader.rank.permissions.list:
     description: Can list the permissions of a rank
-  simpleclans.leader.rank.permissions.add:
+  unionsog.leader.rank.permissions.add:
     description: Can add permissions to a rank
-  simpleclans.leader.rank.permissions.remove:
+  unionsog.leader.rank.permissions.remove:
     description: Can remove permissions from a rank
-  simpleclans.leader.rank.setdisplayname:
+  unionsog.leader.rank.setdisplayname:
     description: Can set the rank displayname
-  simpleclans.leader.rank.setdefault:
+  unionsog.leader.rank.setdefault:
     description: Can set the default rank
-  simpleclans.leader.rank.removedefault:
+  unionsog.leader.rank.removedefault:
     description: Can remove the default rank
-  simpleclans.member.bank:
+  unionsog.member.bank:
     description: Can use banks
-  simpleclans.admin.*:
+  unionsog.admin.*:
     description: Permissions for admins
     default: op
     children:
-      simpleclans.admin.reload: true
-      simpleclans.admin.all-seeing-eye: true
-      simpleclans.admin.resetkdr: true
-      simpleclans.admin.demote: true
-      simpleclans.admin.promote: true
-      simpleclans.admin.permanent: true
-      simpleclans.admin.bank.status: true
-      simpleclans.admin.bank.take: true
-      simpleclans.admin.bank.give: true
-      simpleclans.admin.bank.set: true
-  simpleclans.mod.*:
+      unionsog.admin.reload: true
+      unionsog.admin.all-seeing-eye: true
+      unionsog.admin.resetkdr: true
+      unionsog.admin.demote: true
+      unionsog.admin.promote: true
+      unionsog.admin.permanent: true
+      unionsog.admin.bank.status: true
+      unionsog.admin.bank.take: true
+      unionsog.admin.bank.give: true
+      unionsog.admin.bank.set: true
+  unionsog.mod.*:
     description: Permissions for moderators
     default: op
     children:
-      simpleclans.mod.verify: true
-      simpleclans.mod.ban: true
-      simpleclans.mod.disband: true
-      simpleclans.mod.kick: true
-      simpleclans.mod.globalff: true
-      simpleclans.mod.bypass: true
-      simpleclans.mod.home: true
-      simpleclans.mod.mostkilled: true
-      simpleclans.mod.keep-items: true
-      simpleclans.mod.nopvpinwar: true
-      simpleclans.mod.place: true
-      simpleclans.mod.staffgui: true
-      simpleclans.mod.modtag: true
-      simpleclans.mod.bb-clear: true
-      simpleclans.mod.bb: true
-      simpleclans.mod.bb-add: true
-      simpleclans.mod.locale: true
-  simpleclans.anyone.*:
+      unionsog.mod.verify: true
+      unionsog.mod.ban: true
+      unionsog.mod.disband: true
+      unionsog.mod.kick: true
+      unionsog.mod.globalff: true
+      unionsog.mod.bypass: true
+      unionsog.mod.home: true
+      unionsog.mod.mostkilled: true
+      unionsog.mod.keep-items: true
+      unionsog.mod.nopvpinwar: true
+      unionsog.mod.place: true
+      unionsog.mod.staffgui: true
+      unionsog.mod.modtag: true
+      unionsog.mod.bb-clear: true
+      unionsog.mod.bb: true
+      unionsog.mod.bb-add: true
+      unionsog.mod.locale: true
+  unionsog.anyone.*:
     description: Permissions for anyone
     default: true
     children:
-      simpleclans.anyone.list: true
-      simpleclans.anyone.profile: true
-      simpleclans.anyone.roster: true
-      simpleclans.anyone.lookup: true
-      simpleclans.anyone.leaderboard: true
-      simpleclans.anyone.alliances: true
-      simpleclans.anyone.rivalries: true
-      simpleclans.anyone.invite-toggle: true
-      simpleclans.anyone.locale: true
-  simpleclans.member.land.*:
+      unionsog.anyone.list: true
+      unionsog.anyone.profile: true
+      unionsog.anyone.roster: true
+      unionsog.anyone.lookup: true
+      unionsog.anyone.leaderboard: true
+      unionsog.anyone.alliances: true
+      unionsog.anyone.rivalries: true
+      unionsog.anyone.invite-toggle: true
+      unionsog.anyone.locale: true
+  unionsog.member.land.*:
     description: Permissions for allowing/blocking actions in lands
     default: false
     children:
-      simpleclans.member.land.allow.container: true
-      simpleclans.member.land.allow.place: true
-      simpleclans.member.land.allow.damage: true
-      simpleclans.member.land.allow.break: true
-      simpleclans.member.land.allow.interact: true
-      simpleclans.member.land.allow.interact_entity: true
-      simpleclans.member.land.block.container: true
-      simpleclans.member.land.block.place: true
-      simpleclans.member.land.block.damage: true
-      simpleclans.member.land.block.break: true
-      simpleclans.member.land.block.interact: true
-      simpleclans.member.land.block.interact_entity: true
-  simpleclans.member.*:
+      unionsog.member.land.allow.container: true
+      unionsog.member.land.allow.place: true
+      unionsog.member.land.allow.damage: true
+      unionsog.member.land.allow.break: true
+      unionsog.member.land.allow.interact: true
+      unionsog.member.land.allow.interact_entity: true
+      unionsog.member.land.block.container: true
+      unionsog.member.land.block.place: true
+      unionsog.member.land.block.damage: true
+      unionsog.member.land.block.break: true
+      unionsog.member.land.block.interact: true
+      unionsog.member.land.block.interact_entity: true
+  unionsog.member.*:
     description: Permissions for those who can be union members
     default: true
     children:
-      simpleclans.member.land: true
-      simpleclans.member.land.*: true
-      simpleclans.member.can-join: true
-      simpleclans.member.profile: true
-      simpleclans.member.roster: true
-      simpleclans.member.lookup: true
-      simpleclans.member.vitals: true
-      simpleclans.member.coords: true
-      simpleclans.member.stats: true
-      simpleclans.member.bb: true
-      simpleclans.member.bb-add: true
-      simpleclans.member.bb-toggle: true
-      simpleclans.member.cape-toggle: true
-      simpleclans.member.tag-toggle: true
-      simpleclans.member.ff: true
-      simpleclans.member.resign: true
-      simpleclans.member.ally: true
-      simpleclans.member.chat: true
-      simpleclans.member.home: true
-      simpleclans.member.kills: true
-      simpleclans.member.bank: true
-      simpleclans.member.fee-check: true
-      simpleclans.member.chat.color: true
-  simpleclans.leader.*:
+      unionsog.member.land: true
+      unionsog.member.land.*: true
+      unionsog.member.can-join: true
+      unionsog.member.profile: true
+      unionsog.member.roster: true
+      unionsog.member.lookup: true
+      unionsog.member.vitals: true
+      unionsog.member.coords: true
+      unionsog.member.stats: true
+      unionsog.member.bb: true
+      unionsog.member.bb-add: true
+      unionsog.member.bb-toggle: true
+      unionsog.member.cape-toggle: true
+      unionsog.member.tag-toggle: true
+      unionsog.member.ff: true
+      unionsog.member.resign: true
+      unionsog.member.ally: true
+      unionsog.member.chat: true
+      unionsog.member.home: true
+      unionsog.member.kills: true
+      unionsog.member.bank: true
+      unionsog.member.chat.color: true
+  unionsog.leader.*:
     description: Permissions for those who can be union leaders
     default: true
     children:
-      simpleclans.leader.create: true
-      simpleclans.leader.verify: true
-      simpleclans.leader.ally: true
-      simpleclans.leader.rival: true
-      simpleclans.leader.modtag: true
-      simpleclans.leader.color: true
-      simpleclans.leader.cape: true
-      simpleclans.leader.invite: true
-      simpleclans.leader.kick: true
-      simpleclans.leader.promote: true
-      simpleclans.leader.promotable: true
-      simpleclans.leader.demote: true
-      simpleclans.leader.ff: true
-      simpleclans.leader.withdraw-toggle: true
-      simpleclans.leader.deposit-toggle: true
-      simpleclans.leader.fee: true
-      simpleclans.leader.disband: true
-      simpleclans.leader.settrust: true
-      simpleclans.leader.war: true
-      simpleclans.leader.home-set: true
-      simpleclans.leader.regroup.home: true
-      simpleclans.leader.regroup.me: true
-      simpleclans.leader.setrank: true
-      simpleclans.leader.coloredtag: true
-      simpleclans.leader.coloredrank: true
-      simpleclans.leader.bb-clear: true
-      simpleclans.leader.rank.setdisplayname: true
-      simpleclans.leader.rank.setdefault: true
-      simpleclans.leader.rank.removedefault: true
-      simpleclans.leader.rank.list: true
-      simpleclans.leader.rank.create: true
-      simpleclans.leader.rank.assign: true
-      simpleclans.leader.rank.unassign: true
-      simpleclans.leader.rank.delete: true
-      simpleclans.leader.rank.permissions.available: true
-      simpleclans.leader.rank.permissions.add: true
-      simpleclans.leader.rank.permissions.remove: true
-      simpleclans.leader.rank.permissions.list: true
-      simpleclans.leader.discord.create: true
+      unionsog.leader.create: true
+      unionsog.leader.verify: true
+      unionsog.leader.ally: true
+      unionsog.leader.rival: true
+      unionsog.leader.modtag: true
+      unionsog.leader.color: true
+      unionsog.leader.cape: true
+      unionsog.leader.invite: true
+      unionsog.leader.kick: true
+      unionsog.leader.promote: true
+      unionsog.leader.promotable: true
+      unionsog.leader.demote: true
+      unionsog.leader.ff: true
+      unionsog.leader.withdraw-toggle: true
+      unionsog.leader.deposit-toggle: true
+      unionsog.leader.disband: true
+      unionsog.leader.settrust: true
+      unionsog.leader.war: true
+      unionsog.leader.home-set: true
+      unionsog.leader.regroup.home: true
+      unionsog.leader.regroup.me: true
+      unionsog.leader.setrank: true
+      unionsog.leader.coloredtag: true
+      unionsog.leader.coloredrank: true
+      unionsog.leader.bb-clear: true
+      unionsog.leader.rank.setdisplayname: true
+      unionsog.leader.rank.setdefault: true
+      unionsog.leader.rank.removedefault: true
+      unionsog.leader.rank.list: true
+      unionsog.leader.rank.create: true
+      unionsog.leader.rank.assign: true
+      unionsog.leader.rank.unassign: true
+      unionsog.leader.rank.delete: true
+      unionsog.leader.rank.permissions.available: true
+      unionsog.leader.rank.permissions.add: true
+      unionsog.leader.rank.permissions.remove: true
+      unionsog.leader.rank.permissions.list: true
+      unionsog.leader.discord.create: true

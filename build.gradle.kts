@@ -27,9 +27,9 @@ java {
 kotlin { jvmToolchain(17) }
 
 /* ----------------------------- Metadata ------------------------------ */
-group = "net.sacredlabyrinth.phaed.simpleclans" // Declare bundle identifier.
+group = "net.trueog.unionsog" // Declare bundle identifier.
 
-version = "2.19.3-SNAPSHOT" // Declare plugin version (will be in .jar).
+version = "2.20" // Declare plugin version (will be in .jar).
 
 val apiVersion = "1.19" // Declare minecraft server target version.
 
@@ -71,10 +71,11 @@ repositories {
 /* ---------------------- Java project deps ---------------------------- */
 dependencies {
     compileOnly("org.purpurmc.purpur:purpur-api:1.19.4-R0.1-SNAPSHOT")
-    compileOnly("com.github.MilkBowl:VaultAPI:1.7") {
-        exclude(group = "com.googlecode.json-simple", module = "json-simple")
-    }
+    compileOnly("net.luckperms:api:5.5") // Import LuckPerms API.
     compileOnlyApi(project(":libs:Utilities-OG")) // Import TrueOG Network Utilities-OG Java API (from source).
+    compileOnlyApi(project(":libs:DiamondBank-OG")) {
+        attributes { attribute(kotlinAttribute, true) }
+    } // Import TrueOG network DiamondBank-OG Kotlin API (from source).
     compileOnly("me.clip:placeholderapi:2.11.3")
     compileOnly("org.jetbrains:annotations:24.0.1")
     implementation("io.papermc:paperlib:1.0.8-SNAPSHOT")
@@ -104,11 +105,11 @@ tasks.withType<AbstractArchiveTask>().configureEach { // Ensure reproducible .ja
 
 /* ----------------------------- Shadow -------------------------------- */
 tasks.shadowJar {
-    relocate("io.papermc.lib", "net.sacredlabyrinth.phaed.simpleclans.paperlib")
-    relocate("co.aikar.commands", "net.sacredlabyrinth.phaed.simpleclans.acf")
-    relocate("co.aikar.locales", "net.sacredlabyrinth.phaed.simpleclans.locales")
-    relocate("com.cryptomorin.xseries", "net.sacredlabyrinth.phaed.simpleclans.xseries")
-    relocate("com.google.gson", "net.sacredlabyrinth.phaed.simpleclans.gson")
+    relocate("io.papermc.lib", "net.trueog.unionsog.paperlib")
+    relocate("co.aikar.commands", "net.trueog.unionsog.acf")
+    relocate("co.aikar.locales", "net.trueog.unionsog.locales")
+    relocate("com.cryptomorin.xseries", "net.trueog.unionsog.xseries")
+    relocate("com.google.gson", "net.trueog.unionsog.gson")
     dependencies { exclude(dependency("org.jetbrains:annotations:.*")) }
     archiveBaseName.set("Unions-OG")
     archiveClassifier.set("")
