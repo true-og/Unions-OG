@@ -4,6 +4,7 @@ import com.cryptomorin.xseries.XMaterial;
 import net.trueog.unionsog.UnionsOG;
 import net.trueog.unionsog.ui.*;
 import net.trueog.unionsog.ui.frames.staff.StaffFrame;
+import net.trueog.unionsog.utils.ChatUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.jetbrains.annotations.NotNull;
@@ -18,6 +19,7 @@ import static net.trueog.unionsog.managers.SettingsManager.ConfigField.*;
 public class MainFrame extends SCFrame {
 
     private final UnionsOG plugin = UnionsOG.getInstance();
+    private int nextSlot;
 
     public MainFrame(Player viewer) {
 
@@ -28,11 +30,13 @@ public class MainFrame extends SCFrame {
     @Override
     public void createComponents() {
 
-        add(Components.getPlayerComponent(this, getViewer(), getViewer(), 0, false));
+        nextSlot = 0;
+        add(Components.getPlayerComponent(this, getViewer(), getViewer(), nextSlot++, false));
         add(Components.getClanComponent(this, getViewer(),
-                plugin.getClanManager().getCreateClanPlayer(getViewer().getUniqueId()).getClan(), 1, true));
-        addLeaderboard();
+                plugin.getClanManager().getCreateClanPlayer(getViewer().getUniqueId()).getClan(), nextSlot++, true));
+        addUnionBanking();
         addClanList();
+        addLeaderboard();
         addResetKdr();
         addStaff();
         addLanguageSelector();
@@ -40,10 +44,22 @@ public class MainFrame extends SCFrame {
 
     }
 
+    private void addUnionBanking() {
+
+        SCComponent unionBanking = new SCComponentImpl(ChatUtils.parseColors("&6Union Banking"),
+                Arrays.asList(ChatUtils.parseColors("&7This feature is not finished yet."),
+                        ChatUtils.parseColors("&eUnion Banking will be available soon.")),
+                XMaterial.DIAMOND_PICKAXE, nextSlot++);
+        unionBanking.setListener(ClickType.LEFT, () -> getViewer().sendMessage(
+                ChatUtils.parseColors("&eUnion Banking is not finished yet and will be available soon.")));
+        add(unionBanking);
+
+    }
+
     private void addOtherCommands() {
 
         SCComponent otherCommands = new SCComponentImpl(lang("gui.main.other.commands.title", getViewer()),
-                Collections.singletonList(lang("gui.main.other.commands.lore", getViewer())), XMaterial.BOOK, 8);
+                Collections.singletonList(lang("gui.main.other.commands.lore", getViewer())), XMaterial.BOOK, nextSlot++);
         otherCommands.setListener(ClickType.LEFT, () -> InventoryController.runSubcommand(getViewer(), "help", false));
         add(otherCommands);
 
@@ -53,7 +69,7 @@ public class MainFrame extends SCFrame {
 
         if (plugin.getPermissionsManager().has(getViewer(), "unionsog.mod.staffgui")) {
 
-            SCComponent staff = new SCComponentImpl.Builder(XMaterial.COMMAND_BLOCK).withSlot(6)
+            SCComponent staff = new SCComponentImpl.Builder(XMaterial.COMMAND_BLOCK).withSlot(nextSlot++)
                     .withDisplayName(lang("gui.main.staff.title", getViewer()))
                     .withLore(Collections.singletonList(lang("gui.main.staff.lore", getViewer()))).build();
             staff.setPermission(ClickType.LEFT, "unionsog.mod.staffgui");
@@ -67,7 +83,8 @@ public class MainFrame extends SCFrame {
     private void addLeaderboard() {
 
         SCComponent leaderboard = new SCComponentImpl(lang("gui.main.leaderboard.title", getViewer()),
-                Collections.singletonList(lang("gui.main.leaderboard.lore", getViewer())), XMaterial.PAINTING, 3);
+                Collections.singletonList(lang("gui.main.leaderboard.lore", getViewer())), XMaterial.PAINTING,
+                nextSlot++);
         leaderboard.setListener(ClickType.LEFT, () -> InventoryDrawer.open(new LeaderboardFrame(getViewer(), this)));
         leaderboard.setPermission(ClickType.LEFT, "unionsog.anyone.leaderboard");
         add(leaderboard);
@@ -77,7 +94,8 @@ public class MainFrame extends SCFrame {
     private void addClanList() {
 
         SCComponent clanList = new SCComponentImpl(lang("gui.main.clan.list.title", getViewer()),
-                Collections.singletonList(lang("gui.main.clan.list.lore", getViewer())), XMaterial.PURPLE_BANNER, 4);
+                Collections.singletonList(lang("gui.main.clan.list.lore", getViewer())), XMaterial.PURPLE_BANNER,
+                nextSlot++);
         clanList.setListener(ClickType.LEFT, () -> InventoryDrawer.open(new ClanListFrame(this, getViewer())));
         clanList.setPermission(ClickType.LEFT, "unionsog.anyone.list");
         add(clanList);
@@ -89,7 +107,7 @@ public class MainFrame extends SCFrame {
         if (plugin.getSettingsManager().is(LANGUAGE_SELECTOR)) {
 
             SCComponent language = new SCComponentImpl.Builder(XMaterial.MAP)
-                    .withDisplayName(lang("gui.main.languageselector.title", getViewer())).withSlot(7)
+                    .withDisplayName(lang("gui.main.languageselector.title", getViewer())).withSlot(nextSlot++)
                     .withLore(Arrays.asList(lang("gui.main.languageselector.lore.left.click", getViewer()),
                             lang("gui.main.languageselector.lore.right.click", getViewer())))
                     .build();
@@ -119,7 +137,7 @@ public class MainFrame extends SCFrame {
         List<String> resetKdrLore = Collections.singletonList(lang("gui.main.reset.kdr.lore", getViewer()));
 
         SCComponent resetKdr = new SCComponentImpl(lang("gui.main.reset.kdr.title", getViewer()), resetKdrLore,
-                XMaterial.ANVIL, 5);
+                XMaterial.ANVIL, nextSlot++);
         resetKdr.setListener(ClickType.LEFT, () -> InventoryController.runSubcommand(getViewer(), "resetkdr", false));
         resetKdr.setConfirmationRequired(ClickType.LEFT);
         resetKdr.setPermission(ClickType.LEFT, "unionsog.vip.resetkdr");
@@ -138,7 +156,7 @@ public class MainFrame extends SCFrame {
     @Override
     public int getSize() {
 
-        return 3 * 9;
+        return 9;
 
     }
 
