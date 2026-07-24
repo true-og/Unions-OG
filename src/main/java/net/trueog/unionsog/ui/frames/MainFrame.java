@@ -50,8 +50,8 @@ public class MainFrame extends SCFrame {
                 Arrays.asList(ChatUtils.parseColors("&7This feature is not finished yet."),
                         ChatUtils.parseColors("&eUnion Banking will be available soon.")),
                 XMaterial.DIAMOND_PICKAXE, nextSlot++);
-        unionBanking.setListener(ClickType.LEFT, () -> getViewer().sendMessage(
-                ChatUtils.parseColors("&eUnion Banking is not finished yet and will be available soon.")));
+        unionBanking.setListener(ClickType.LEFT, () -> getViewer()
+                .sendMessage(ChatUtils.parseColors("&eUnion Banking is not finished yet and will be available soon.")));
         add(unionBanking);
 
     }
@@ -59,7 +59,8 @@ public class MainFrame extends SCFrame {
     private void addOtherCommands() {
 
         SCComponent otherCommands = new SCComponentImpl(lang("gui.main.other.commands.title", getViewer()),
-                Collections.singletonList(lang("gui.main.other.commands.lore", getViewer())), XMaterial.BOOK, nextSlot++);
+                Collections.singletonList(lang("gui.main.other.commands.lore", getViewer())), XMaterial.BOOK,
+                nextSlot++);
         otherCommands.setListener(ClickType.LEFT, () -> InventoryController.runSubcommand(getViewer(), "help", false));
         add(otherCommands);
 
