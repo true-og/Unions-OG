@@ -5,6 +5,7 @@ import net.trueog.unionsog.UnionsOG;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -40,23 +41,46 @@ public class MySQLCore implements DBCore {
 
     private void initialize() {
 
+        loadDriver();
+
         try {
 
-            Class.forName("com.mysql.jdbc.Driver");
             connection = DriverManager.getConnection(
                     "jdbc:mysql://" + host + ":" + port + "/" + database
                             + "?useUnicode=true&characterEncoding=utf-8&autoReconnect=true&useSSL=false",
                     username, password);
-
-        } catch (ClassNotFoundException e) {
-
-            log.severe("ClassNotFoundException! " + e.getMessage());
 
         } catch (SQLException e) {
 
             log.severe("SQLException! " + e.getMessage());
 
         }
+
+    }
+
+    /**
+     * Loads whichever driver class the server provides. Connector/J 8 dropped the
+     * legacy class name, so a missing class must not stop the connection attempt:
+     * JDBC service discovery still finds a driver that is on the classpath.
+     */
+    private void loadDriver() {
+
+        for (String driver : List.of("com.mysql.cj.jdbc.Driver", "com.mysql.jdbc.Driver", "org.mariadb.jdbc.Driver")) {
+
+            try {
+
+                Class.forName(driver);
+                return;
+
+            } catch (ClassNotFoundException ignored) {
+
+                // Try the next known driver class name.
+
+            }
+
+        }
+
+        log.warning("No known MySQL driver class was found, falling back to JDBC service discovery.");
 
     }
 

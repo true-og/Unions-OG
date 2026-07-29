@@ -1,95 +1,84 @@
-[![Unions-OG Logo](https://i.imgur.com/9vgfVdX.png)](https://www.spigotmc.org/resources/simpleclans.71242/)
+![Unions-OG Logo](https://i.imgur.com/9vgfVdX.png)
 
-Unions-OG
-==========
+# Unions-OG
 
-Full featured union system for PVP Minecraft servers!
+A full-featured union system for PvP Minecraft servers.
 
-[![Build Status](https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fci.roinujnosde.me%2Fjob%2FSimpleClans%2F)](https://ci.roinujnosde.me/job/SimpleClans/)
-[![Spiget Downloads](https://img.shields.io/spiget/downloads/71242)](https://www.spigotmc.org/resources/simpleclans.71242/)
-[![Issues](https://img.shields.io/github/issues/RoinujNosde/SimpleClans.svg)](https://github.com/RoinujNosde/SimpleClans/issues)
-[![Crowdin](https://badges.crowdin.net/simpleclans/localized.svg)](https://crowdin.com/project/simpleclans)
-[![Discord](https://img.shields.io/discord/719557355917934613?label=discord&logo=discord)](https://discord.gg/CkNwgdE)
+> [!IMPORTANT]
+> Unions-OG is an unofficial soft fork of
+> [SimpleClans](https://github.com/RoinujNosde/SimpleClans), maintained for the
+> TrueOG Network. Upstream behavior is retained where practical, while
+> branding, integrations, and selected gameplay behavior intentionally differ.
 
+Current fork version: **2.3**
 
-#### Download Link
+- [Fork-only changelog](CHANGELOG.md)
+- [PlaceholderAPI and MiniPlaceholders reference](placeholder-info.txt)
+- [Upstream SimpleClans project](https://github.com/RoinujNosde/SimpleClans)
 
-* [Download from Spigot](https://www.spigotmc.org/resources/simpleclans.71242/)
+## Main fork differences
 
-#### Documentation 
+- Uses Unions-OG branding and union terminology.
+- Provides `/union` and `/unions` while keeping `/clan` and `/clans` as
+  compatibility aliases.
+- Uses `/u` for union chat; a bare `/u` toggles the union-chat channel.
+- Adds `/union color <color>` with the `unionsog.leader.color` permission.
+- Supports both `simpleclans` and `simpleunions` placeholder identifiers in
+  PlaceholderAPI and MiniPlaceholders.
+- Uses DiamondBank-OG instead of Vault for player economy access. Union-owned
+  bank accounts remain under development, so their commands are currently
+  disabled.
+- Treats unions as verified without requiring the upstream verification
+  workflow.
+- Includes a configuration-gated, transactional importer for the legacy
+  unions database.
 
-* [Documentation](https://simpleclans.gitbook.io/simpleclans/)
-* Commands & Permissions
-  * [Permissions](https://simpleclans.gitbook.io/simpleclans/commands-and-permissions/permissions)
-  * [Commands](https://simpleclans.gitbook.io/simpleclans/commands-and-permissions/commands)
-  * [Union Alliances and Rivalries](https://simpleclans.gitbook.io/simpleclans/commands-and-permissions/aliances-and-rivalries)
-  * [Union Ranks with Permissions](https://simpleclans.gitbook.io/simpleclans/commands-and-permissions/ranks-with-permissions)
-* How to Setup
-  * [Configuration](https://simpleclans.gitbook.io/simpleclans/how-to-setup/configuration)
-  * [Translation](https://simpleclans.gitbook.io/simpleclans/how-to-setup/translation)
-  * [Union Member Fee](https://simpleclans.gitbook.io/simpleclans/how-to-setup/member-fee)
-  * [Union Upkeep](https://simpleclans.gitbook.io/simpleclans/how-to-setup/clan-upkeep)
-  * [Union name above players head](https://simpleclans.gitbook.io/simpleclans/how-to-setup/clan-below-players-name)
-  * [Union name on Tablist](https://simpleclans.gitbook.io/simpleclans/how-to-setup/clan-on-tablist)
-* Plugins & Development 
-  * [Unions-OG API Example](https://simpleclans.gitbook.io/simpleclans/other/simpleclans-api)
-  * [Placeholder and MiniPlaceholder Reference](placeholder-info.txt)
-  * [Land Protection Plugins](https://simpleclans.gitbook.io/simpleclans/other/land-claims)
-  
-#### Support & Suggestions
+See the [changelog](CHANGELOG.md) for the complete list of changes maintained
+by this fork. Upstream SimpleClans changes are intentionally not repeated
+there.
 
-* [Discord Support](https://discord.gg/CkNwgdE)
-* [Bugs and Suggestions](https://github.com/RoinujNosde/SimpleClans/issues)
+## Documentation
 
-#### Current Changes over SimpleClans
+The [SimpleClans documentation](https://simpleclans.gitbook.io/simpleclans/)
+remains the baseline reference for inherited features. It uses upstream clan
+terminology, and fork-specific commands, permissions, banking behavior, and
+integrations may differ.
 
-* Renamed to `Unions-OG`.
-* Clans renamed to unions.
-* Added /union commands.
-* Union tag color changes now use `/union color <color>`.
-* The new permission node is `simpleclans.leader.color`.
+- [Upstream commands](https://simpleclans.gitbook.io/simpleclans/commands-and-permissions/commands)
+- [Upstream permissions](https://simpleclans.gitbook.io/simpleclans/commands-and-permissions/permissions)
+- [Upstream configuration](https://simpleclans.gitbook.io/simpleclans/how-to-setup/configuration)
+- [Upstream ranks](https://simpleclans.gitbook.io/simpleclans/commands-and-permissions/ranks-with-permissions)
+- [Upstream land protection integrations](https://simpleclans.gitbook.io/simpleclans/other/land-claims)
 
-#### Developers
+For the unmodified upstream plugin and its public releases, use the
+[SimpleClans Spigot page](https://www.spigotmc.org/resources/simpleclans.71242/).
+That download is not an Unions-OG build.
 
-Including Unions-OG with Maven:
-```xml
-<repositories>
-    <repository>
-        <id>roinujnosde-repo</id>
-        <url>https://repo.roinujnosde.me/releases/</url>
-    </repository>
-</repositories>
-```
-```xml
-<dependencies>
-    <dependency>
-        <groupId>net.sacredlabyrinth.phaed.simpleclans</groupId>
-        <artifactId>SimpleClans</artifactId>
-        <version>2.19.2</version> <!-- Current stable release; master is 2.19.3-SNAPSHOT -->
-        <scope>provided</scope>
-    </dependency>
-</dependencies>
+## Building
+
+The build requires Java 17. Clone with submodules, then run:
+
+```bash
+git submodule update --init --recursive
+./gradlew build
 ```
 
-Using Gradle:
-```groovy
-repositories {
-    maven {
-        url  "https://repo.roinujnosde.me/releases/" 
-    }
-}
-dependencies {
-    compileOnly "net.sacredlabyrinth.phaed.simpleclans:SimpleClans:2.19.2"
-}
-```
+The shaded plugin is produced under `build/libs/` with the
+`Unions-OG-2.3.jar` name.
 
-Feel free to learn our [Javadoc](https://ci.roinujnosde.me/job/SimpleClans/Javadoc/).
-Compatibility note: the published Maven coordinates, package names, and permissions still use `simpleclans`.
-PlaceholderAPI and MiniPlaceholders support both `simpleclans` and `simpleunions`; see [placeholder-info.txt](placeholder-info.txt) for the full placeholder reference.
-##### Latest version:
-[![Maven metadata URL](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Frepo.roinujnosde.me%2Freleases%2Fnet%2Fsacredlabyrinth%2Fphaed%2Fsimpleclans%2FSimpleClans%2Fmaven-metadata.xml)](https://repo.roinujnosde.me/#/releases/net/sacredlabyrinth/phaed/simpleclans/SimpleClans)
-##### API Examples
-* [Examples of how to use the API](https://simpleclans.gitbook.io/simpleclans/other/simpleclans-api)
+## Developer compatibility
 
+- Java and Gradle namespace: `net.trueog.unionsog`
+- Bukkit main class: `net.trueog.unionsog.UnionsOG`
+- Permission prefix: `unionsog.*`
+- Command aliases: `union`, `unions`, `clan`, and `clans`
+- Placeholder identifiers: `simpleunions` and the retained `simpleclans`
+  compatibility identifier
 
-[![Mikasa Host](https://mikasa.host/images/partners/banners/SimpleClans.gif)](https://mikasa.host/ref/6)
+The old SimpleClans Maven coordinates and Java packages do not describe this
+fork and should not be used as Unions-OG API coordinates.
+
+## Credits and license
+
+Unions-OG is derived from SimpleClans by its original and upstream
+contributors. This fork remains licensed under the [GNU GPL v3](LICENSE).

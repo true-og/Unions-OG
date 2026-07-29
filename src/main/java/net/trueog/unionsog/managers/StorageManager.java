@@ -4,6 +4,7 @@ import net.trueog.unionsog.*;
 import net.trueog.unionsog.events.ClanBalanceUpdateEvent;
 import net.trueog.unionsog.loggers.BankLogger;
 import net.trueog.unionsog.loggers.BankOperator;
+import net.trueog.unionsog.migrations.legacy.LegacyUnionsDatabaseMigrationRunner;
 import net.trueog.unionsog.storage.DBCore;
 import net.trueog.unionsog.storage.MySQLCore;
 import net.trueog.unionsog.storage.SQLiteCore;
@@ -50,8 +51,20 @@ public final class StorageManager {
     public StorageManager() {
 
         plugin = UnionsOG.getInstance();
+        LegacyUnionsDatabaseMigrationRunner.validateConfiguration(plugin);
         initiateDB();
         updateDatabase();
+        try {
+
+            LegacyUnionsDatabaseMigrationRunner.run(plugin, core.getConnection());
+
+        } catch (LegacyUnionsDatabaseMigrationRunner.MigrationStartupException ex) {
+
+            core.close();
+            throw ex;
+
+        }
+
         importFromDatabase();
 
     }

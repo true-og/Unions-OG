@@ -13,6 +13,7 @@ import net.trueog.unionsog.migrations.BbMigration;
 import net.trueog.unionsog.migrations.ChatFormatMigration;
 import net.trueog.unionsog.migrations.LanguageMigration;
 import net.trueog.unionsog.migrations.UnionBankZeroMigration;
+import net.trueog.unionsog.migrations.legacy.LegacyUnionsDatabaseMigrationRunner.MigrationStartupException;
 import net.trueog.unionsog.proxy.BungeeManager;
 import net.trueog.unionsog.proxy.ProxyManager;
 import net.trueog.unionsog.tasks.*;
@@ -60,6 +61,7 @@ public class UnionsOG extends JavaPlugin {
     private ChatManager chatManager;
     private ProxyManager proxyManager;
     private boolean hasUUID;
+    private boolean startupComplete;
     private static final Pattern ACF_PLACEHOLDER_PATTERN = Pattern.compile("\\{(?<key>[a-zA-Z]+?)}");
 
     private BankLogger bankLogger;
@@ -125,7 +127,18 @@ public class UnionsOG extends JavaPlugin {
         requestManager = new RequestManager();
         clanManager = new ClanManager();
         proxyManager = new BungeeManager(this);
-        storageManager = new StorageManager();
+        try {
+
+            storageManager = new StorageManager();
+
+        } catch (MigrationStartupException ex) {
+
+            getLogger().log(Level.SEVERE, ex.getMessage(), ex);
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+
+        }
+
         teleportManager = new TeleportManager();
         protectionManager = new ProtectionManager();
         protectionManager.registerListeners();
@@ -146,6 +159,7 @@ public class UnionsOG extends JavaPlugin {
         hookIntoPAPI();
         hookIntoMiniPlaceholders();
         new UpdateChecker(this).check();
+        startupComplete = true;
 
     }
 
@@ -213,15 +227,26 @@ public class UnionsOG extends JavaPlugin {
     @Override
     public void onDisable() {
 
-        if (getSettingsManager().is(PERFORMANCE_SAVE_PERIODICALLY)) {
+        if (storageManager != null) {
 
-            getStorageManager().saveModified();
+            if (startupComplete && settingsManager != null && settingsManager.is(PERFORMANCE_SAVE_PERIODICALLY)) {
+
+                storageManager.saveModified();
+
+            }
+
+            storageManager.closeConnection();
 
         }
 
-        getStorageManager().closeConnection();
-        getPermissionsManager().savePermissions();
-        getSettingsManager().loadAndSave();
+        if (!startupComplete) {
+
+            return;
+
+        }
+
+        permissionsManager.savePermissions();
+        settingsManager.loadAndSave();
 
     }
 

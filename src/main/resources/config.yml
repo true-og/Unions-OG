@@ -214,13 +214,17 @@ purge:
     inactive-clan-days: 7
     unverified-clan-days: 2
 mysql:
-    username: ''
+    username: '^{MARIADB_USER}'
     host: localhost
     port: 3306
-    enable: false
-    password: ''
-    database: ''
+    enable: true
+    password: '^{MARIADB_PASSWORD}'
+    database: 'unions'
     table_prefix: 'sc_'
+    # One-time, source-read-only import from the legacy unions schema.
+    # The <table_prefix>clans, <table_prefix>players, and <table_prefix>kills
+    # destination tables must be empty and use InnoDB.
+    migrate-legacy-unions-database: false
 permissions:
   auto-group-groupname: false
   YourClanNameHere:

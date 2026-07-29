@@ -29,7 +29,7 @@ kotlin { jvmToolchain(17) }
 /* ----------------------------- Metadata ------------------------------ */
 group = "net.trueog.unionsog" // Declare bundle identifier.
 
-version = "2.20" // Declare plugin version (will be in .jar).
+version = "2.3" // Declare plugin version (will be in .jar).
 
 val apiVersion = "1.19" // Declare minecraft server target version.
 
@@ -93,6 +93,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.11.3")
     testImplementation("org.mockito:mockito-core:5.14.2")
     testImplementation("org.mockito:mockito-junit-jupiter:5.14.2")
+    testImplementation("com.h2database:h2:2.3.232")
 }
 
 apply(from = "eclipse.gradle.kts") // Import eclipse classpath support script.
