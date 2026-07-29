@@ -20,7 +20,6 @@ import net.trueog.unionsog.tasks.*;
 import net.trueog.unionsog.ui.InventoryController;
 import net.trueog.unionsog.utils.ChatUtils;
 import net.trueog.unionsog.utils.TagValidator;
-import net.trueog.unionsog.utils.UpdateChecker;
 import net.trueog.unionsog.uuid.UUIDMigration;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -158,7 +157,6 @@ public class UnionsOG extends JavaPlugin {
         startTasks();
         hookIntoPAPI();
         hookIntoMiniPlaceholders();
-        new UpdateChecker(this).check();
         startupComplete = true;
 
     }
