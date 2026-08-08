@@ -506,7 +506,7 @@ public final class SettingsManager {
         CLAN_MIN_DESCRIPTION_LENGTH("clan.min-description-length", 10), CLAN_MAX_MEMBERS("clan.max-members", 25),
         CLAN_UNVERIFIED_MAX_MEMBERS("clan.unverified-max-members", 10), CLAN_MAX_ALLIANCES("clan.max-alliances", -1),
         CLAN_CONFIRMATION_FOR_PROMOTE("clan.confirmation-for-promote", false),
-        CLAN_TRUST_MEMBERS_BY_DEFAULT("clan.trust-members-by-default", false),
+        CLAN_TRUST_MEMBERS_BY_DEFAULT("clan.trust-members-by-default", true),
         CLAN_CONFIRMATION_FOR_DEMOTE("clan.confirmation-for-demote", false),
         CLAN_PERCENTAGE_ONLINE_TO_DEMOTE("clan.percentage-online-to-demote", 100.0),
         CLAN_FF_ON_BY_DEFAULT("clan.ff-on-by-default", false), CLAN_MIN_TO_VERIFY("clan.min-to-verify", 1),

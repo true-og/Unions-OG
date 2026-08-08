@@ -10,7 +10,6 @@ import net.trueog.unionsog.hooks.discord.DiscordHook;
 import net.trueog.unionsog.hooks.discord.exceptions.DiscordHookException;
 import net.trueog.unionsog.managers.*;
 import net.trueog.unionsog.utils.ChatUtils;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.Objects;
@@ -165,76 +164,6 @@ public class LeaderCommands extends BaseCommand {
             ChatBlock.sendMessage(player, AQUA + lang("the.clan.has.been.verified", player));
 
         }
-
-    }
-
-    @Subcommand("%trust")
-    @CommandPermission("unionsog.leader.settrust")
-    @CommandCompletion("@clan_members")
-    @Description("{@@command.description.trust}")
-    public void trust(Player player, Clan clan, @Conditions("same_clan") @Name("member") ClanPlayerInput trusted) {
-
-        ClanPlayer trustedInput = trusted.getClanPlayer();
-        if (player.getUniqueId().equals(trustedInput.getUniqueId())) {
-
-            ChatBlock.sendMessage(player, RED + lang("you.cannot.trust.yourself", player));
-            return;
-
-        }
-
-        if (clan.isLeader(trustedInput.getUniqueId())) {
-
-            ChatBlock.sendMessage(player, RED + lang("leaders.are.already.trusted", player));
-            return;
-
-        }
-
-        if (trustedInput.isTrusted()) {
-
-            ChatBlock.sendMessage(player, ChatColor.RED + lang("this.player.is.already.trusted", player));
-            return;
-
-        }
-
-        clan.addBb(player.getName(),
-                lang("has.been.given.trusted.status.by", trustedInput.getName(), player.getName()));
-        trustedInput.setTrusted(true);
-        storage.updateClanPlayer(trustedInput);
-
-    }
-
-    @Subcommand("%untrust")
-    @CommandPermission("unionsog.leader.settrust")
-    @CommandCompletion("@clan_members")
-    @Description("{@@command.description.untrust}")
-    public void untrust(Player player, Clan clan, @Conditions("same_clan") @Name("member") ClanPlayerInput trusted) {
-
-        ClanPlayer trustedInput = trusted.getClanPlayer();
-        if (trustedInput.getUniqueId().equals(player.getUniqueId())) {
-
-            ChatBlock.sendMessage(player, RED + lang("you.cannot.untrust.yourself", player));
-            return;
-
-        }
-
-        if (clan.isLeader(trustedInput.getUniqueId())) {
-
-            ChatBlock.sendMessage(player, RED + lang("leaders.cannot.be.untrusted", player));
-            return;
-
-        }
-
-        if (!trustedInput.isTrusted()) {
-
-            ChatBlock.sendMessage(player, RED + lang("this.player.is.already.untrusted", player));
-            return;
-
-        }
-
-        clan.addBb(player.getName(),
-                lang("has.been.given.untrusted.status.by", trustedInput.getName(), player.getName()));
-        trustedInput.setTrusted(false);
-        storage.updateClanPlayer(trustedInput);
 
     }
 

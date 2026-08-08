@@ -135,7 +135,7 @@ clan:
     max-members: 25
     unverified-max-members: 10
     confirmation-for-promote: false
-    trust-members-by-default: false
+    trust-members-by-default: true
     confirmation-for-demote: false
     percentage-online-to-demote: 100.0
     ff-on-by-default: false

@@ -875,7 +875,7 @@ public class ClanPlayer implements Serializable, Comparable<ClanPlayer> {
     @Placeholder(value = "is_member", resolver = "member_status")
     public boolean isTrusted() {
 
-        return leader || trusted;
+        return true;
 
     }
 
