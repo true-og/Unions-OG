@@ -137,36 +137,6 @@ public class LeaderCommands extends BaseCommand {
 
     }
 
-    @Subcommand("%verify")
-    @CommandPermission("unionsog.leader.verify")
-    @Description("{@@command.description.verify}")
-    public void verify(Player player, Clan clan) {
-
-        if (clan.isVerified()) {
-
-            ChatBlock.sendMessageKey(player, "your.clan.already.verified");
-            return;
-
-        }
-
-        int minToVerify = settings.getInt(CLAN_MIN_TO_VERIFY);
-        if (minToVerify > clan.getMembers().size()) {
-
-            ChatBlock.sendMessage(player, lang("your.clan.must.have.members.to.verify", player, minToVerify));
-            return;
-
-        }
-
-        if (!settings.is(ECONOMY_PURCHASE_CLAN_VERIFY) || cm.purchaseVerification(player)) {
-
-            clan.verifyClan();
-            clan.addBb(player.getName(), lang("clan.0.has.been.verified", clan.getName()));
-            ChatBlock.sendMessage(player, AQUA + lang("the.clan.has.been.verified", player));
-
-        }
-
-    }
-
     @Subcommand("%rename")
     @CommandPermission("unionsog.leader.rename")
     @CommandCompletion("@nothing")
@@ -227,7 +197,6 @@ public class LeaderCommands extends BaseCommand {
     @Subcommand("%discord %create")
     @CommandPermission("unionsog.leader.discord.create")
     @Description("{@@command.description.discord.create}")
-    @Conditions("verified")
     public void discord(Player player, Clan clan) {
 
         DiscordHook discordHook = chatManager.getDiscordHook();

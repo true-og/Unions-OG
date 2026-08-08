@@ -20,7 +20,7 @@ import static net.trueog.unionsog.managers.SettingsManager.ConfigField.*;
 import static org.bukkit.ChatColor.*;
 
 @CommandAlias("%clan")
-@Conditions("%basic_conditions|verified")
+@Conditions("%basic_conditions")
 public class HomeCommands extends BaseCommand {
 
     @Dependency

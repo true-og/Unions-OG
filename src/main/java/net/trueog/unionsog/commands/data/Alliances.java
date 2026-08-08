@@ -32,12 +32,6 @@ public class Alliances extends Sendable {
 
         for (Clan clan : clans) {
 
-            if (!clan.isVerified()) {
-
-                continue;
-
-            }
-
             chatBlock.addRow("  " + AQUA + clan.getName(), clan.getAllyString(DARK_GRAY + ", ", sender));
 
         }

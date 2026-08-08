@@ -101,7 +101,6 @@ These resolve against the requested player's union:
 - color_tag
 - size
 - rivals_count
-- is_verified
 - is_permanent
 - onlinemembers_count
 - leader_size

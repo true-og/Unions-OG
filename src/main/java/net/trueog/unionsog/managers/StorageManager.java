@@ -337,23 +337,10 @@ public final class StorageManager {
 
             }
 
-            if (clan.isVerified()) {
+            int purgeClan = plugin.getSettingsManager().getInt(PURGE_INACTIVE_CLAN_DAYS);
+            if (clan.getInactiveDays() > purgeClan && purgeClan > 0) {
 
-                int purgeClan = plugin.getSettingsManager().getInt(PURGE_INACTIVE_CLAN_DAYS);
-                if (clan.getInactiveDays() > purgeClan && purgeClan > 0) {
-
-                    purge.add(clan);
-
-                }
-
-            } else {
-
-                int purgeUnverified = plugin.getSettingsManager().getInt(PURGE_UNVERIFIED_CLAN_DAYS);
-                if (clan.getInactiveDays() > purgeUnverified && purgeUnverified > 0) {
-
-                    purge.add(clan);
-
-                }
+                purge.add(clan);
 
             }
 
@@ -432,7 +419,6 @@ public final class StorageManager {
 
                     try {
 
-                        boolean verified = res.getBoolean("verified");
                         boolean friendly_fire = res.getBoolean("friendly_fire");
                         String tag = res.getString("tag");
                         String color_tag = ChatUtils.parseColors(res.getString("color_tag"));
@@ -464,7 +450,6 @@ public final class StorageManager {
 
                         Clan clan = new Clan();
                         clan.setFlags(flags);
-                        clan.setVerified(verified);
                         clan.setFriendlyFire(friendly_fire);
                         clan.setTag(tag);
                         clan.setColorTag(color_tag);
@@ -525,7 +510,6 @@ public final class StorageManager {
 
                     try {
 
-                        boolean verified = res.getBoolean("verified");
                         boolean friendly_fire = res.getBoolean("friendly_fire");
                         String tag = res.getString("tag");
                         String color_tag = ChatUtils.parseColors(res.getString("color_tag"));
@@ -557,7 +541,6 @@ public final class StorageManager {
 
                         Clan clan = new Clan();
                         clan.setFlags(flags);
-                        clan.setVerified(verified);
                         clan.setFriendlyFire(friendly_fire);
                         clan.setTag(tag);
                         clan.setColorTag(color_tag);
@@ -776,7 +759,6 @@ public final class StorageManager {
 
                                 Clan clanReSync = UnionsOG.getInstance().getClanManager().getClan(tag);
                                 clanReSync.setFlags(clanDB.getFlags());
-                                clanReSync.setVerified(clanDB.isVerified());
                                 clanReSync.setFriendlyFire(clanDB.isFriendlyFire());
                                 clanReSync.setTag(clanDB.getTag());
                                 clanReSync.setColorTag(clanDB.getColorTag());
@@ -839,12 +821,12 @@ public final class StorageManager {
         String values = "VALUES ( '" + Helper.escapeQuotes(YAMLSerializer.serialize(clan.getBanner())) + "','"
                 + Helper.escapeQuotes(Helper.ranksToJson(clan.getRanks(), clan.getDefaultRank())) + "','"
                 + Helper.escapeQuotes(clan.getDescription()) + "'," + (clan.isMemberFeeEnabled() ? 1 : 0) + ","
-                + Helper.escapeQuotes(String.valueOf(clan.getMemberFee())) + "," + (clan.isVerified() ? 1 : 0) + ",'"
-                + Helper.escapeQuotes(clan.getTag()) + "','" + Helper.escapeQuotes(clan.getColorTag()) + "','"
-                + Helper.escapeQuotes(clan.getName()) + "'," + (clan.isFriendlyFire() ? 1 : 0) + ",'"
-                + clan.getFounded() + "','" + clan.getLastUsed() + "','" + Helper.escapeQuotes(clan.getPackedAllies())
-                + "','" + Helper.escapeQuotes(clan.getPackedRivals()) + "','" + Helper.escapeQuotes(clan.getPackedBb())
-                + "','" + Helper.escapeQuotes(clan.getCapeUrl()) + "','" + Helper.escapeQuotes(clan.getFlags()) + "','"
+                + Helper.escapeQuotes(String.valueOf(clan.getMemberFee())) + ",1,'" + Helper.escapeQuotes(clan.getTag())
+                + "','" + Helper.escapeQuotes(clan.getColorTag()) + "','" + Helper.escapeQuotes(clan.getName()) + "',"
+                + (clan.isFriendlyFire() ? 1 : 0) + ",'" + clan.getFounded() + "','" + clan.getLastUsed() + "','"
+                + Helper.escapeQuotes(clan.getPackedAllies()) + "','" + Helper.escapeQuotes(clan.getPackedRivals())
+                + "','" + Helper.escapeQuotes(clan.getPackedBb()) + "','" + Helper.escapeQuotes(clan.getCapeUrl())
+                + "','" + Helper.escapeQuotes(clan.getFlags()) + "','"
                 + Helper.escapeQuotes(String.valueOf(clan.getBalance())) + "');";
         core.executeUpdate(query + values);
 
@@ -966,7 +948,7 @@ public final class StorageManager {
         statement.setString(3, clan.getDescription());
         statement.setInt(4, clan.isMemberFeeEnabled() ? 1 : 0);
         statement.setDouble(5, clan.getMemberFee());
-        statement.setInt(6, clan.isVerified() ? 1 : 0);
+        statement.setInt(6, 1);
         statement.setString(7, clan.getTag());
         statement.setString(8, clan.getColorTag());
         statement.setString(9, clan.getName());

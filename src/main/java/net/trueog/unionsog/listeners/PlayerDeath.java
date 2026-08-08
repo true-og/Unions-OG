@@ -83,7 +83,7 @@ public class PlayerDeath extends SCListener {
 
         Clan victimClan = victim.getClan();
         Clan attackerClan = attacker.getClan();
-        if (victimClan == null || attackerClan == null || !victimClan.isVerified() || !attackerClan.isVerified()) {
+        if (victimClan == null || attackerClan == null) {
 
             addKill(Kill.Type.CIVILIAN, attacker, victim);
 

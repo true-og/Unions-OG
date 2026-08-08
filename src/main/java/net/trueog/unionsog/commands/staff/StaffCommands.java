@@ -276,28 +276,6 @@ public class StaffCommands extends BaseCommand {
 
     }
 
-    @Subcommand("%mod %verify")
-    @CommandPermission("unionsog.mod.verify")
-    @CommandCompletion("@clans:unverified")
-    @Description("{@@command.description.mod.verify}")
-    public void verify(CommandSender sender, @Name("clan") ClanInput clan) {
-
-        Clan clanInput = clan.getClan();
-
-        if (!clanInput.isVerified()) {
-
-            clanInput.verifyClan();
-            clanInput.addBb(sender.getName(), lang("clan.0.has.been.verified", clanInput.getName()));
-            ChatBlock.sendMessage(sender, AQUA + lang("the.clan.has.been.verified", sender));
-
-        } else {
-
-            ChatBlock.sendMessage(sender, RED + lang("the.clan.is.already.verified", sender));
-
-        }
-
-    }
-
     @Subcommand("%admin %purge")
     @CommandPermission("unionsog.admin.purge")
     @CommandCompletion("@players")

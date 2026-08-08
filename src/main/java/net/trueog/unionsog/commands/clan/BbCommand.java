@@ -15,7 +15,7 @@ import static net.trueog.unionsog.UnionsOG.lang;
 import static org.bukkit.ChatColor.RED;
 
 @CommandAlias("%clan")
-@Conditions("%basic_conditions|verified")
+@Conditions("%basic_conditions")
 public class BbCommand extends BaseCommand {
 
     @Dependency

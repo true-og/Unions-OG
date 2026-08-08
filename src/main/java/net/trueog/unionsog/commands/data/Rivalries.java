@@ -31,12 +31,6 @@ public class Rivalries extends Sendable {
 
         for (Clan clan : clans) {
 
-            if (!clan.isVerified()) {
-
-                continue;
-
-            }
-
             chatBlock.addRow("  " + AQUA + clan.getName(), clan.getRivalString(DARK_GRAY + ", ", sender));
 
         }

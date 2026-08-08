@@ -40,8 +40,6 @@ permissions:
     description: Can give money to a union
   unionsog.admin.bank.set:
     description: Can set the balance of a union
-  unionsog.mod.verify:
-    description: Can verify unions
   unionsog.mod.ban:
     description: Can ban players from the entire plugin
   unionsog.mod.disband:
@@ -120,8 +118,6 @@ permissions:
     description: Bypasses the teleport delay
   unionsog.leader.create:
     description: Can create unions
-  unionsog.leader.verify:
-    description: Can verify his union
   unionsog.leader.home-set:
     description: Can set home base
   unionsog.leader.regroup.home:
@@ -242,7 +238,6 @@ permissions:
     description: Permissions for moderators
     default: op
     children:
-      unionsog.mod.verify: true
       unionsog.mod.ban: true
       unionsog.mod.disband: true
       unionsog.mod.kick: true
@@ -319,7 +314,6 @@ permissions:
     default: true
     children:
       unionsog.leader.create: true
-      unionsog.leader.verify: true
       unionsog.leader.ally: true
       unionsog.leader.rival: true
       unionsog.leader.modtag: true

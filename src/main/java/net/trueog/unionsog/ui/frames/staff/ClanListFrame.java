@@ -15,7 +15,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static net.trueog.unionsog.UnionsOG.lang;
 
@@ -35,12 +34,6 @@ public class ClanListFrame extends SCFrame {
         this.toPlace = toPlace;
         UnionsOG plugin = UnionsOG.getInstance();
         clans = plugin.getClanManager().getClans();
-        if (type == Type.UNVERIFIED) {
-
-            clans = clans.stream().filter(c -> !c.isVerified()).collect(Collectors.toList());
-
-        }
-
         paginator = new Paginator(getSize() - 9, clans);
         plugin.getClanManager().sortClansByName(clans, true);
 
@@ -127,12 +120,6 @@ public class ClanListFrame extends SCFrame {
 
         }
 
-        if (type == Type.UNVERIFIED) {
-
-            return lang("gui.staff.clanlist.unverified.title", getViewer(), clans.size());
-
-        }
-
         return lang("gui.clanlist.title", getViewer(), clans.size());
 
     }
@@ -145,7 +132,7 @@ public class ClanListFrame extends SCFrame {
     }
 
     public enum Type {
-        ALL, UNVERIFIED, PLACE
+        ALL, PLACE
     }
 
 }

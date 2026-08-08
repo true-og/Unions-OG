@@ -152,7 +152,7 @@ public class GeneralCommands extends BaseCommand {
 
     @Subcommand("%kills")
     @CommandPermission("unionsog.member.kills")
-    @Conditions("verified|rank:name=KILLS")
+    @Conditions("rank:name=KILLS")
     @CommandCompletion("@players")
     @Description("{@@command.description.kills}")
     public void kills(Player sender, @Optional @Name("player") ClanPlayerInput player) {
@@ -173,7 +173,7 @@ public class GeneralCommands extends BaseCommand {
     @CommandPermission("unionsog.anyone.profile")
     @CommandCompletion("@clans:hide_own")
     @Description("{@@command.description.profile.other}")
-    public void profile(CommandSender sender, @Conditions("verified") @Name("clan") ClanInput clan) {
+    public void profile(CommandSender sender, @Name("clan") ClanInput clan) {
 
         ClanProfile p = new ClanProfile(plugin, sender, clan.getClan());
         p.send();
@@ -184,7 +184,7 @@ public class GeneralCommands extends BaseCommand {
     @CommandCompletion("@clans:hide_own")
     @CommandPermission("unionsog.anyone.roster")
     @Description("{@@command.description.roster.other}")
-    public void roster(CommandSender sender, @Conditions("verified") @Name("clan") ClanInput clan) {
+    public void roster(CommandSender sender, @Name("clan") ClanInput clan) {
 
         ClanRoster r = new ClanRoster(plugin, sender, clan.getClan());
         r.send();
@@ -340,7 +340,7 @@ public class GeneralCommands extends BaseCommand {
 
     @Subcommand("%mostkilled")
     @CommandPermission("unionsog.mod.mostkilled")
-    @Conditions("verified|rank:name=MOSTKILLED")
+    @Conditions("rank:name=MOSTKILLED")
     @Description("{@@command.description.mostkilled}")
     public void mostKilled(Player player) {
 
@@ -382,7 +382,7 @@ public class GeneralCommands extends BaseCommand {
         for (int i = 0; i < 10 && i < clans.size(); i++) {
 
             Clan clan = clans.get(i);
-            String name = " " + (clan.isVerified() ? settings.getColored(PAGE_CLAN_NAME_COLOR) : GRAY) + clan.getName();
+            String name = " " + settings.getColored(PAGE_CLAN_NAME_COLOR) + clan.getName();
             String line = MessageFormat.format(lineFormat, i + 1, leftBracket, clan.getColorTag(), rightBracket, name,
                     clan.getBalanceFormatted());
             sender.sendMessage(line);
@@ -395,11 +395,11 @@ public class GeneralCommands extends BaseCommand {
     @CommandPermission("unionsog.anyone.list")
     @Description("{@@command.description.list}")
     @CommandCompletion("@clan_list_type @order")
-    public void list(CommandSender sender, @Optional @Values("@clan_list_type") String type,
-            @Optional @Single @Values("@order") String order)
+    public void list(CommandSender sender, @Optional String type, @Optional @Single String order,
+            @Optional Integer page)
     {
 
-        ClanList list = new ClanList(plugin, sender, type, order);
+        ClanList list = new ClanList(plugin, sender, type, order, page);
         list.send();
 
     }

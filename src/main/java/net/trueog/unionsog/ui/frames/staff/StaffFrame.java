@@ -59,12 +59,9 @@ public class StaffFrame extends SCFrame {
 
         SCComponent clanList = new SCComponentImpl.Builder(XMaterial.PURPLE_BANNER)
                 .withDisplayName(lang("gui.main.clan.list.title", getViewer())).withSlot(9)
-                .withLoreLine(lang("gui.staff.clan.list.lore.left.click", getViewer()))
-                .withLoreLine(lang("gui.staff.clan.list.lore.right.click", getViewer())).build();
+                .withLoreLine(lang("gui.staff.clan.list.lore.left.click", getViewer())).build();
         clanList.setListener(ClickType.LEFT,
                 () -> InventoryDrawer.open(new ClanListFrame(this, getViewer(), Type.ALL, null)));
-        clanList.setListener(ClickType.RIGHT,
-                () -> InventoryDrawer.open(new ClanListFrame(this, getViewer(), Type.UNVERIFIED, null)));
         add(clanList);
 
     }

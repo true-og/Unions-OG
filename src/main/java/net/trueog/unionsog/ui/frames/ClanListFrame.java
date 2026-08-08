@@ -18,10 +18,8 @@ import org.jetbrains.annotations.NotNull;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static net.trueog.unionsog.UnionsOG.lang;
-import static net.trueog.unionsog.managers.SettingsManager.ConfigField.SHOW_UNVERIFIED_ON_LIST;
 
 public class ClanListFrame extends SCFrame {
 
@@ -34,8 +32,7 @@ public class ClanListFrame extends SCFrame {
         super(parent, viewer);
         UnionsOG plugin = UnionsOG.getInstance();
         SettingsManager sm = plugin.getSettingsManager();
-        clans = plugin.getClanManager().getClans().stream()
-                .filter(clan -> clan.isVerified() || sm.is(SHOW_UNVERIFIED_ON_LIST)).collect(Collectors.toList());
+        clans = plugin.getClanManager().getClans();
         paginator = new Paginator(getSize() - 9, clans);
         plugin.getClanManager().sortClansByKDR(clans);
 

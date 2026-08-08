@@ -171,7 +171,7 @@ public final class ClanManager {
 
         ClanPlayer cp = getCreateClanPlayer(player.getUniqueId());
 
-        Clan clan = new Clan(colorTag, name, true);
+        Clan clan = new Clan(colorTag, name);
         clan.addPlayerToClan(cp);
         cp.setLeader(true);
         clan.getRanks().addAll(plugin.getSettingsManager().getStarterRanks());
@@ -1462,39 +1462,6 @@ public final class ClanManager {
         }
 
         return false;
-
-    }
-
-    /**
-     * Purchase clan verification
-     */
-    public boolean purchaseVerification(Player player) {
-
-        if (!plugin.getSettingsManager().is(ECONOMY_PURCHASE_CLAN_VERIFY)) {
-
-            return true;
-
-        }
-
-        double price = plugin.getSettingsManager().getDouble(ECONOMY_VERIFICATION_PRICE);
-
-        if (plugin.getPermissionsManager().hasEconomy()) {
-
-            if (plugin.getPermissionsManager().chargePlayer(player, price, Cause.CLAN_VERIFICATION)) {
-
-                player.sendMessage(RED + MessageFormat.format(lang("account.has.been.debited", player),
-                        CurrencyFormat.format(price, player)));
-
-            } else {
-
-                player.sendMessage(RED + lang("not.sufficient.money", player, CurrencyFormat.format(price, player)));
-                return false;
-
-            }
-
-        }
-
-        return true;
 
     }
 

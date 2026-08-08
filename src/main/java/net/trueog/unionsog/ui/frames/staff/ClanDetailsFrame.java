@@ -52,7 +52,6 @@ public class ClanDetailsFrame extends SCFrame {
         // accounts exist; the bank commands it links to are unregistered until then.
         // addBank();
         // TODO: end
-        addVerify();
         addDisband();
 
     }
@@ -67,34 +66,6 @@ public class ClanDetailsFrame extends SCFrame {
         disband.setConfirmationRequired(ClickType.LEFT);
         disband.setPermission(ClickType.LEFT, "unionsog.mod.disband");
         add(disband);
-
-    }
-
-    private void addVerify() {
-
-        boolean verified = clan.isVerified();
-
-        XMaterial material = verified ? XMaterial.REDSTONE_TORCH : XMaterial.LEVER;
-        String title = verified ? lang("gui.clandetails.verified.title", getViewer())
-                : lang("gui.clandetails.not.verified.title", getViewer());
-        List<String> lore = verified ? null : new ArrayList<>();
-        if (!verified) {
-
-            lore.add(lang("gui.staffclandetails.not.verified.lore", getViewer()));
-
-        }
-
-        SCComponent verify = new SCComponentImpl(title, lore, material, 32);
-        if (!verified) {
-
-            verify.setPermission(ClickType.LEFT, "unionsog.mod.verify");
-            verify.setConfirmationRequired(ClickType.LEFT);
-            verify.setListener(ClickType.LEFT,
-                    () -> InventoryController.runSubcommand(getViewer(), "mod verify", false, clan.getTag()));
-
-        }
-
-        add(verify);
 
     }
 

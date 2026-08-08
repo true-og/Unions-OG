@@ -26,7 +26,7 @@ import static org.bukkit.ChatColor.RED;
 
 @CommandAlias("%clan")
 @Subcommand("%rank")
-@Conditions("%basic_conditions|verified|leader")
+@Conditions("%basic_conditions|leader")
 public class RankCommand extends BaseCommand {
 
     @Dependency

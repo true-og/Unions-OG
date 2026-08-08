@@ -321,11 +321,11 @@ public final class LegacyUnionsDatabaseMigration {
 
             for (LegacyUnion union : unions) {
 
-                final String tag = tags.get(union.id());
+                final String displayTag = tags.get(union.id());
                 statement.setInt(1, 1);
-                statement.setString(2, tag);
-                statement.setString(3, coloredTag(union.color(), tag));
-                statement.setString(4, truncate(nonBlankOr(union.name(), tag), MAX_UNION_NAME_LENGTH));
+                statement.setString(2, displayTag.toLowerCase(Locale.ROOT));
+                statement.setString(3, coloredTag(union.color(), displayTag));
+                statement.setString(4, truncate(nonBlankOr(union.name(), displayTag), MAX_UNION_NAME_LENGTH));
                 statement.setString(5, truncateNullable(union.description(), MAX_DESCRIPTION_LENGTH));
                 statement.setInt(6, 0);
                 statement.setLong(7, migrationTime);
@@ -387,7 +387,7 @@ public final class LegacyUnionsDatabaseMigration {
 
                 }
 
-                final String tag = union != null ? tags.get(union.id()) : "";
+                final String tag = union != null ? tags.get(union.id()).toLowerCase(Locale.ROOT) : "";
 
                 statement.setString(1, player.uuid().toString());
                 statement.setString(2, names.get(player.uuid()));
@@ -516,7 +516,7 @@ public final class LegacyUnionsDatabaseMigration {
                     || (character >= '0' && character <= '9'))
             {
 
-                normalized.append(Character.toLowerCase(character));
+                normalized.append(character);
 
             }
 
@@ -535,10 +535,11 @@ public final class LegacyUnionsDatabaseMigration {
 
     static String uniqueTag(String base, UUID unionId, Set<String> usedTags) {
 
-        final String loweredBase = base.toLowerCase(Locale.ROOT);
-        if (usedTags.add(loweredBase)) {
+        // Tags keep the capitalization of the legacy union while uniqueness is
+        // decided case-insensitively, matching how the plugin matches tags.
+        if (usedTags.add(base.toLowerCase(Locale.ROOT))) {
 
-            return loweredBase;
+            return base;
 
         }
 
@@ -546,8 +547,8 @@ public final class LegacyUnionsDatabaseMigration {
         for (int suffixLength = 8; suffixLength <= Math.min(uuid.length(), MAX_TAG_LENGTH); suffixLength += 4) {
 
             final String suffix = uuid.substring(0, suffixLength);
-            final String candidate = truncate(loweredBase, MAX_TAG_LENGTH - suffix.length()) + suffix;
-            if (usedTags.add(candidate)) {
+            final String candidate = truncate(base, MAX_TAG_LENGTH - suffix.length()) + suffix;
+            if (usedTags.add(candidate.toLowerCase(Locale.ROOT))) {
 
                 return candidate;
 

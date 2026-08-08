@@ -402,16 +402,14 @@ public final class SettingsManager {
         COLOR_CODE_FROM_PREFIX_FOR_NAME("settings.use-colorcode-from-prefix-for-name", true),
         DISPLAY_CHAT_TAGS("settings.display-chat-tags", true),
         GLOBAL_FRIENDLY_FIRE("settings.global-friendly-fire", false), UNRIVABLE_CLANS("settings.unrivable-clans"),
-        SHOW_UNVERIFIED_ON_LIST("settings.show-unverified-on-list", false),
         BLACKLISTED_WORLDS("settings.blacklisted-worlds"), BANNED_PLAYERS("settings.banned-players"),
         DISALLOWED_TAGS("settings.disallowed-tags"), LANGUAGE("settings.language", "en"),
         LANGUAGE_SELECTOR("settings.user-language-selector", true),
         DISALLOWED_TAG_COLORS("settings.disallowed-tag-colors"), SERVER_NAME("settings.server-name", "&4UnionsOG"),
-        REQUIRE_VERIFICATION("settings.new-clan-verification-required", false),
         ALLOW_REGROUP("settings.allow-regroup-command", true), ALLOW_RESET_KDR("settings.allow-reset-kdr", false),
         REJOIN_COOLDOWN("settings.rejoin-cooldown", 60),
         ENABLE_REJOIN_COOLDOWN("settings.rejoin-cooldown-enabled", false),
-        RANKING_TYPE("settings.ranking-type", "DENSE"), LIST_DEFAULT_ORDER_BY("settings.list-default-order-by", "kdr"),
+        RANKING_TYPE("settings.ranking-type", "DENSE"), LIST_DEFAULT_ORDER_BY("settings.list-default-order-by", "size"),
         LORE_LENGTH("settings.lore-length", 36), PVP_ONLY_WHILE_IN_WAR("settings.pvp-only-while-at-war", false),
         PAST_CLANS_LIMIT("settings.past-clans-limit", 10),
         USERNAME_REGEX("settings.username-regex", "^\\**[a-zA-Z0-9_$]{1,16}$"), TAG_REGEX("settings.tag-regex", ""),
@@ -474,8 +472,6 @@ public final class SettingsManager {
          */
         ECONOMY_CREATION_PRICE("economy.creation-price", 100.0),
         ECONOMY_PURCHASE_CLAN_CREATE("economy.purchase-clan-create", false),
-        ECONOMY_VERIFICATION_PRICE("economy.verification-price", 1000.0),
-        ECONOMY_PURCHASE_CLAN_VERIFY("economy.purchase-clan-verify", false),
         ECONOMY_INVITE_PRICE("economy.invite-price", 20),
         ECONOMY_PURCHASE_CLAN_INVITE("economy.purchase-clan-invite", false),
         ECONOMY_HOME_TELEPORT_PRICE("economy.home-teleport-price", 5.0),
@@ -504,13 +500,12 @@ public final class SettingsManager {
         CLAN_MIN_SIZE_TO_SET_ALLY("clan.min-size-to-set-ally", 3), CLAN_MAX_LENGTH("clan.max-length", 25),
         CLAN_MIN_LENGTH("clan.min-length", 2), CLAN_MAX_DESCRIPTION_LENGTH("clan.max-description-length", 120),
         CLAN_MIN_DESCRIPTION_LENGTH("clan.min-description-length", 10), CLAN_MAX_MEMBERS("clan.max-members", 25),
-        CLAN_UNVERIFIED_MAX_MEMBERS("clan.unverified-max-members", 10), CLAN_MAX_ALLIANCES("clan.max-alliances", -1),
+        CLAN_MAX_ALLIANCES("clan.max-alliances", -1),
         CLAN_CONFIRMATION_FOR_PROMOTE("clan.confirmation-for-promote", false),
         CLAN_TRUST_MEMBERS_BY_DEFAULT("clan.trust-members-by-default", true),
         CLAN_CONFIRMATION_FOR_DEMOTE("clan.confirmation-for-demote", false),
         CLAN_PERCENTAGE_ONLINE_TO_DEMOTE("clan.percentage-online-to-demote", 100.0),
-        CLAN_FF_ON_BY_DEFAULT("clan.ff-on-by-default", false), CLAN_MIN_TO_VERIFY("clan.min-to-verify", 1),
-        CLAN_DEFAULT_RANK("clan.default-rank", "recruit"),
+        CLAN_FF_ON_BY_DEFAULT("clan.ff-on-by-default", false), CLAN_DEFAULT_RANK("clan.default-rank", "recruit"),
         /*
          * ================ > Page Settings ================
          */
@@ -584,7 +579,6 @@ public final class SettingsManager {
          */
         PURGE_INACTIVE_PLAYER_DAYS("purge.inactive-player-data-days", 30),
         PURGE_INACTIVE_CLAN_DAYS("purge.inactive-clan-days", 7),
-        PURGE_UNVERIFIED_CLAN_DAYS("purge.unverified-clan-days", 2),
         /*
          * ================ > MySQL Settings ================
          */

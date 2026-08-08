@@ -69,7 +69,7 @@ public class ClanCommands extends BaseCommand {
 
     @Subcommand("%war %start")
     @CommandPermission("unionsog.leader.war")
-    @Conditions("verified|rank:name=WAR_START")
+    @Conditions("rank:name=WAR_START")
     @Description("{@@command.description.war.start}")
     @CommandCompletion("@rivals")
     public void startWar(Player player, ClanPlayer requester, Clan requestClan,
@@ -104,7 +104,7 @@ public class ClanCommands extends BaseCommand {
 
     @Subcommand("%war %end")
     @CommandPermission("unionsog.leader.war")
-    @Conditions("verified|rank:name=WAR_END")
+    @Conditions("rank:name=WAR_END")
     @Description("{@@command.description.war.end}")
     @CommandCompletion("@warring_clans")
     public void endWar(ClanPlayer cp, Clan issuerClan, @Name("clan") ClanInput other) {
@@ -125,7 +125,7 @@ public class ClanCommands extends BaseCommand {
 
     @Subcommand("%color")
     @CommandPermission("unionsog.leader.color")
-    @Conditions("verified|rank:name=COLOR")
+    @Conditions("rank:name=COLOR")
     @CommandCompletion("@clan_colors")
     @Description("{@@command.description.color}")
     public void color(Player player, Clan clan, @Name("color") String color) {
@@ -175,7 +175,7 @@ public class ClanCommands extends BaseCommand {
 
     @Subcommand("%setbanner")
     @CommandPermission("unionsog.leader.setbanner")
-    @Conditions("verified|rank:name=SETBANNER")
+    @Conditions("rank:name=SETBANNER")
     @Description("{@@command.description.setbanner}")
     public void setbanner(Player player, Clan clan) {
 
@@ -318,7 +318,7 @@ public class ClanCommands extends BaseCommand {
 
     @Subcommand("%description")
     @CommandPermission("unionsog.leader.description")
-    @Conditions("verified|rank:name=DESCRIPTION")
+    @Conditions("rank:name=DESCRIPTION")
     @Description("{@@command.description.description}")
     public void setDescription(Player player, Clan clan, @Name("description") String description) {
 
@@ -346,12 +346,10 @@ public class ClanCommands extends BaseCommand {
 
     @Subcommand("%rival %add")
     @CommandPermission("unionsog.leader.rival")
-    @Conditions("verified|rivable|minimum_to_rival|rank:name=RIVAL_ADD")
+    @Conditions("rivable|minimum_to_rival|rank:name=RIVAL_ADD")
     @CommandCompletion("@clans:hide_own")
     @Description("{@@command.description.rival.add}")
-    public void addRival(Player player, Clan issuerClan,
-            @Conditions("verified|different") @Name("clan") ClanInput rival)
-    {
+    public void addRival(Player player, Clan issuerClan, @Conditions("different") @Name("clan") ClanInput rival) {
 
         Clan rivalInput = rival.getClan();
         if (settings.isUnrivable(rivalInput.getTag())) {
@@ -387,7 +385,7 @@ public class ClanCommands extends BaseCommand {
 
     @Subcommand("%rival %remove")
     @CommandPermission("unionsog.leader.rival")
-    @Conditions("verified|rank:name=RIVAL_REMOVE")
+    @Conditions("rank:name=RIVAL_REMOVE")
     @CommandCompletion("@rivals")
     @Description("{@@command.description.rival.remove}")
     public void removeRival(Player player, ClanPlayer cp, Clan issuerClan,
@@ -410,11 +408,11 @@ public class ClanCommands extends BaseCommand {
 
     @Subcommand("%ally %add")
     @CommandPermission("unionsog.leader.ally")
-    @Conditions("verified|rank:name=ALLY_ADD|minimum_to_ally")
+    @Conditions("rank:name=ALLY_ADD|minimum_to_ally")
     @CommandCompletion("@clans:hide_own")
     @Description("{@@command.description.ally.add}")
     public void addAlly(Player player, ClanPlayer cp, Clan issuerClan,
-            @Conditions("verified|different") @Name("clan") ClanInput other)
+            @Conditions("different") @Name("clan") ClanInput other)
     {
 
         Clan input = other.getClan();
@@ -458,7 +456,7 @@ public class ClanCommands extends BaseCommand {
     }
 
     @Subcommand("%ally %remove")
-    @Conditions("verified|rank:name=ALLY_REMOVE")
+    @Conditions("rank:name=ALLY_REMOVE")
     @CommandPermission("unionsog.leader.ally")
     @Description("{@@command.description.ally.remove}")
     @CommandCompletion("@allied_clans")

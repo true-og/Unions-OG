@@ -98,7 +98,7 @@ public class EconomyTransactionEvent extends Event implements Cancellable {
     }
 
     public enum Cause {
-        CLAN_CREATION, CLAN_VERIFICATION, CLAN_INVITATION, CLAN_REGROUP, CLAN_HOME_TELEPORT, CLAN_HOME_TELEPORT_SET
+        CLAN_CREATION, CLAN_INVITATION, CLAN_REGROUP, CLAN_HOME_TELEPORT, CLAN_HOME_TELEPORT_SET
     }
 
     public enum TransactionType {

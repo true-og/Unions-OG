@@ -20,8 +20,8 @@ class LegacyUnionsDatabaseMigrationTest {
     @Test
     void normalizesTagFromSchemaValues() {
 
-        assertEquals("legacytag", LegacyUnionsDatabaseMigration.normalizedTag("&4Legacy-Tag", "Ignored", FIRST_ID));
-        assertEquals("unionname", LegacyUnionsDatabaseMigration.normalizedTag(null, "Union Name", FIRST_ID));
+        assertEquals("LegacyTag", LegacyUnionsDatabaseMigration.normalizedTag("&4Legacy-Tag", "Ignored", FIRST_ID));
+        assertEquals("UnionName", LegacyUnionsDatabaseMigration.normalizedTag(null, "Union Name", FIRST_ID));
         assertEquals("union11111111", LegacyUnionsDatabaseMigration.normalizedTag(null, "!@#", FIRST_ID));
 
     }
@@ -30,8 +30,8 @@ class LegacyUnionsDatabaseMigrationTest {
     void assignsDeterministicSuffixToDuplicateTag() {
 
         final Set<String> used = new HashSet<>();
-        assertEquals("same", LegacyUnionsDatabaseMigration.uniqueTag("same", FIRST_ID, used));
-        assertEquals("sameaaaaaaaa", LegacyUnionsDatabaseMigration.uniqueTag("same", SECOND_ID, used));
+        assertEquals("Same", LegacyUnionsDatabaseMigration.uniqueTag("Same", FIRST_ID, used));
+        assertEquals("sAmEaaaaaaaa", LegacyUnionsDatabaseMigration.uniqueTag("sAmE", SECOND_ID, used));
 
     }
 

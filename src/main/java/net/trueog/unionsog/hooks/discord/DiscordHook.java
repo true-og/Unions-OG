@@ -436,9 +436,8 @@ public class DiscordHook implements Listener {
      * </p>
      *
      * @param clanTag the clan tag
-     * @throws InvalidChannelException  clan is not verified or permanent, no one
-     *                                  member is linked or clan is not in the
-     *                                  whitelist.
+     * @throws InvalidChannelException  no one member is linked or clan is not in
+     *                                  the whitelist.
      * @throws ChannelExistsException   if channel is already exist
      * @throws CategoriesLimitException if categories reached the limit.
      * @throws ChannelsLimitException   if discord reached the channels limit.
@@ -754,12 +753,6 @@ public class DiscordHook implements Listener {
         if (clan == null) {
 
             throw new InvalidChannelException(String.format("Clan %s is null", clanTag));
-
-        }
-
-        if (!clan.isVerified() && !clan.isPermanent()) {
-
-            throw new InvalidChannelException(String.format("Clan %s is not verified or permanent", clanTag));
 
         }
 

@@ -79,7 +79,7 @@ class LegacyUnionsDatabaseMigrationDatabaseTest {
             try (ResultSet row = statement.executeQuery()) {
 
                 assertTrue(row.next());
-                assertEquals("&4alphatag", row.getString("color_tag"));
+                assertEquals("&4AlphaTag", row.getString("color_tag"));
                 assertEquals("First description", row.getString("description"));
                 assertTrue(row.getString("packed_bb").matches("\\d+_Legacy\u00a6MOTD"));
                 assertEquals(0, row.getDouble("balance"));

@@ -42,7 +42,6 @@ public class Clan implements Serializable, Comparable<Clan> {
 
     private static final long serialVersionUID = 1L;
     private static final String WARRING_KEY = "warring";
-    private boolean verified;
     private String tag;
     private String colorTag;
     private String name;
@@ -73,14 +72,13 @@ public class Clan implements Serializable, Comparable<Clan> {
 
     }
 
-    public Clan(String tag, String name, boolean verified) {
+    public Clan(String tag, String name) {
 
         this.tag = Helper.cleanTag(tag);
         this.colorTag = ChatUtils.parseColors(tag);
         this.name = name;
         this.founded = (new Date()).getTime();
         this.lastUsed = (new Date()).getTime();
-        this.verified = verified;
         this.capeUrl = "";
         if (UnionsOG.getInstance().getSettingsManager().is(CLAN_FF_ON_BY_DEFAULT)) {
 
@@ -404,10 +402,7 @@ public class Clan implements Serializable, Comparable<Clan> {
 
         }
 
-        int verifiedClanInactiveDays = UnionsOG.getInstance().getSettingsManager().getInt(PURGE_INACTIVE_CLAN_DAYS);
-        int unverifiedClanInactiveDays = UnionsOG.getInstance().getSettingsManager().getInt(PURGE_UNVERIFIED_CLAN_DAYS);
-
-        return isVerified() ? verifiedClanInactiveDays : unverifiedClanInactiveDays;
+        return UnionsOG.getInstance().getSettingsManager().getInt(PURGE_INACTIVE_CLAN_DAYS);
 
     }
 
@@ -707,28 +702,6 @@ public class Clan implements Serializable, Comparable<Clan> {
     public boolean isAlly(String tag) {
 
         return allies.contains(tag);
-
-    }
-
-    /**
-     * Tells you if the clan is verified. Verification is disabled for gameplay, so
-     * this remains true while the stored flag is kept for compatibility.
-     */
-    @Placeholder("is_verified")
-    public boolean isVerified() {
-
-        return true;
-
-    }
-
-    /**
-     * (used internally)
-     *
-     * @param verified the verified to set
-     */
-    public void setVerified(boolean verified) {
-
-        this.verified = verified;
 
     }
 
@@ -1383,16 +1356,6 @@ public class Clan implements Serializable, Comparable<Clan> {
     }
 
     /**
-     * Verify a clan
-     */
-    public void verifyClan() {
-
-        setVerified(true);
-        UnionsOG.getInstance().getStorageManager().updateClan(this);
-
-    }
-
-    /**
      * Check whether any clan member is online
      */
     @Placeholder("is_anyonline")
@@ -1561,13 +1524,9 @@ public class Clan implements Serializable, Comparable<Clan> {
      */
     public void addBb(String announcerName, String msg) {
 
-        if (isVerified()) {
-
-            addBb(msg);
-            clanAnnounce(announcerName,
-                    UnionsOG.getInstance().getSettingsManager().getColored(BB_PREFIX) + ChatUtils.parseColors(msg));
-
-        }
+        addBb(msg);
+        clanAnnounce(announcerName,
+                UnionsOG.getInstance().getSettingsManager().getColored(BB_PREFIX) + ChatUtils.parseColors(msg));
 
     }
 
@@ -1576,13 +1535,9 @@ public class Clan implements Serializable, Comparable<Clan> {
      */
     public void addBb(String announcerName, String msg, boolean updateLastUsed) {
 
-        if (isVerified()) {
-
-            addBb(msg, updateLastUsed);
-            clanAnnounce(announcerName,
-                    UnionsOG.getInstance().getSettingsManager().getColored(BB_PREFIX) + ChatUtils.parseColors(msg));
-
-        }
+        addBb(msg, updateLastUsed);
+        clanAnnounce(announcerName,
+                UnionsOG.getInstance().getSettingsManager().getColored(BB_PREFIX) + ChatUtils.parseColors(msg));
 
     }
 
@@ -1601,12 +1556,6 @@ public class Clan implements Serializable, Comparable<Clan> {
      * @param maxSize amount of lines to display
      */
     public void displayBb(Player player, int maxSize) {
-
-        if (!isVerified()) {
-
-            return;
-
-        }
 
         SettingsManager settings = UnionsOG.getInstance().getSettingsManager();
 
@@ -1727,12 +1676,7 @@ public class Clan implements Serializable, Comparable<Clan> {
                 cp.setClan(null);
                 cp.setJoinDate(0);
                 cp.setRank(null);
-                if (isVerified()) {
-
-                    cp.addPastClan(getColorTag() + (cp.isLeader() ? DARK_RED + "*" : ""));
-
-                }
-
+                cp.addPastClan(getColorTag() + (cp.isLeader() ? DARK_RED + "*" : ""));
                 cp.setLeader(false);
 
             }

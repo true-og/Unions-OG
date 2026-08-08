@@ -22,7 +22,7 @@ import static org.bukkit.ChatColor.RED;
 
 @CommandAlias("%clan")
 @Subcommand("%bank")
-@Conditions("%basic_conditions|economy|verified")
+@Conditions("%basic_conditions|economy")
 public class BankCommand extends BaseCommand {
 
     @Dependency
