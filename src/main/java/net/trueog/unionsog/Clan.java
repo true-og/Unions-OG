@@ -567,6 +567,15 @@ public class Clan implements Serializable, Comparable<Clan> {
 
     }
 
+    // Returns the color tag wrapped in dark gray brackets with a trailing space,
+    // blank when resolved without a clan.
+    @Placeholder("bracket_tag")
+    public String getBracketTag() {
+
+        return DARK_GRAY + "[" + colorTag + DARK_GRAY + "] ";
+
+    }
+
     /**
      * (used internally)
      *
