@@ -1,7 +1,7 @@
 package net.trueog.unionsog.ui.frames;
 
 import com.cryptomorin.xseries.XMaterial;
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.UnionPlayer;
 import net.trueog.unionsog.UnionsOG;
 import net.trueog.unionsog.language.LanguageResource;
 import net.trueog.unionsog.ui.InventoryDrawer;
@@ -22,7 +22,7 @@ import static net.trueog.unionsog.UnionsOG.lang;
 
 public class LanguageSelectorFrame extends SCFrame {
 
-    private final ClanPlayer clanPlayer;
+    private final UnionPlayer unionPlayer;
     private final UnionsOG plugin;
     private final Paginator paginator;
     private final List<Locale> languages;
@@ -31,7 +31,7 @@ public class LanguageSelectorFrame extends SCFrame {
 
         super(parent, viewer);
         plugin = UnionsOG.getInstance();
-        clanPlayer = plugin.getClanManager().getCreateClanPlayer(viewer.getUniqueId());
+        unionPlayer = plugin.getUnionManager().getCreateUnionPlayer(viewer.getUniqueId());
         languages = LanguageResource.getAvailableLocales();
         paginator = new Paginator(getSize() - 9, languages);
 
@@ -40,7 +40,7 @@ public class LanguageSelectorFrame extends SCFrame {
     @Override
     public @NotNull String getTitle() {
 
-        Locale locale = clanPlayer.getLocale();
+        Locale locale = unionPlayer.getLocale();
         if (locale == null) {
 
             locale = plugin.getSettingsManager().getLanguage();
@@ -81,50 +81,16 @@ public class LanguageSelectorFrame extends SCFrame {
                 .withSlot(slot)
                 .withLore(Arrays.asList(lang("gui.languageselector.language.lore.left.click", getViewer()),
                         lang("gui.languageselector.language.lore.translation.status", getViewer(),
-                                LanguageResource.getTranslationStatus(locale)),
-                        !locale.equals(Locale.ENGLISH)
-                                ? lang("gui.languageselector.language.lore.right.click", getViewer())
-                                : ""))
+                                LanguageResource.getTranslationStatus(locale))))
                 .build();
         c.setListener(ClickType.LEFT, () -> {
 
-            clanPlayer.setLocale(locale);
-            plugin.getStorageManager().updateClanPlayer(clanPlayer);
+            unionPlayer.setLocale(locale);
+            plugin.getStorageManager().updateUnionPlayer(unionPlayer);
             InventoryDrawer.open(this);
 
         });
-        if (!locale.equals(Locale.ENGLISH)) {
-
-            c.setListener(ClickType.RIGHT, () -> {
-
-                getViewer().sendMessage(lang("click.to.help.translating", getViewer(), getCrowdinLink(locale)));
-                getViewer().closeInventory();
-
-            });
-
-        }
-
         add(c);
-
-    }
-
-    private String getCrowdinLink(@NotNull Locale locale) {
-
-        String base = "https://crowdin.com/project/simpleclans/";
-        // only known exception
-        if (locale.equals(new Locale("uk", "UA"))) {
-
-            return base + "uk";
-
-        }
-
-        if (locale.getLanguage().equalsIgnoreCase(locale.getCountry())) {
-
-            return base + locale.getLanguage();
-
-        }
-
-        return base + locale.toLanguageTag();
 
     }
 

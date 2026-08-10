@@ -1,6 +1,9 @@
 package net.trueog.unionsog.ui.frames;
 
 import com.cryptomorin.xseries.XMaterial;
+import net.trueog.unionsog.Proposal;
+import net.trueog.unionsog.Union;
+import net.trueog.unionsog.UnionPlayer;
 import net.trueog.unionsog.UnionsOG;
 import net.trueog.unionsog.ui.*;
 import net.trueog.unionsog.ui.frames.staff.StaffFrame;
@@ -32,15 +35,37 @@ public class MainFrame extends SCFrame {
 
         nextSlot = 0;
         add(Components.getPlayerComponent(this, getViewer(), getViewer(), nextSlot++, false));
-        add(Components.getClanComponent(this, getViewer(),
-                plugin.getClanManager().getCreateClanPlayer(getViewer().getUniqueId()).getClan(), nextSlot++, true));
+        add(Components.getUnionComponent(this, getViewer(),
+                plugin.getUnionManager().getCreateUnionPlayer(getViewer().getUniqueId()).getUnion(), nextSlot++, true));
+        addProposal();
         addUnionBanking();
-        addClanList();
+        addUnionList();
         addLeaderboard();
         addResetKdr();
         addStaff();
         addLanguageSelector();
         addOtherCommands();
+
+    }
+
+    private void addProposal() {
+
+        UnionPlayer cp = plugin.getUnionManager().getUnionPlayer(getViewer());
+        Union union = cp != null ? cp.getUnion() : null;
+        Proposal proposal = plugin.getProposalManager().getProposal(union);
+        if (union == null || proposal == null) {
+
+            return;
+
+        }
+
+        String state = proposal.hasVoted(getViewer().getUniqueId()) ? lang("gui.main.proposal.lore.voted", getViewer())
+                : lang("gui.main.proposal.lore.not.voted", getViewer());
+        SCComponent vote = new SCComponentImpl(lang("gui.main.proposal.title", getViewer()),
+                Arrays.asList(plugin.getProposalManager().describe(proposal, union), state), XMaterial.WRITABLE_BOOK,
+                nextSlot++);
+        vote.setListener(ClickType.LEFT, () -> InventoryDrawer.open(new ProposalFrame(this, getViewer(), union)));
+        add(vote);
 
     }
 
@@ -92,14 +117,14 @@ public class MainFrame extends SCFrame {
 
     }
 
-    private void addClanList() {
+    private void addUnionList() {
 
-        SCComponent clanList = new SCComponentImpl(lang("gui.main.clan.list.title", getViewer()),
-                Collections.singletonList(lang("gui.main.clan.list.lore", getViewer())), XMaterial.PURPLE_BANNER,
+        SCComponent unionList = new SCComponentImpl(lang("gui.main.union.list.title", getViewer()),
+                Collections.singletonList(lang("gui.main.union.list.lore", getViewer())), XMaterial.PURPLE_BANNER,
                 nextSlot++);
-        clanList.setListener(ClickType.LEFT, () -> InventoryDrawer.open(new ClanListFrame(this, getViewer())));
-        clanList.setPermission(ClickType.LEFT, "unionsog.anyone.list");
-        add(clanList);
+        unionList.setListener(ClickType.LEFT, () -> InventoryDrawer.open(new UnionListFrame(this, getViewer())));
+        unionList.setPermission(ClickType.LEFT, "unionsog.anyone.list");
+        add(unionList);
 
     }
 
@@ -109,18 +134,10 @@ public class MainFrame extends SCFrame {
 
             SCComponent language = new SCComponentImpl.Builder(XMaterial.MAP)
                     .withDisplayName(lang("gui.main.languageselector.title", getViewer())).withSlot(nextSlot++)
-                    .withLore(Arrays.asList(lang("gui.main.languageselector.lore.left.click", getViewer()),
-                            lang("gui.main.languageselector.lore.right.click", getViewer())))
+                    .withLore(Collections.singletonList(lang("gui.main.languageselector.lore.left.click", getViewer())))
                     .build();
             language.setListener(ClickType.LEFT,
                     () -> InventoryDrawer.open(new LanguageSelectorFrame(this, getViewer())));
-            language.setListener(ClickType.RIGHT, () -> {
-
-                getViewer().sendMessage(
-                        lang("click.to.help.translating", getViewer(), "https://crowdin.com/project/simpleclans"));
-                getViewer().closeInventory();
-
-            });
             add(language);
 
         }
@@ -150,7 +167,7 @@ public class MainFrame extends SCFrame {
     @Override
     public @NotNull String getTitle() {
 
-        return lang("gui.main.title", getViewer(), plugin.getSettingsManager().getColored(SERVER_NAME));
+        return lang("gui.main.title", getViewer());
 
     }
 

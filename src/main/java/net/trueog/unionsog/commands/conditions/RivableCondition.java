@@ -4,7 +4,7 @@ import co.aikar.commands.BukkitCommandIssuer;
 import co.aikar.commands.ConditionContext;
 import co.aikar.commands.ConditionFailedException;
 import co.aikar.commands.InvalidCommandArgument;
-import net.trueog.unionsog.Clan;
+import net.trueog.unionsog.Union;
 import net.trueog.unionsog.UnionsOG;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,10 +23,10 @@ public class RivableCondition extends AbstractCommandCondition {
     @Override
     public void validateCondition(ConditionContext<BukkitCommandIssuer> context) throws InvalidCommandArgument {
 
-        Clan clan = Conditions.assertClanMember(clanManager, context.getIssuer());
-        if (clan.isUnrivable()) {
+        Union union = Conditions.assertUnionMember(unionManager, context.getIssuer());
+        if (union.isUnrivable()) {
 
-            throw new ConditionFailedException(RED + lang("your.clan.cannot.create.rivals", context.getIssuer()));
+            throw new ConditionFailedException(RED + lang("your.union.cannot.create.rivals", context.getIssuer()));
 
         }
 

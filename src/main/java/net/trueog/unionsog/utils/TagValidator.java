@@ -37,10 +37,10 @@ public class TagValidator {
     }
 
     /**
-     * Validates a clan tag
+     * Validates a union tag
      *
-     * @param player player who tried to create a clan
-     * @param tag    clan tag
+     * @param player player who tried to create a union
+     * @param tag    union tag
      * @return error message if any
      */
     public Optional<String> validate(@NotNull Player player, @NotNull String tag) {
@@ -50,10 +50,10 @@ public class TagValidator {
     }
 
     /**
-     * Validates a clan tag
+     * Validates a union tag
      *
-     * @param player      player who tried to create or modify a clan tag
-     * @param tag         clan tag
+     * @param player      player who tried to create or modify a union tag
+     * @param tag         union tag
      * @param allowColors whether the tag may contain color codes
      * @return error message if any
      */
@@ -63,7 +63,7 @@ public class TagValidator {
         String cleanTag = Helper.cleanTag(tag);
         if (tag.length() > 255 && settings.is(MYSQL_ENABLE)) {
 
-            return Optional.of(lang("your.clan.color.tag.cannot.be.longer.than.characters", player, 255));
+            return Optional.of(lang("your.union.color.tag.cannot.be.longer.than.characters", player, 255));
 
         }
 
@@ -84,14 +84,14 @@ public class TagValidator {
             int minLength = settings.getInt(TAG_MIN_LENGTH);
             if (cleanTag.length() < minLength) {
 
-                error = lang("your.clan.tag.must.be.longer.than.characters", player, minLength);
+                error = lang("your.union.tag.must.be.longer.than.characters", player, minLength);
 
             }
 
             int maxLength = settings.getInt(TAG_MAX_LENGTH);
             if (cleanTag.length() > maxLength) {
 
-                error = lang("your.clan.tag.cannot.be.longer.than.characters", player, maxLength);
+                error = lang("your.union.tag.cannot.be.longer.than.characters", player, maxLength);
 
             }
 
@@ -120,7 +120,7 @@ public class TagValidator {
 
     private void checkAlphabet(@NotNull Player player, @NotNull String cleanTag) {
 
-        String alphabetError = lang("your.clan.tag.can.only.contain.letters.numbers.and.color.codes", player);
+        String alphabetError = lang("your.union.tag.can.only.contain.letters.numbers.and.color.codes", player);
         if (settings.is(ACCEPT_OTHER_ALPHABETS_LETTERS)) {
 
             for (char c : cleanTag.toCharArray()) {

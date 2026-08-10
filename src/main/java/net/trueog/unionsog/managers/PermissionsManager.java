@@ -9,18 +9,16 @@ import net.trueog.unionsog.events.EconomyTransactionEvent;
 import net.trueog.unionsog.events.EconomyTransactionEvent.Cause;
 import net.trueog.diamondbankog.api.DiamondBankAPIJava;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
-import static net.trueog.unionsog.UnionsOG.lang;
 import static net.trueog.unionsog.managers.SettingsManager.ConfigField.ENABLE_AUTO_GROUPS;
 import static net.trueog.unionsog.managers.SettingsManager.ConfigField.PERMISSIONS_AUTO_GROUP_GROUPNAME;
 import static org.bukkit.Bukkit.getPluginManager;
@@ -86,31 +84,31 @@ public final class PermissionsManager {
     }
 
     /**
-     * Loads the permissions for each clan from the config
+     * Loads the permissions for each union from the config
      */
     public void loadPermissions() {
 
         permissions.clear();
-        for (Clan clan : plugin.getClanManager().getClans()) {
+        for (Union union : plugin.getUnionManager().getUnions()) {
 
-            permissions.put(clan.getTag(), UnionsOG.getInstance().getSettingsManager().getConfig()
-                    .getStringList("permissions." + clan.getTag()));
+            permissions.put(union.getTag(), UnionsOG.getInstance().getSettingsManager().getConfig()
+                    .getStringList("permissions." + union.getTag()));
 
         }
 
     }
 
     /**
-     * Saves the permissions for each clan from the config
+     * Saves the permissions for each union from the config
      */
     public void savePermissions() {
 
-        for (Clan clan : plugin.getClanManager().getClans()) {
+        for (Union union : plugin.getUnionManager().getUnions()) {
 
-            if (permissions.containsKey(clan.getTag())) {
+            if (permissions.containsKey(union.getTag())) {
 
-                UnionsOG.getInstance().getSettingsManager().getConfig().set("permissions." + clan.getTag(),
-                        getPermissions(clan));
+                UnionsOG.getInstance().getSettingsManager().getConfig().set("permissions." + union.getTag(),
+                        getPermissions(union));
 
             }
 
@@ -119,11 +117,11 @@ public final class PermissionsManager {
     }
 
     /**
-     * Adds all permissions for a clan
+     * Adds all permissions for a union
      */
-    public void updateClanPermissions(Clan clan) {
+    public void updateUnionPermissions(Union union) {
 
-        for (ClanPlayer cp : clan.getMembers()) {
+        for (UnionPlayer cp : union.getMembers()) {
 
             addPlayerPermissions(cp);
 
@@ -134,7 +132,7 @@ public final class PermissionsManager {
     /**
      * Adds permissions for a player
      */
-    public void addPlayerPermissions(@Nullable ClanPlayer cp) {
+    public void addPlayerPermissions(@Nullable UnionPlayer cp) {
 
         if (cp == null) {
 
@@ -142,8 +140,8 @@ public final class PermissionsManager {
 
         }
 
-        Clan clan = cp.getClan();
-        if (clan == null) {
+        Union union = cp.getUnion();
+        if (union == null) {
 
             return;
 
@@ -152,7 +150,7 @@ public final class PermissionsManager {
         Player player = cp.toPlayer();
         if (player != null) {
 
-            if (permissions.containsKey(clan.getTag())) {
+            if (permissions.containsKey(union.getTag())) {
 
                 if (!permAttaches.containsKey(player)) {
 
@@ -160,8 +158,8 @@ public final class PermissionsManager {
 
                 }
 
-                // Adds all permissions from his clan
-                for (String perm : getPermissions(clan)) {
+                // Adds all permissions from his union
+                for (String perm : getPermissions(union)) {
 
                     permAttaches.get(player).setPermission(perm, true);
 
@@ -169,7 +167,7 @@ public final class PermissionsManager {
 
                 if (plugin.getSettingsManager().is(PERMISSIONS_AUTO_GROUP_GROUPNAME)) {
 
-                    permAttaches.get(player).setPermission("group." + clan.getTag(), true);
+                    permAttaches.get(player).setPermission("group." + union.getTag(), true);
 
                 }
 
@@ -182,14 +180,14 @@ public final class PermissionsManager {
     }
 
     /**
-     * Removes permissions for a clan (when it gets disbanded for example)
+     * Removes permissions for a union (when it gets disbanded for example)
      */
-    public void removeClanPermissions(Clan clan) {
+    public void removeUnionPermissions(Union union) {
 
-        for (ClanPlayer cp : clan.getMembers()) {
+        for (UnionPlayer cp : union.getMembers()) {
 
-            removeClanPlayerPermissions(cp);
-            removeClanPermissions(cp);
+            removeUnionPlayerPermissions(cp);
+            removeUnionPermissions(cp);
 
         }
 
@@ -198,12 +196,12 @@ public final class PermissionsManager {
     /**
      * Removes permissions for a player (when he gets kicked for example)
      */
-    public void removeClanPlayerPermissions(@Nullable ClanPlayer cp) {
+    public void removeUnionPlayerPermissions(@Nullable UnionPlayer cp) {
 
-        if (cp != null && cp.getClan() != null && cp.toPlayer() != null) {
+        if (cp != null && cp.getUnion() != null && cp.toPlayer() != null) {
 
             Player player = cp.toPlayer();
-            if (player != null && permissions.containsKey(cp.getClan().getTag()) && permAttaches.containsKey(player)) {
+            if (player != null && permissions.containsKey(cp.getUnion().getTag()) && permAttaches.containsKey(player)) {
 
                 permAttaches.get(player).remove();
                 permAttaches.remove(player);
@@ -215,9 +213,9 @@ public final class PermissionsManager {
     }
 
     /**
-     * Removes permissions linked to a clan from the player
+     * Removes permissions linked to a union from the player
      */
-    public void removeClanPermissions(ClanPlayer cp) {
+    public void removeUnionPermissions(UnionPlayer cp) {
 
         if (!plugin.getSettingsManager().is(ENABLE_AUTO_GROUPS)) {
 
@@ -232,7 +230,6 @@ public final class PermissionsManager {
             user.data().remove(InheritanceNode.builder("clan_" + cp.getTag()).build());
             user.data().remove(InheritanceNode.builder("sc_untrusted").build());
             user.data().remove(InheritanceNode.builder("sc_trusted").build());
-            user.data().remove(InheritanceNode.builder("sc_leader").build());
             luckPerms.getUserManager().saveUser(user);
 
         }
@@ -240,11 +237,11 @@ public final class PermissionsManager {
     }
 
     /**
-     * @return the permissions for a clan
+     * @return the permissions for a union
      */
-    public List<String> getPermissions(Clan clan) {
+    public List<String> getPermissions(Union union) {
 
-        return permissions.get(clan.getTag());
+        return permissions.get(union.getTag());
 
     }
 
@@ -432,6 +429,38 @@ public final class PermissionsManager {
      * @return {@code true} if the grant was successful, {@code false} otherwise.
      * @see EconomyTransactionEvent
      */
+    /**
+     * Grants the Shards to a player's DiamondBank-OG bank whether or not they are
+     * online. No {@link EconomyTransactionEvent} is fired, since the transaction
+     * does not need the player present.
+     *
+     * @param uuid   the player receiving the Shards
+     * @param shards the amount of Shards to grant
+     * @param reason what the payout is for, recorded by DiamondBank-OG
+     * @return {@code true} if the grant was successful, {@code false} otherwise
+     */
+    public boolean grantPlayerShards(@NotNull UUID uuid, long shards, @NotNull String reason) {
+
+        if (economy == null) {
+
+            return false;
+
+        }
+
+        try {
+
+            economy.addToPlayerBankShards(uuid, shards, "Unions-OG: " + reason, null);
+            return true;
+
+        } catch (Exception e) {
+
+            plugin.getLogger().severe("Failed to grant " + shards + " Shards to " + uuid + ": " + e.getMessage());
+            return false;
+
+        }
+
+    }
+
     public boolean grantPlayerShards(@NotNull Player player, long shards, @Nullable Cause cause) {
 
         if (economy == null) {
@@ -583,174 +612,9 @@ public final class PermissionsManager {
     }
 
     /**
-     * Checks if the player has the rank permission or the permission level, and the
-     * equivalent Bukkit permission
-     *
-     * @param player     the player
-     * @param permission the rank permission
-     * @param notify     notify the player if they don't have permission
-     * @deprecated use
-     *             {@link PermissionsManager#has(Player, RankPermission, boolean)}
-     *             or {@link PermissionsManager#has(Player, String)}
+     * Gives the player permissions linked to a union
      */
-    @Deprecated
-    public boolean has(Player player, RankPermission permission, PermissionLevel level, boolean notify) {
-
-        if (player == null || permission == null) {
-
-            return false;
-
-        }
-
-        ClanPlayer clanPlayer = plugin.getClanManager().getClanPlayer(player);
-        if (clanPlayer == null) {
-
-            return false;
-
-        }
-
-        boolean hasBukkitPermission = has(player, permission.getBukkitPermission());
-        if (!hasBukkitPermission) {
-
-            return false;
-
-        }
-
-        boolean hasLevel = hasLevel(clanPlayer, level);
-
-        boolean hasRankPermission = false;
-        String rankName = clanPlayer.getRankId();
-        Clan clan = clanPlayer.getClan();
-        // noinspection ConstantConditions
-        if (clan.hasRank(rankName)) {
-
-            // noinspection ConstantConditions
-            hasRankPermission = clan.getRank(rankName).getPermissions().contains(permission.toString());
-
-        } else if (!rankName.isEmpty()) {
-
-            clanPlayer.setRank(null);
-
-        }
-
-        if (notify && !hasLevel && !hasRankPermission) {
-
-            ChatBlock.sendMessage(player,
-                    ChatColor.RED
-                            + MessageFormat.format(lang("you.must.be.0.or.have.the.permission.1.to.use.this", player),
-                                    level == PermissionLevel.LEADER ? lang("leader", player) : lang("trusted", player),
-                                    permission.toString()));
-
-        }
-
-        return hasLevel || hasRankPermission;
-
-    }
-
-    /**
-     * Checks if the player has the rank permission or the permission level, and the
-     * equivalent Bukkit permission
-     *
-     * @param player     the player
-     * @param permission the rank permission
-     * @param notify     notify the player if they don't have permission
-     */
-    public boolean has(Player player, RankPermission permission, boolean notify) {
-
-        if (player == null || permission == null) {
-
-            return false;
-
-        }
-
-        ClanPlayer clanPlayer = plugin.getClanManager().getClanPlayer(player);
-        if (clanPlayer == null) {
-
-            if (notify) {
-
-                player.sendMessage(ChatColor.RED + lang("not.a.member.of.any.clan", player));
-
-            }
-
-            return false;
-
-        }
-
-        boolean hasBukkitPermission = has(player, permission.getBukkitPermission());
-        if (!hasBukkitPermission) {
-
-            if (notify) {
-
-                ChatBlock.sendMessage(player, ChatColor.RED + lang("insufficient.permissions", player));
-
-            }
-
-            return false;
-
-        }
-
-        boolean hasLevel = hasLevel(clanPlayer, permission.getPermissionLevel());
-        boolean hasRankPermission = false;
-        String rankName = clanPlayer.getRankId();
-        Clan clan = clanPlayer.getClan();
-        if (clan != null) {
-
-            Rank rank = clan.getRank(rankName);
-            if (rank != null) {
-
-                hasRankPermission = rank.getPermissions().contains(permission.toString());
-                if (!hasRankPermission && permission == RankPermission.COLOR) {
-
-                    hasRankPermission = rank.getPermissions().contains("modtag");
-
-                }
-
-            }
-
-        } else if (!rankName.isEmpty()) {
-
-            clanPlayer.setRank(null);
-
-        }
-
-        if (notify && !hasLevel && !hasRankPermission) {
-
-            ChatBlock.sendMessage(player,
-                    ChatColor.RED
-                            + MessageFormat.format(lang("you.must.be.0.or.have.the.permission.1.to.use.this", player),
-                                    permission.getPermissionLevel() == PermissionLevel.LEADER ? lang("leader", player)
-                                            : lang("trusted", player),
-                                    permission.toString()));
-
-        }
-
-        return hasLevel || hasRankPermission;
-
-    }
-
-    private boolean hasLevel(@NotNull ClanPlayer cp, @Nullable PermissionLevel level) {
-
-        if (level != null) {
-
-            switch (level) {
-
-                case LEADER:
-                    return cp.isLeader();
-                case TRUSTED:
-                    return cp.isTrusted();
-
-            }
-
-        }
-
-        return false;
-
-    }
-
-    /**
-     * Gives the player permissions linked to a clan
-     */
-    public void addClanPermissions(ClanPlayer cp) {
+    public void addUnionPermissions(UnionPlayer cp) {
 
         if (!plugin.getSettingsManager().is(ENABLE_AUTO_GROUPS) || cp == null || luckPerms == null) {
 
@@ -766,18 +630,13 @@ public final class PermissionsManager {
         }
 
         User user = luckPerms.getPlayerAdapter(Player.class).getUser(player);
-        user.data().remove(InheritanceNode.builder("sc_leader").build());
         user.data().remove(InheritanceNode.builder("sc_trusted").build());
         user.data().remove(InheritanceNode.builder("sc_untrusted").build());
 
-        if (cp.getClan() != null) {
+        if (cp.getUnion() != null) {
 
             user.data().add(InheritanceNode.builder("clan_" + cp.getTag()).build());
-            if (cp.isLeader()) {
-
-                user.data().add(InheritanceNode.builder("sc_leader").build());
-
-            } else if (cp.isTrusted()) {
+            if (cp.isTrusted()) {
 
                 user.data().add(InheritanceNode.builder("sc_trusted").build());
 

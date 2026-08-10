@@ -5,8 +5,8 @@ import github.scarsz.discordsrv.api.Subscribe;
 import github.scarsz.discordsrv.api.events.DiscordReadyEvent;
 import github.scarsz.discordsrv.dependencies.jda.api.JDA;
 import me.clip.placeholderapi.PlaceholderAPI;
-import net.trueog.unionsog.Clan;
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.Union;
+import net.trueog.unionsog.UnionPlayer;
 import net.trueog.unionsog.Helper;
 import net.trueog.unionsog.UnionsOG;
 import net.trueog.unionsog.chat.ChatHandler;
@@ -23,9 +23,8 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
-import static net.trueog.unionsog.ClanPlayer.Channel;
+import static net.trueog.unionsog.UnionPlayer.Channel;
 import static net.trueog.unionsog.chat.SCMessage.Source;
-import static net.trueog.unionsog.chat.SCMessage.Source.DISCORD;
 import static net.trueog.unionsog.managers.SettingsManager.ConfigField;
 import static net.trueog.unionsog.managers.SettingsManager.ConfigField.*;
 import static org.bukkit.Bukkit.getPluginManager;
@@ -77,9 +76,9 @@ public final class ChatManager {
 
     public void processChat(@NotNull SCMessage message) {
 
-        Clan clan = Objects.requireNonNull(message.getSender().getClan(), "Clan cannot be null");
+        Union union = Objects.requireNonNull(message.getSender().getUnion(), "Clan cannot be null");
 
-        List<ClanPlayer> receivers = new ArrayList<>();
+        List<UnionPlayer> receivers = new ArrayList<>();
         switch (message.getChannel()) {
 
             case ALLY:
@@ -89,19 +88,19 @@ public final class ChatManager {
 
                 }
 
-                receivers.addAll(getOnlineAllyMembers(clan).stream().filter(allyMember -> !allyMember.isMutedAlly())
+                receivers.addAll(getOnlineAllyMembers(union).stream().filter(allyMember -> !allyMember.isMutedAlly())
                         .collect(Collectors.toList()));
-                receivers.addAll(clan.getOnlineMembers().stream().filter(onlineMember -> !onlineMember.isMutedAlly())
+                receivers.addAll(union.getOnlineMembers().stream().filter(onlineMember -> !onlineMember.isMutedAlly())
                         .collect(Collectors.toList()));
                 break;
-            case CLAN:
-                if (!plugin.getSettingsManager().is(CLANCHAT_ENABLE)) {
+            case UNION:
+                if (!plugin.getSettingsManager().is(UNIONCHAT_ENABLE)) {
 
                     return;
 
                 }
 
-                receivers.addAll(clan.getOnlineMembers().stream().filter(member -> !member.isMuted())
+                receivers.addAll(union.getOnlineMembers().stream().filter(member -> !member.isMuted())
                         .collect(Collectors.toList()));
 
         }
@@ -120,12 +119,12 @@ public final class ChatManager {
 
     }
 
-    public void processChat(@NotNull Source source, @NotNull Channel channel, @NotNull ClanPlayer clanPlayer,
+    public void processChat(@NotNull Source source, @NotNull Channel channel, @NotNull UnionPlayer unionPlayer,
             String message)
     {
 
-        Objects.requireNonNull(clanPlayer.getClan(), "Clan cannot be null");
-        processChat(new SCMessage(source, channel, clanPlayer, message));
+        Objects.requireNonNull(unionPlayer.getUnion(), "Clan cannot be null");
+        processChat(new SCMessage(source, channel, unionPlayer, message));
 
     }
 
@@ -138,16 +137,10 @@ public final class ChatManager {
     public String parseChatFormat(String format, SCMessage message, Map<String, String> placeholders) {
 
         SettingsManager sm = plugin.getSettingsManager();
-        ClanPlayer sender = message.getSender();
+        UnionPlayer sender = message.getSender();
 
-        String leaderColor = sm.getColored(ConfigField.valueOf(message.getChannel() + "CHAT_LEADER_COLOR"));
         String memberColor = sm.getColored(ConfigField.valueOf(message.getChannel() + "CHAT_MEMBER_COLOR"));
         String trustedColor = sm.getColored(ConfigField.valueOf(message.getChannel() + "CHAT_TRUSTED_COLOR"));
-
-        String rank = sender.getRankId().isEmpty() ? null : ChatUtils.parseColors(sender.getRankDisplayName());
-        ConfigField configField = ConfigField.valueOf(
-                String.format("%sCHAT_RANK", message.getSource() == DISCORD ? "DISCORD" : message.getChannel()));
-        String rankFormat = (rank != null) ? sm.getColored(configField).replace("%rank%", rank) : "";
 
         if (placeholders != null) {
 
@@ -160,11 +153,10 @@ public final class ChatManager {
         }
 
         String parsedFormat = ChatUtils.parseColors(format)
-                .replace("%clan%", Objects.requireNonNull(sender.getClan()).getColorTag())
-                .replace("%clean-tag%", sender.getClan().getTag())
-                .replace("%nick-color%",
-                        (sender.isLeader() ? leaderColor : sender.isTrusted() ? trustedColor : memberColor))
-                .replace("%player%", sender.getName()).replace("%rank%", rankFormat);
+                .replace("%union%", Objects.requireNonNull(sender.getUnion()).getColorTag())
+                .replace("%clean-tag%", sender.getUnion().getTag())
+                .replace("%nick-color%", (sender.isTrusted() ? trustedColor : memberColor))
+                .replace("%player%", sender.getName());
         parsedFormat = parseWithPapi(message.getSender(), parsedFormat).replace("%message%", message.getContent());
 
         return parsedFormat;
@@ -177,7 +169,7 @@ public final class ChatManager {
 
     }
 
-    private String parseWithPapi(ClanPlayer cp, String message) {
+    private String parseWithPapi(UnionPlayer cp, String message) {
 
         if (getPluginManager().getPlugin("PlaceholderAPI") == null) {
 
@@ -225,9 +217,9 @@ public final class ChatManager {
 
     }
 
-    private List<ClanPlayer> getOnlineAllyMembers(Clan clan) {
+    private List<UnionPlayer> getOnlineAllyMembers(Union union) {
 
-        return clan.getAllAllyMembers().stream().filter(allyPlayer -> allyPlayer.toPlayer() != null)
+        return union.getAllAllyMembers().stream().filter(allyPlayer -> allyPlayer.toPlayer() != null)
                 .collect(Collectors.toList());
 
     }

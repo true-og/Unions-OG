@@ -1,18 +1,13 @@
 package net.trueog.unionsog.migrations.legacy;
 
-import net.trueog.unionsog.Helper;
-import net.trueog.unionsog.Rank;
 import net.trueog.unionsog.UnionsOG;
 import net.trueog.unionsog.managers.SettingsManager;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
 
-import static net.trueog.unionsog.managers.SettingsManager.ConfigField.CLAN_DEFAULT_RANK;
 import static net.trueog.unionsog.managers.SettingsManager.ConfigField.MYSQL_ENABLE;
 import static net.trueog.unionsog.managers.SettingsManager.ConfigField.MYSQL_MIGRATE_LEGACY_UNIONS_DATABASE;
 import static net.trueog.unionsog.managers.SettingsManager.ConfigField.MYSQL_TABLE_PREFIX;
@@ -77,15 +72,8 @@ public final class LegacyUnionsDatabaseMigrationRunner {
 
         plugin.getLogger().info("Legacy unions database migration starting.");
 
-        final List<Rank> starterRanks = new ArrayList<>(settings.getStarterRanks());
-        final String configuredDefaultRank = settings.getString(CLAN_DEFAULT_RANK);
-        final String defaultRank = starterRanks.stream().anyMatch(rank -> rank.getName().equals(configuredDefaultRank))
-                ? configuredDefaultRank
-                : null;
-
         final LegacyUnionsDatabaseMigration.Result result = migrateOrThrow(connection,
-                settings.getString(MYSQL_TABLE_PREFIX), Helper.ranksToJson(starterRanks, defaultRank),
-                uuid -> plugin.getServer().getOfflinePlayer(uuid).getName());
+                settings.getString(MYSQL_TABLE_PREFIX), uuid -> plugin.getServer().getOfflinePlayer(uuid).getName());
         logResult(plugin, result);
         settings.set(MYSQL_MIGRATE_LEGACY_UNIONS_DATABASE, false);
         settings.save();
@@ -93,13 +81,12 @@ public final class LegacyUnionsDatabaseMigrationRunner {
     }
 
     static LegacyUnionsDatabaseMigration.Result migrateOrThrow(Connection connection, String targetTablePrefix,
-            String ranksJson, Function<UUID, String> playerNameResolver)
+            Function<UUID, String> playerNameResolver)
     {
 
         try {
 
-            return new LegacyUnionsDatabaseMigration(connection, targetTablePrefix, ranksJson, playerNameResolver)
-                    .migrate();
+            return new LegacyUnionsDatabaseMigration(connection, targetTablePrefix, playerNameResolver).migrate();
 
         } catch (SQLException | RuntimeException ex) {
 
@@ -140,13 +127,6 @@ public final class LegacyUnionsDatabaseMigrationRunner {
 
             plugin.getLogger().warning(String.format("%d player membership(s) referenced a missing union and were "
                     + "imported without an active union.", result.orphanedMemberships()));
-
-        }
-
-        if (result.unionsWithoutLeaders() > 0) {
-
-            plugin.getLogger().warning(String.format("%d imported union(s) did not have a matching leader row.",
-                    result.unionsWithoutLeaders()));
 
         }
 

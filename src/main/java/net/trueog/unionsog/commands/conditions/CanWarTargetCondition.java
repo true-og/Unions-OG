@@ -1,16 +1,15 @@
 package net.trueog.unionsog.commands.conditions;
 
 import co.aikar.commands.*;
-import net.trueog.unionsog.Clan;
+import net.trueog.unionsog.Union;
 import net.trueog.unionsog.UnionsOG;
-import net.trueog.unionsog.commands.ClanInput;
+import net.trueog.unionsog.commands.UnionInput;
 import org.jetbrains.annotations.NotNull;
 
 import static net.trueog.unionsog.UnionsOG.lang;
 import static net.trueog.unionsog.managers.SettingsManager.ConfigField.WAR_MAX_MEMBERS_DIFFERENCE;
-import static net.trueog.unionsog.managers.SettingsManager.ConfigField.WAR_START_REQUEST_ENABLED;
 
-public class CanWarTargetCondition extends AbstractParameterCondition<ClanInput> {
+public class CanWarTargetCondition extends AbstractParameterCondition<UnionInput> {
 
     public CanWarTargetCondition(@NotNull UnionsOG plugin) {
 
@@ -19,39 +18,39 @@ public class CanWarTargetCondition extends AbstractParameterCondition<ClanInput>
     }
 
     @Override
-    public Class<ClanInput> getType() {
+    public Class<UnionInput> getType() {
 
-        return ClanInput.class;
+        return UnionInput.class;
 
     }
 
     @Override
     public void validateCondition(ConditionContext<BukkitCommandIssuer> context,
-            BukkitCommandExecutionContext execContext, ClanInput target) throws InvalidCommandArgument
+            BukkitCommandExecutionContext execContext, UnionInput target) throws InvalidCommandArgument
     {
 
         BukkitCommandIssuer issuer = execContext.getIssuer();
-        Clan issuerClan = Conditions.assertClanMember(clanManager, issuer);
-        Clan targetClan = target.getClan();
+        Union issuerUnion = Conditions.assertUnionMember(unionManager, issuer);
+        Union targetUnion = target.getUnion();
 
-        if (!issuerClan.isRival(targetClan.getTag())) {
+        if (!issuerUnion.isRival(targetUnion.getTag())) {
 
             throw new ConditionFailedException(lang("you.can.only.start.war.with.rivals", issuer));
 
         }
 
-        if (issuerClan.isWarring(targetClan)) {
+        if (issuerUnion.isWarring(targetUnion)) {
 
-            throw new ConditionFailedException(lang("clans.already.at.war", issuer));
+            throw new ConditionFailedException(lang("unions.already.at.war", issuer));
 
         }
 
-        boolean isWarRequestEnabled = settingsManager.is(WAR_START_REQUEST_ENABLED);
+        // War no longer needs the target's consent, so the size guard always applies.
         int maxDifference = settingsManager.getInt(WAR_MAX_MEMBERS_DIFFERENCE);
 
-        if (!isWarRequestEnabled && maxDifference >= 0) {
+        if (maxDifference >= 0) {
 
-            int difference = Math.abs(issuerClan.getOnlineMembers().size() - targetClan.getOnlineMembers().size());
+            int difference = Math.abs(issuerUnion.getOnlineMembers().size() - targetUnion.getOnlineMembers().size());
             if (difference > maxDifference)
                 throw new ConditionFailedException(lang("you.cant.start.war.online.members.difference", issuer));
 

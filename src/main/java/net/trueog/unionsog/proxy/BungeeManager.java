@@ -5,13 +5,13 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import net.trueog.unionsog.Clan;
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.Union;
+import net.trueog.unionsog.UnionPlayer;
 import net.trueog.unionsog.UnionsOG;
 import net.trueog.unionsog.chat.SCMessage;
 import net.trueog.unionsog.managers.SettingsManager.ConfigField;
-import net.trueog.unionsog.proxy.adapters.ClanPlayerListAdapter;
-import net.trueog.unionsog.proxy.adapters.ClanPlayerTypeAdapterFactory;
+import net.trueog.unionsog.proxy.adapters.UnionPlayerListAdapter;
+import net.trueog.unionsog.proxy.adapters.UnionPlayerTypeAdapterFactory;
 import net.trueog.unionsog.proxy.adapters.ConfigurationSerializableAdapter;
 import net.trueog.unionsog.proxy.adapters.SCMessageAdapter;
 import net.trueog.unionsog.proxy.listeners.MessageListener;
@@ -30,10 +30,10 @@ import java.util.regex.Pattern;
 
 public final class BungeeManager implements ProxyManager, PluginMessageListener {
 
-    private static final String UPDATE_CLAN_CHANNEL = "UpdateClan";
-    private static final String UPDATE_CLANPLAYER_CHANNEL = "UpdateClanPlayer";
-    private static final String DELETE_CLAN_CHANNEL = "DeleteClan";
-    private static final String DELETE_CLANPLAYER_CHANNEL = "DeleteClanPlayer";
+    private static final String UPDATE_UNION_CHANNEL = "UpdateClan";
+    private static final String UPDATE_UNIONPLAYER_CHANNEL = "UpdateClanPlayer";
+    private static final String DELETE_UNION_CHANNEL = "DeleteClan";
+    private static final String DELETE_UNIONPLAYER_CHANNEL = "DeleteClanPlayer";
     private static final String CHAT_CHANNEL = "Chat";
     private static final String BROADCAST = "Broadcast";
     private static final String MESSAGE = "Message";
@@ -50,9 +50,9 @@ public final class BungeeManager implements ProxyManager, PluginMessageListener 
     public BungeeManager(UnionsOG plugin) {
 
         this.plugin = plugin;
-        gson = new GsonBuilder().registerTypeAdapterFactory(new ClanPlayerTypeAdapterFactory(plugin))
+        gson = new GsonBuilder().registerTypeAdapterFactory(new UnionPlayerTypeAdapterFactory(plugin))
                 .registerTypeAdapterFactory(new ConfigurationSerializableAdapter())
-                .registerTypeAdapter(ClanPlayerListAdapter.getType(), new ClanPlayerListAdapter(plugin))
+                .registerTypeAdapter(UnionPlayerListAdapter.getType(), new UnionPlayerListAdapter(plugin))
                 .registerTypeAdapter(SCMessage.class, new SCMessageAdapter(plugin)).setExclusionStrategies().create();
         if (!plugin.getSettingsManager().is(ConfigField.PERFORMANCE_USE_BUNGEECORD)) {
 
@@ -226,30 +226,30 @@ public final class BungeeManager implements ProxyManager, PluginMessageListener 
     }
 
     @Override
-    public void sendDelete(Clan clan) {
+    public void sendDelete(Union union) {
 
-        forwardToAllServers(DELETE_CLAN_CHANNEL, clan.getTag());
-
-    }
-
-    @Override
-    public void sendDelete(ClanPlayer cp) {
-
-        forwardToAllServers(DELETE_CLANPLAYER_CHANNEL, cp.getUniqueId().toString());
+        forwardToAllServers(DELETE_UNION_CHANNEL, union.getTag());
 
     }
 
     @Override
-    public void sendUpdate(Clan clan) {
+    public void sendDelete(UnionPlayer cp) {
 
-        forwardToAllServers(UPDATE_CLAN_CHANNEL, gson.toJson(clan));
+        forwardToAllServers(DELETE_UNIONPLAYER_CHANNEL, cp.getUniqueId().toString());
 
     }
 
     @Override
-    public void sendUpdate(ClanPlayer cp) {
+    public void sendUpdate(Union union) {
 
-        forwardToAllServers(UPDATE_CLANPLAYER_CHANNEL, gson.toJson(cp));
+        forwardToAllServers(UPDATE_UNION_CHANNEL, gson.toJson(union));
+
+    }
+
+    @Override
+    public void sendUpdate(UnionPlayer cp) {
+
+        forwardToAllServers(UPDATE_UNIONPLAYER_CHANNEL, gson.toJson(cp));
 
     }
 

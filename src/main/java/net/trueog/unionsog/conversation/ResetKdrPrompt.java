@@ -1,9 +1,9 @@
 package net.trueog.unionsog.conversation;
 
-import net.trueog.unionsog.Clan;
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.Union;
+import net.trueog.unionsog.UnionPlayer;
 import net.trueog.unionsog.events.PlayerResetKdrEvent;
-import net.trueog.unionsog.managers.ClanManager;
+import net.trueog.unionsog.managers.UnionManager;
 import org.bukkit.Bukkit;
 import org.bukkit.conversations.Prompt;
 
@@ -12,16 +12,16 @@ import static org.bukkit.ChatColor.RED;
 
 public class ResetKdrPrompt extends ConfirmationPrompt {
 
-    private final ClanManager cm;
+    private final UnionManager cm;
 
-    public ResetKdrPrompt(ClanManager cm) {
+    public ResetKdrPrompt(UnionManager cm) {
 
         this.cm = cm;
 
     }
 
     @Override
-    protected Prompt confirm(ClanPlayer sender, Clan clan) {
+    protected Prompt confirm(UnionPlayer sender, Union union) {
 
         PlayerResetKdrEvent event = new PlayerResetKdrEvent(sender);
         Bukkit.getPluginManager().callEvent(event);

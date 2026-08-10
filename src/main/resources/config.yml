@@ -5,12 +5,10 @@ tag:
     min-length: 2
     bracket:
         color: '8'
-        leader-color: '4'
         left: ''
         right: ''
     separator:
         color: '8'
-        leader-color: '4'
         char: ' .'
 settings:
     enable-gui: true
@@ -18,8 +16,8 @@ settings:
     tameable-mobs-sharing: false
     teleport-blocks: false
     teleport-home-on-spawn: false
-    drop-items-on-clan-home: false
-    keep-items-on-clan-home: false
+    drop-items-on-union-home: false
+    keep-items-on-union-home: false
     item-list: []
     show-debug-info: false
     enable-auto-groups: false
@@ -29,7 +27,7 @@ settings:
     accept-other-alphabets-letters-on-tag: false
     display-chat-tags: true
     global-friendly-fire: false
-    unrivable-clans:
+    unrivable-unions:
     - admin
     - staff
     - mod
@@ -51,7 +49,7 @@ settings:
     ranking-type: "DENSE"
     list-default-order-by: size
     lore-length: 36
-    past-clans-limit: 10
+    past-unions-limit: 10
     username-regex: '(\.|\*){0,1}[a-zA-Z0-9_$]{1,16}'
     tag-regex: ''
     date-time-pattern: 'HH:mm - dd/MM/yyyy'
@@ -74,8 +72,7 @@ war-and-protection:
     war-disconnect-expiration-time: 0
     edit-all-lands: false
     land-creation:
-        only-leaders: false
-        only-one-per-clan: false
+        only-one-per-union: false
     war-actions:
         CONTAINER: true
         INTERACT: true
@@ -84,7 +81,6 @@ war-and-protection:
         DAMAGE: true
         INTERACT_ENTITY: true
     war-start:
-        request-enabled: true
         members-online-max-difference: 5
 kdr-grinding-prevention:
     enable-max-kills: false
@@ -94,17 +90,17 @@ kdr-grinding-prevention:
 commands:
     more: more
     ally: ally
-    clan: union
+    union: union
     accept: accept
     deny: deny
     global: global
-    clan_chat: u
+    union_chat: u
     force-priority: true
 economy:
     creation-price: 100.0
-    purchase-clan-create: false
+    purchase-union-create: false
     invite-price: 20.0
-    purchase-clan-invite: false
+    purchase-union-invite: false
     home-teleport-price: 5.0
     purchase-home-teleport: false
     home-teleport-set-price: 5.0
@@ -121,7 +117,7 @@ kill-weights:
     neutral: 1.0
     ally: -1.0
     deny-same-ip-kills: false
-clan:
+union:
     homebase-teleport-wait-secs: 5
     homebase-can-be-set-only-once: true
     min-size-to-set-rival: 3
@@ -129,44 +125,27 @@ clan:
     max-description-length: 120
     min-description-length: 10
     max-members: 25
-    confirmation-for-promote: false
     trust-members-by-default: true
-    confirmation-for-demote: false
-    percentage-online-to-demote: 100.0
     ff-on-by-default: false
     min-length: 2
     max-alliances: -1
     min-size-to-set-ally: 3
-    starter-ranks:
-        - recruit:
-            display-name: "&7Recruit"
-            permissions: [ stats, kills, mostkilled, rank.list ]
-        - ambassador:
-            display-name: "&bAmbassador"
-            permissions: [ ally.chat, ally.add, ally.remove, rival.add, rival.remove, war.end, war.start ]
-        - treasurer:
-            display-name: "&6Treasurer"
-            permissions: [ bank.balance, bank.deposit, bank.withdraw ]
-    default-rank: "recruit"
 
 page:
     untrusted-color: '8'
-    clan-name-color: b
+    union-name-color: b
     subtitle-color: '7'
     headings-color: '8'
     trusted-color: f
-    leader-color: '4'
     separator: '-'
     size: 100
     help-size: 10
-clanchat:
+unionchat:
     enable: true
-    tag-based-clan-chat: false
+    tag-based-union-chat: false
     announcement-color: e
-    format: "&b[%clan%&b] &4<%nick-color%%player%&4> %rank%: &b%message%"
-    spy-format: "&8[Spy] [&bC&8] <%clean-tag%&8> <%nick-color%*&8%player%>&8 %rank%&8: %message%"
-    rank: "&f[%rank%&f]"
-    leader-color: '4'
+    format: "&b[%union%&b] &4<%nick-color%%player%&4>: &b%message%"
+    spy-format: "&8[Spy] [&bC&8] <%clean-tag%&8> <%nick-color%*&8%player%>&8: %message%"
     trusted-color: 'f'
     member-color: '7'
     listener-priority: LOW
@@ -181,31 +160,25 @@ bb:
     login-size: 6
 allychat:
     enable: true
-    format: "&b[Ally Chat] &4<%clan%&4> <%nick-color%%player%&4> %rank%: &b%message%"
-    spy-format: "&8[Spy] [&cA&8] <%clean-tag%&8> <%nick-color%*&8%player%>&8 %rank%&8: %message%"
-    rank: "&f[%rank%&f]"
-    leader-color: '4'
+    format: "&b[Ally Chat] &4<%union%&4> <%nick-color%%player%&4>: &b%message%"
+    spy-format: "&8[Spy] [&cA&8] <%clean-tag%&8> <%nick-color%*&8%player%>&8: %message%"
     trusted-color: 'f'
     member-color: '7'
 discordchat:
     enable: false
     auto-creation: true
     discord-format: "%player% » %message%"
-    format: "&b[&9D&b] &b[%clan%&b] &4<%nick-color%%player%&4> %rank%: &b%message%"
-    spy-format: "&8[Spy] [&9D&8] <%clean-tag%&8> <%nick-color%*&8%player%>&8 %rank%&8: %message%"
-    rank: "[%rank%]"
-    leader-role: "Leader"
-    leader-color: 231, 76, 60, 100
-    leader-id: 0
+    format: "&b[&9D&b] &b[%union%&b] &4<%nick-color%%player%&4>: &b%message%"
+    spy-format: "&8[Spy] [&9D&8] <%clean-tag%&8> <%nick-color%*&8%player%>&8: %message%"
     min-linked-players-to-create: 3
     text:
         category-format: "SC - TextChannels"
         category-ids: []
         whitelist: []
-        clans-limit: 100
+        unions-limit: 100
 purge:
     inactive-player-data-days: 30
-    inactive-clan-days: 7
+    inactive-union-days: 7
 mysql:
     username: '^{MARIADB_USER}'
     host: localhost

@@ -1,7 +1,7 @@
 package net.trueog.unionsog.hooks.papi.resolvers;
 
-import net.trueog.unionsog.Clan;
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.Union;
+import net.trueog.unionsog.UnionPlayer;
 import net.trueog.unionsog.UnionsOG;
 import net.trueog.unionsog.hooks.papi.PlaceholderResolver;
 import org.bukkit.OfflinePlayer;
@@ -32,21 +32,21 @@ public class RankingPositionResolver extends PlaceholderResolver {
             @NotNull String placeholder, @NotNull Map<String, String> config)
     {
 
-        if (object instanceof Clan) {
+        if (object instanceof Union) {
 
-            List<Clan> clans = plugin.getClanManager().getClans();
-            plugin.getClanManager().sortClansByKDR(clans);
+            List<Union> unions = plugin.getUnionManager().getUnions();
+            plugin.getUnionManager().sortUnionsByKDR(unions);
 
-            return String.valueOf(clans.indexOf(object) + 1);
+            return String.valueOf(unions.indexOf(object) + 1);
 
         }
 
-        if (object instanceof ClanPlayer) {
+        if (object instanceof UnionPlayer) {
 
-            List<ClanPlayer> clanPlayers = plugin.getClanManager().getAllClanPlayers();
-            plugin.getClanManager().sortClanPlayersByKDR(clanPlayers);
+            List<UnionPlayer> unionPlayers = plugin.getUnionManager().getAllUnionPlayers();
+            plugin.getUnionManager().sortUnionPlayersByKDR(unionPlayers);
 
-            return String.valueOf(clanPlayers.indexOf(object) + 1);
+            return String.valueOf(unionPlayers.indexOf(object) + 1);
 
         }
 

@@ -1,8 +1,6 @@
 package net.trueog.unionsog;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import net.trueog.unionsog.managers.PermissionsManager;
 import org.bukkit.Location;
@@ -39,7 +37,6 @@ import static net.trueog.unionsog.utils.ChatUtils.stripColors;
 public final class Helper {
 
     private static final Gson GSON = new Gson();
-    private static final Type RANKS_TYPE = TypeToken.getParameterized(List.class, Rank.class).getType();
     private static final Type RESIGN_TYPE = TypeToken.getParameterized(Map.class, String.class, Long.class).getType();
 
     private Helper() {
@@ -137,69 +134,6 @@ public final class Helper {
 
         return getClasses(packageName).stream().filter(type::isAssignableFrom)
                 .map(aClass -> ((Class<? extends T>) aClass)).collect(Collectors.toSet());
-
-    }
-
-    /**
-     * Parses a list of ranks from the specified Json String
-     *
-     * @param json the Json String
-     * @return a list of ranks or null if the JSON String is null/empty
-     */
-    public static @Nullable List<Rank> ranksFromJson(@Nullable String json) {
-
-        if (json != null && !json.isEmpty()) {
-
-            JsonObject object = GSON.fromJson(json, JsonObject.class);
-            JsonElement ranks = object.get("ranks");
-            return GSON.fromJson(ranks, RANKS_TYPE);
-
-        }
-
-        return null;
-
-    }
-
-    /**
-     * Parses the default rank from the specified Json String
-     *
-     * @param json the Json String
-     * @return the default rank or null if not found and/or it does not exist
-     */
-    public static @Nullable String defaultRankFromJson(@Nullable String json) {
-
-        if (json != null && !json.isEmpty()) {
-
-            JsonObject object = GSON.fromJson(json, JsonObject.class);
-            JsonElement defaultRank = object.get("defaultRank");
-            if (defaultRank != null && !defaultRank.isJsonNull()) {
-
-                return defaultRank.getAsString();
-
-            }
-
-        }
-
-        return null;
-
-    }
-
-    /**
-     * Converts a list of ranks and the default rank to a JSON String
-     *
-     * @param ranks       the ranks
-     * @param defaultRank the default rank
-     * @return a JSON String
-     */
-    public static String ranksToJson(List<Rank> ranks, @Nullable String defaultRank) {
-
-        if (ranks == null)
-            ranks = new ArrayList<>();
-
-        JsonObject object = new JsonObject();
-        object.add("ranks", GSON.toJsonTree(ranks));
-        object.addProperty("defaultRank", defaultRank);
-        return object.toString();
 
     }
 
@@ -328,25 +262,6 @@ public final class Helper {
     }
 
     /**
-     * Converts the Permission values array to a String array
-     *
-     * @return
-     */
-    public static String[] fromPermissionArray() {
-
-        RankPermission[] permissions = RankPermission.values();
-        String[] sa = new String[permissions.length];
-        for (int i = 0; i < permissions.length; i++) {
-
-            sa[i] = permissions[i].toString();
-
-        }
-
-        return sa;
-
-    }
-
-    /**
      * Cleans up the tag from color codes and makes it lowercase
      *
      * @param tag
@@ -379,16 +294,16 @@ public final class Helper {
     }
 
     /**
-     * Remove offline players from a ClanPlayer array
+     * Remove offline players from a UnionPlayer array
      *
      * @param in
      * @return
      */
-    public static List<ClanPlayer> stripOffLinePlayers(List<ClanPlayer> in) {
+    public static List<UnionPlayer> stripOffLinePlayers(List<UnionPlayer> in) {
 
-        List<ClanPlayer> out = new ArrayList<>();
+        List<UnionPlayer> out = new ArrayList<>();
 
-        for (ClanPlayer cp : in) {
+        for (UnionPlayer cp : in) {
 
             if (cp.toPlayer() != null) {
 
@@ -475,10 +390,10 @@ public final class Helper {
     }
 
     @NotNull
-    public static String getFormattedClanStatus(Clan clan, CommandSender sender) {
+    public static String getFormattedUnionStatus(Union union, CommandSender sender) {
 
         ArrayList<String> statuses = new ArrayList<>();
-        if (clan.isPermanent()) {
+        if (union.isPermanent()) {
 
             statuses.add(lang("permanent", sender));
 

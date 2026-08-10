@@ -1,7 +1,7 @@
 package net.trueog.unionsog.tasks;
 
 import com.cryptomorin.xseries.XMaterial;
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.UnionPlayer;
 import net.trueog.unionsog.UnionsOG;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;
@@ -40,10 +40,10 @@ public class PlayerHeadCacheTask extends BukkitRunnable {
         plugin.getLogger().info("Caching player heads...");
         long begin = System.currentTimeMillis();
         Inventory inventory = Bukkit.createInventory(null, 9);
-        List<ClanPlayer> players = plugin.getClanManager().getAllClanPlayers();
-        players.sort(Comparator.comparing(ClanPlayer::getName));
+        List<UnionPlayer> players = plugin.getUnionManager().getAllUnionPlayers();
+        players.sort(Comparator.comparing(UnionPlayer::getName));
 
-        for (ClanPlayer player : players) {
+        for (UnionPlayer player : players) {
 
             if (isCancelled()) {
 

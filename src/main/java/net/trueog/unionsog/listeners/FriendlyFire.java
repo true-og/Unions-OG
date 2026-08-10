@@ -1,8 +1,8 @@
 package net.trueog.unionsog.listeners;
 
 import net.trueog.unionsog.ChatBlock;
-import net.trueog.unionsog.Clan;
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.Union;
+import net.trueog.unionsog.UnionPlayer;
 import net.trueog.unionsog.UnionsOG;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -47,20 +47,20 @@ public class FriendlyFire extends SCListener {
 
         }
 
-        ClanPlayer vcp = plugin.getClanManager().getClanPlayer(victim);
+        UnionPlayer vcp = plugin.getUnionManager().getUnionPlayer(victim);
 
-        Clan victimClan = vcp == null ? null : vcp.getClan();
-        Clan attackerClan = plugin.getClanManager().getClanByPlayerUniqueId(attacker.getUniqueId());
+        Union victimUnion = vcp == null ? null : vcp.getUnion();
+        Union attackerUnion = plugin.getUnionManager().getUnionByPlayerUniqueId(attacker.getUniqueId());
 
-        process(event, attacker, vcp, victimClan, attackerClan);
+        process(event, attacker, vcp, victimUnion, attackerUnion);
 
     }
 
-    private void process(EntityDamageEvent event, Player attacker, @Nullable ClanPlayer vcp, @Nullable Clan victimClan,
-            @Nullable Clan attackerClan)
+    private void process(EntityDamageEvent event, Player attacker, @Nullable UnionPlayer vcp,
+            @Nullable Union victimUnion, @Nullable Union attackerUnion)
     {
 
-        if (vcp == null || victimClan == null || attackerClan == null) {
+        if (vcp == null || victimUnion == null || attackerUnion == null) {
 
             if (plugin.getSettingsManager().is(SAFE_CIVILIANS)) {
 
@@ -73,7 +73,7 @@ public class FriendlyFire extends SCListener {
 
         }
 
-        if (vcp.isFriendlyFire() || victimClan.isFriendlyFire()
+        if (vcp.isFriendlyFire() || victimUnion.isFriendlyFire()
                 || plugin.getSettingsManager().is(GLOBAL_FRIENDLY_FIRE))
         {
 
@@ -81,15 +81,15 @@ public class FriendlyFire extends SCListener {
 
         }
 
-        if (victimClan.equals(attackerClan)) {
+        if (victimUnion.equals(attackerUnion)) {
 
-            warn(attacker, "cannot.attack.clan.member");
+            warn(attacker, "cannot.attack.union.member");
             event.setCancelled(true);
             return;
 
         }
 
-        if (victimClan.isAlly(attackerClan.getTag())) {
+        if (victimUnion.isAlly(attackerUnion.getTag())) {
 
             warn(attacker, "cannot.attack.ally");
             event.setCancelled(true);

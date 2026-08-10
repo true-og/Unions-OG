@@ -1,8 +1,7 @@
 package net.trueog.unionsog.ui.frames;
 
 import com.cryptomorin.xseries.XMaterial;
-import net.trueog.unionsog.Clan;
-import net.trueog.unionsog.RankPermission;
+import net.trueog.unionsog.Union;
 import net.trueog.unionsog.UnionsOG;
 import net.trueog.unionsog.ui.*;
 import net.trueog.unionsog.utils.Paginator;
@@ -20,9 +19,9 @@ public class AlliesFrame extends SCFrame {
     private final UnionsOG plugin = UnionsOG.getInstance();
     private final Paginator paginator;
     private final List<String> allies;
-    private final Clan subject;
+    private final Union subject;
 
-    public AlliesFrame(Player viewer, SCFrame parent, Clan subject) {
+    public AlliesFrame(Player viewer, SCFrame parent, Union subject) {
 
         super(parent, viewer);
         this.subject = subject;
@@ -46,7 +45,7 @@ public class AlliesFrame extends SCFrame {
 
         SCComponent add = new SCComponentImpl(lang("gui.allies.add.title", getViewer()), null, XMaterial.CYAN_WOOL, 4);
         add.setListener(ClickType.LEFT, () -> InventoryDrawer.open(new AddAllyFrame(this, getViewer(), subject)));
-        add.setPermission(ClickType.LEFT, RankPermission.ALLY_ADD);
+        add.setPermission(ClickType.LEFT, "unionsog.member.ally-set");
         add(add);
 
         add(Components.getPreviousPageComponent(6, this::previousPage, paginator, getViewer()));
@@ -55,15 +54,15 @@ public class AlliesFrame extends SCFrame {
         int slot = 9;
         for (int i = paginator.getMinIndex(); paginator.isValidIndex(i); i++) {
 
-            Clan clan = plugin.getClanManager().getClan(allies.get(i));
-            if (clan == null)
+            Union union = plugin.getUnionManager().getUnion(allies.get(i));
+            if (union == null)
                 continue;
             SCComponent c = new SCComponentImpl(
-                    lang("gui.clanlist.clan.title", getViewer(), clan.getColorTag(), clan.getName()),
-                    Collections.singletonList(lang("gui.allies.clan.lore", getViewer())), XMaterial.CYAN_BANNER, slot);
+                    lang("gui.unionlist.union.title", getViewer(), union.getColorTag(), union.getName()),
+                    Collections.singletonList(lang("gui.allies.union.lore", getViewer())), XMaterial.CYAN_BANNER, slot);
             c.setListener(ClickType.RIGHT,
-                    () -> InventoryController.runSubcommand(getViewer(), "ally remove", false, clan.getTag()));
-            c.setPermission(ClickType.RIGHT, RankPermission.ALLY_REMOVE);
+                    () -> InventoryController.runSubcommand(getViewer(), "ally remove", false, union.getTag()));
+            c.setPermission(ClickType.RIGHT, "unionsog.member.ally-set");
             add(c);
             slot++;
 

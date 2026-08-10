@@ -1,7 +1,7 @@
 package net.trueog.unionsog.managers;
 
-import net.trueog.unionsog.Clan;
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.Union;
+import net.trueog.unionsog.UnionPlayer;
 import net.trueog.unionsog.UnionsOG;
 import net.trueog.unionsog.War;
 import net.trueog.unionsog.events.WarEndEvent;
@@ -30,7 +30,7 @@ import static net.trueog.unionsog.managers.SettingsManager.ConfigField.*;
 public class ProtectionManager {
 
     private final SettingsManager settingsManager;
-    private final ClanManager clanManager;
+    private final UnionManager unionManager;
     private final Logger logger;
     private final Map<War, BukkitTask> wars = new HashMap<>();
     private final List<ProtectionProvider> providers = new ArrayList<>();
@@ -41,7 +41,7 @@ public class ProtectionManager {
 
         plugin = UnionsOG.getInstance();
         settingsManager = plugin.getSettingsManager();
-        clanManager = plugin.getClanManager();
+        unionManager = plugin.getUnionManager();
         logger = plugin.getLogger();
         if (!settingsManager.is(ENABLE_WAR) && !settingsManager.is(LAND_SHARING)) {
 
@@ -168,7 +168,7 @@ public class ProtectionManager {
                 }
 
                 if (isWarringAndAllowed(action, owner, involved)
-                        || isSameClanAndAllowed(action, owner, involved, land.getId()))
+                        || isSameUnionAndAllowed(action, owner, involved, land.getId()))
                 {
 
                     return true;
@@ -184,9 +184,9 @@ public class ProtectionManager {
     }
 
     @SuppressWarnings("UnusedReturnValue")
-    public boolean addWar(@NotNull ClanPlayer requester, Clan requestClan, Clan targetClan) {
+    public boolean addWar(@NotNull UnionPlayer requester, Union requestUnion, Union targetUnion) {
 
-        War war = new War(requestClan, targetClan);
+        War war = new War(requestUnion, targetUnion);
 
         if (wars.containsKey(war)) {
 
@@ -202,8 +202,8 @@ public class ProtectionManager {
 
         }
 
-        requestClan.addWarringClan(requester, targetClan);
-        targetClan.addWarringClan(requester, requestClan);
+        requestUnion.addWarringUnion(requester, targetUnion);
+        targetUnion.addWarringUnion(requester, requestUnion);
 
         wars.put(war, scheduleTask(war, settingsManager.getMinutes(WAR_NORMAL_EXPIRATION_TIME)));
         return true;
@@ -224,7 +224,7 @@ public class ProtectionManager {
 
     }
 
-    public void setWarExpirationTime(@NotNull Clan clan, int expirationTime) {
+    public void setWarExpirationTime(@NotNull Union union, int expirationTime) {
 
         if (expirationTime < 1) {
 
@@ -235,7 +235,7 @@ public class ProtectionManager {
         for (Map.Entry<War, BukkitTask> entry : wars.entrySet()) {
 
             War war = entry.getKey();
-            if (!war.getClans().contains(clan)) {
+            if (!war.getUnions().contains(union)) {
 
                 continue;
 
@@ -263,19 +263,19 @@ public class ProtectionManager {
         }
 
         wars.remove(war);
-        Clan clan1 = war.getClans().get(0);
-        Clan clan2 = war.getClans().get(1);
-        clan1.removeWarringClan(clan2);
-        clan2.removeWarringClan(clan1);
+        Union union1 = war.getUnions().get(0);
+        Union union2 = war.getUnions().get(1);
+        union1.removeWarringUnion(union2);
+        union2.removeWarringUnion(union1);
 
         WarEndEvent event = new WarEndEvent(war, reason);
         Bukkit.getPluginManager().callEvent(event);
 
     }
 
-    public @Nullable War getWar(@Nullable Clan clan1, @Nullable Clan clan2) {
+    public @Nullable War getWar(@Nullable Union union1, @Nullable Union union2) {
 
-        if (clan1 == null || clan2 == null) {
+        if (union1 == null || union2 == null) {
 
             return null;
 
@@ -283,8 +283,8 @@ public class ProtectionManager {
 
         for (War war : wars.keySet()) {
 
-            List<Clan> clans = war.getClans();
-            if (clans.contains(clan1) && clans.contains(clan2)) {
+            List<Union> unions = war.getUnions();
+            if (unions.contains(union1) && unions.contains(union2)) {
 
                 return war;
 
@@ -304,11 +304,11 @@ public class ProtectionManager {
 
         }
 
-        for (Clan clan : clanManager.getClans()) {
+        for (Union union : unionManager.getUnions()) {
 
-            for (Clan warringClan : clan.getWarringClans()) {
+            for (Union warringUnion : union.getWarringUnions()) {
 
-                clan.removeWarringClan(warringClan);
+                union.removeWarringUnion(warringUnion);
 
             }
 
@@ -316,7 +316,7 @@ public class ProtectionManager {
 
     }
 
-    private boolean isSameClanAndAllowed(Action action, UUID owner, Player involved, String landId) {
+    private boolean isSameUnionAndAllowed(Action action, UUID owner, Player involved, String landId) {
 
         if (!settingsManager.is(LAND_SHARING)) {
 
@@ -324,9 +324,9 @@ public class ProtectionManager {
 
         }
 
-        ClanPlayer cp = clanManager.getCreateClanPlayer(owner);
-        Clan involvedClan = clanManager.getClanByPlayerUniqueId(involved.getUniqueId());
-        if (cp.getClan() == null || !cp.getClan().equals(involvedClan)) {
+        UnionPlayer cp = unionManager.getCreateUnionPlayer(owner);
+        Union involvedUnion = unionManager.getUnionByPlayerUniqueId(involved.getUniqueId());
+        if (cp.getUnion() == null || !cp.getUnion().equals(involvedUnion)) {
 
             return false;
 
@@ -344,15 +344,15 @@ public class ProtectionManager {
 
         }
 
-        Clan ownerClan = clanManager.getClanByPlayerUniqueId(owner);
-        Clan involvedClan = clanManager.getClanByPlayerUniqueId(involved.getUniqueId());
-        if (ownerClan == null || involvedClan == null) {
+        Union ownerUnion = unionManager.getUnionByPlayerUniqueId(owner);
+        Union involvedUnion = unionManager.getUnionByPlayerUniqueId(involved.getUniqueId());
+        if (ownerUnion == null || involvedUnion == null) {
 
             return false;
 
         }
 
-        return ownerClan.isWarring(involvedClan);
+        return ownerUnion.isWarring(involvedUnion);
 
     }
 
@@ -467,10 +467,10 @@ public class ProtectionManager {
         public void run() {
 
             removeWar(war, WarEndEvent.Reason.EXPIRATION);
-            Clan clan1 = war.getClans().get(0);
-            Clan clan2 = war.getClans().get(1);
-            clan1.addBb(clan1.getColorTag(), lang("war.expired", clan2.getTag()));
-            clan2.addBb(clan2.getColorTag(), lang("war.expired", clan1.getTag()));
+            Union union1 = war.getUnions().get(0);
+            Union union2 = war.getUnions().get(1);
+            union1.addBb(union1.getColorTag(), lang("war.expired", union2.getTag()));
+            union2.addBb(union2.getColorTag(), lang("war.expired", union1.getTag()));
 
         }
 

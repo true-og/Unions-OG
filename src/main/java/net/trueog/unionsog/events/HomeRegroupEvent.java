@@ -5,8 +5,8 @@
  */
 package net.trueog.unionsog.events;
 
-import net.trueog.unionsog.Clan;
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.Union;
+import net.trueog.unionsog.UnionPlayer;
 import org.bukkit.Location;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -23,33 +23,33 @@ public class HomeRegroupEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
     private boolean cancelled;
-    private final Clan clan;
-    private final ClanPlayer cp;
-    private final List<ClanPlayer> cps;
+    private final Union union;
+    private final UnionPlayer cp;
+    private final List<UnionPlayer> cps;
     private final Location loc;
 
-    public HomeRegroupEvent(Clan clan, ClanPlayer cp, List<ClanPlayer> cps, Location loc) {
+    public HomeRegroupEvent(Union union, UnionPlayer cp, List<UnionPlayer> cps, Location loc) {
 
-        this.clan = clan;
+        this.union = union;
         this.cp = cp;
         this.cps = cps;
         this.loc = loc;
 
     }
 
-    public Clan getClan() {
+    public Union getUnion() {
 
-        return clan;
+        return union;
 
     }
 
-    public ClanPlayer getIssuer() {
+    public UnionPlayer getIssuer() {
 
         return cp;
 
     }
 
-    public List<ClanPlayer> getPlayers() {
+    public List<UnionPlayer> getPlayers() {
 
         return Collections.unmodifiableList(cps);
 

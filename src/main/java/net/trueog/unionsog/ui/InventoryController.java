@@ -1,7 +1,5 @@
 package net.trueog.unionsog.ui;
 
-import net.trueog.unionsog.ClanPlayer;
-import net.trueog.unionsog.RankPermission;
 import net.trueog.unionsog.UnionsOG;
 import net.trueog.unionsog.events.ComponentClickEvent;
 import net.trueog.unionsog.managers.PermissionsManager;
@@ -24,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 import static net.trueog.unionsog.UnionsOG.lang;
-import static net.trueog.unionsog.managers.SettingsManager.ConfigField.COMMANDS_CLAN;
+import static net.trueog.unionsog.managers.SettingsManager.ConfigField.COMMANDS_UNION;
 
 /**
  *
@@ -89,7 +87,7 @@ public class InventoryController implements Listener {
 
         }
 
-        Object permission = component.getPermission(click);
+        String permission = component.getPermission(click);
         if (permission != null) {
 
             if (!hasPermission((Player) entity, permission)) {
@@ -142,21 +140,11 @@ public class InventoryController implements Listener {
      *
      * @author RoinujNosde
      */
-    private boolean hasPermission(@NotNull Player player, @NotNull Object permission) {
+    private boolean hasPermission(@NotNull Player player, @NotNull String permission) {
 
-        UnionsOG plugin = UnionsOG.getInstance();
-        PermissionsManager pm = plugin.getPermissionsManager();
-        if (permission instanceof String) {
+        PermissionsManager pm = UnionsOG.getInstance().getPermissionsManager();
 
-            String perms = (String) permission;
-            boolean leaderPerm = perms.contains("unionsog.leader") && !perms.equalsIgnoreCase("unionsog.leader.create");
-            ClanPlayer cp = plugin.getClanManager().getAnyClanPlayer(player.getUniqueId());
-
-            return pm.has(player, perms) && (!leaderPerm || (cp != null && cp.isLeader()));
-
-        }
-
-        return pm.has(player, (RankPermission) permission, false);
+        return pm.has(player, permission);
 
     }
 
@@ -200,7 +188,7 @@ public class InventoryController implements Listener {
     {
 
         UnionsOG plugin = UnionsOG.getInstance();
-        String baseCommand = plugin.getSettingsManager().getString(COMMANDS_CLAN);
+        String baseCommand = plugin.getSettingsManager().getString(COMMANDS_UNION);
         String finalCommand = String.format("%s %s ", baseCommand, subcommand) + String.join(" ", args);
         new BukkitRunnable() {
 

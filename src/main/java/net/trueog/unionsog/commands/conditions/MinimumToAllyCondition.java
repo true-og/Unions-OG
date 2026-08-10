@@ -4,12 +4,12 @@ import co.aikar.commands.BukkitCommandIssuer;
 import co.aikar.commands.ConditionContext;
 import co.aikar.commands.ConditionFailedException;
 import co.aikar.commands.InvalidCommandArgument;
-import net.trueog.unionsog.Clan;
+import net.trueog.unionsog.Union;
 import net.trueog.unionsog.UnionsOG;
 import org.jetbrains.annotations.NotNull;
 
 import static net.trueog.unionsog.UnionsOG.lang;
-import static net.trueog.unionsog.managers.SettingsManager.ConfigField.CLAN_MIN_SIZE_TO_SET_ALLY;
+import static net.trueog.unionsog.managers.SettingsManager.ConfigField.UNION_MIN_SIZE_TO_SET_ALLY;
 import static org.bukkit.ChatColor.RED;
 
 @SuppressWarnings("unused")
@@ -24,11 +24,11 @@ public class MinimumToAllyCondition extends AbstractCommandCondition {
     @Override
     public void validateCondition(ConditionContext<BukkitCommandIssuer> context) throws InvalidCommandArgument {
 
-        Clan clan = Conditions.assertClanMember(clanManager, context.getIssuer());
-        if (clan.getSize() < settingsManager.getInt(CLAN_MIN_SIZE_TO_SET_ALLY)) {
+        Union union = Conditions.assertUnionMember(unionManager, context.getIssuer());
+        if (union.getSize() < settingsManager.getInt(UNION_MIN_SIZE_TO_SET_ALLY)) {
 
             throw new ConditionFailedException(RED + lang("minimum.to.make.alliance", context.getIssuer(),
-                    settingsManager.getInt(CLAN_MIN_SIZE_TO_SET_ALLY)));
+                    settingsManager.getInt(UNION_MIN_SIZE_TO_SET_ALLY)));
 
         }
 

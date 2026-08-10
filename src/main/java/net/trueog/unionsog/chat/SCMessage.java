@@ -1,6 +1,6 @@
 package net.trueog.unionsog.chat;
 
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.UnionPlayer;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -9,22 +9,22 @@ import java.util.List;
 public class SCMessage implements Cloneable {
 
     private final Source source;
-    private final ClanPlayer.Channel channel;
-    private final ClanPlayer sender;
-    private List<ClanPlayer> receivers;
+    private final UnionPlayer.Channel channel;
+    private final UnionPlayer sender;
+    private List<UnionPlayer> receivers;
     private String content;
 
     /**
      * Creates a message with initial parameters
      *
      * @param source    The source of message
-     * @param channel   The channel of clan player
-     * @param sender    The clan player sender
+     * @param channel   The channel of union player
+     * @param sender    The union player sender
      * @param content   The content of message
-     * @param receivers The clan players, who will receive the content
+     * @param receivers The union players, who will receive the content
      */
-    public SCMessage(@NotNull Source source, @NotNull ClanPlayer.Channel channel, @NotNull ClanPlayer sender,
-            String content, @NotNull List<ClanPlayer> receivers)
+    public SCMessage(@NotNull Source source, @NotNull UnionPlayer.Channel channel, @NotNull UnionPlayer sender,
+            String content, @NotNull List<UnionPlayer> receivers)
     {
 
         this.source = source;
@@ -38,10 +38,10 @@ public class SCMessage implements Cloneable {
     /**
      * Creates a new SCMessage without receivers
      *
-     * @see SCMessage#SCMessage(Source, ClanPlayer.Channel, ClanPlayer, String,
+     * @see SCMessage#SCMessage(Source, UnionPlayer.Channel, UnionPlayer, String,
      *      List) instantiate with initial receievers
      */
-    public SCMessage(@NotNull Source source, @NotNull ClanPlayer.Channel channel, @NotNull ClanPlayer sender,
+    public SCMessage(@NotNull Source source, @NotNull UnionPlayer.Channel channel, @NotNull UnionPlayer sender,
             String content)
     {
 
@@ -49,13 +49,13 @@ public class SCMessage implements Cloneable {
 
     }
 
-    public ClanPlayer.Channel getChannel() {
+    public UnionPlayer.Channel getChannel() {
 
         return channel;
 
     }
 
-    public ClanPlayer getSender() {
+    public UnionPlayer getSender() {
 
         return sender;
 
@@ -73,7 +73,7 @@ public class SCMessage implements Cloneable {
 
     }
 
-    public List<ClanPlayer> getReceivers() {
+    public List<UnionPlayer> getReceivers() {
 
         return receivers;
 
@@ -85,7 +85,7 @@ public class SCMessage implements Cloneable {
 
     }
 
-    public void setReceivers(@NotNull List<ClanPlayer> receivers) {
+    public void setReceivers(@NotNull List<UnionPlayer> receivers) {
 
         this.receivers = receivers;
 

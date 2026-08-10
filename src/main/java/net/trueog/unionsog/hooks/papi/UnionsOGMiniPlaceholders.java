@@ -11,7 +11,7 @@ import java.util.List;
 public class UnionsOGMiniPlaceholders {
 
     private static final List<String> IDENTIFIERS = Arrays.asList("simpleclans", "simpleunions");
-    private static final String SAME_CLAN_COLOR = "&a";
+    private static final String SAME_UNION_COLOR = "&a";
     private static final String RIVAL_COLOR = "&c";
     private static final String ALLY_COLOR = "&b";
 
@@ -29,9 +29,9 @@ public class UnionsOGMiniPlaceholders {
 
             registerRelationalColor(identifier);
             registerPlayerPlaceholders(identifier);
-            registerClanPlaceholders(identifier);
+            registerUnionPlaceholders(identifier);
             registerTopPlayerPlaceholders(identifier);
-            registerTopClanPlaceholders(identifier);
+            registerTopUnionPlaceholders(identifier);
 
         }
 
@@ -40,7 +40,7 @@ public class UnionsOGMiniPlaceholders {
     private void registerRelationalColor(@NotNull String identifier) {
 
         UtilitiesOG.registerRelationalPlaceholder(identifier + "_color", (player, target) -> nullToEmpty(
-                placeholders.resolveRelational(player, target, "color", SAME_CLAN_COLOR, RIVAL_COLOR, ALLY_COLOR)));
+                placeholders.resolveRelational(player, target, "color", SAME_UNION_COLOR, RIVAL_COLOR, ALLY_COLOR)));
 
     }
 
@@ -54,15 +54,15 @@ public class UnionsOGMiniPlaceholders {
 
     }
 
-    private void registerClanPlaceholders(@NotNull String identifier) {
+    private void registerUnionPlaceholders(@NotNull String identifier) {
 
-        for (String placeholder : placeholders.getClanPlaceholders()) {
+        for (String placeholder : placeholders.getUnionPlaceholders()) {
 
             registerAudiencePlaceholder(identifier + "_clan_" + placeholder, "clan_" + placeholder);
 
         }
 
-        for (String placeholder : placeholders.getUnionPlaceholders()) {
+        for (String placeholder : placeholders.getUnionPlaceholdersAndAliases()) {
 
             registerAudiencePlaceholder(identifier + "_union_" + placeholder, "union_" + placeholder);
 
@@ -81,16 +81,16 @@ public class UnionsOGMiniPlaceholders {
 
     }
 
-    private void registerTopClanPlaceholders(@NotNull String identifier) {
+    private void registerTopUnionPlaceholders(@NotNull String identifier) {
 
-        for (String placeholder : placeholders.getClanPlaceholders()) {
+        for (String placeholder : placeholders.getUnionPlaceholders()) {
 
             registerPositionedAudiencePlaceholder(identifier + "_topclans_clan_" + placeholder, (player,
                     position) -> placeholders.resolve(player, "topclans_" + position + "_clan_" + placeholder));
 
         }
 
-        for (String placeholder : placeholders.getUnionPlaceholders()) {
+        for (String placeholder : placeholders.getUnionPlaceholdersAndAliases()) {
 
             registerPositionedAudiencePlaceholder(identifier + "_topunions_union_" + placeholder, (player,
                     position) -> placeholders.resolve(player, "topunions_" + position + "_union_" + placeholder));

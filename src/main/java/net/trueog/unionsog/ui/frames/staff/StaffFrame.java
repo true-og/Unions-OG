@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 import static net.trueog.unionsog.UnionsOG.lang;
 import static net.trueog.unionsog.managers.SettingsManager.ConfigField.GLOBAL_FRIENDLY_FIRE;
-import static net.trueog.unionsog.ui.frames.staff.ClanListFrame.Type;
+import static net.trueog.unionsog.ui.frames.staff.UnionListFrame.Type;
 
 public class StaffFrame extends SCFrame {
 
@@ -48,21 +48,21 @@ public class StaffFrame extends SCFrame {
         }
 
         add(Components.getBackComponent(getParent(), 4, getViewer()));
-        addClans();
+        addUnions();
         addPlayers();
         addGlobalFf();
         addReload();
 
     }
 
-    private void addClans() {
+    private void addUnions() {
 
-        SCComponent clanList = new SCComponentImpl.Builder(XMaterial.PURPLE_BANNER)
-                .withDisplayName(lang("gui.main.clan.list.title", getViewer())).withSlot(9)
-                .withLoreLine(lang("gui.staff.clan.list.lore.left.click", getViewer())).build();
-        clanList.setListener(ClickType.LEFT,
-                () -> InventoryDrawer.open(new ClanListFrame(this, getViewer(), Type.ALL, null)));
-        add(clanList);
+        SCComponent unionList = new SCComponentImpl.Builder(XMaterial.PURPLE_BANNER)
+                .withDisplayName(lang("gui.main.union.list.title", getViewer())).withSlot(9)
+                .withLoreLine(lang("gui.staff.union.list.lore.left.click", getViewer())).build();
+        unionList.setListener(ClickType.LEFT,
+                () -> InventoryDrawer.open(new UnionListFrame(this, getViewer(), Type.ALL, null)));
+        add(unionList);
 
     }
 

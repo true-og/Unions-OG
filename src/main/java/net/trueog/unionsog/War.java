@@ -9,36 +9,36 @@ import java.util.Map;
 
 public class War {
 
-    private final Map<Clan, Integer> clans = new HashMap<>();
+    private final Map<Union, Integer> unions = new HashMap<>();
 
-    public War(@NotNull Clan clan1, @NotNull Clan clan2) {
+    public War(@NotNull Union union1, @NotNull Union union2) {
 
-        clans.put(clan1, 0);
-        clans.put(clan2, 0);
+        unions.put(union1, 0);
+        unions.put(union2, 0);
 
     }
 
-    public List<Clan> getClans() {
+    public List<Union> getUnions() {
 
-        return new ArrayList<>(clans.keySet());
+        return new ArrayList<>(unions.keySet());
 
     }
 
     public int getTotalCasualties() {
 
-        return clans.values().stream().mapToInt(value -> value).sum();
+        return unions.values().stream().mapToInt(value -> value).sum();
 
     }
 
-    public int getCasualties(@NotNull Clan clan) {
+    public int getCasualties(@NotNull Union union) {
 
-        return clans.getOrDefault(clan, 0);
+        return unions.getOrDefault(union, 0);
 
     }
 
-    public void increaseCasualties(@NotNull Clan clan) {
+    public void increaseCasualties(@NotNull Union union) {
 
-        clans.computeIfPresent(clan, (c, i) -> i + 1);
+        unions.computeIfPresent(union, (c, i) -> i + 1);
 
     }
 
@@ -53,7 +53,7 @@ public class War {
 
         if (obj instanceof War) {
 
-            return clans.equals(((War) obj).clans);
+            return unions.equals(((War) obj).unions);
 
         }
 
@@ -64,7 +64,7 @@ public class War {
     @Override
     public int hashCode() {
 
-        return clans.hashCode();
+        return unions.hashCode();
 
     }
 

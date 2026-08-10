@@ -1,6 +1,6 @@
 package net.trueog.unionsog.events;
 
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.UnionPlayer;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -22,13 +22,13 @@ public class ChatEvent extends Event implements Cancellable {
 
     private static final HandlerList HANDLER_LIST = new HandlerList();
     private String message;
-    private final ClanPlayer sender;
-    private final List<ClanPlayer> receivers;
+    private final UnionPlayer sender;
+    private final List<UnionPlayer> receivers;
     private final Map<String, String> placeholders = new HashMap<>();
     private final Type type;
     private boolean cancelled;
 
-    public ChatEvent(String message, ClanPlayer sender, List<ClanPlayer> receivers, Type type) {
+    public ChatEvent(String message, UnionPlayer sender, List<UnionPlayer> receivers, Type type) {
 
         if (message == null || sender == null || receivers == null || type == null) {
 
@@ -58,7 +58,7 @@ public class ChatEvent extends Event implements Cancellable {
     }
 
     public enum Type {
-        ALLY, CLAN
+        ALLY, UNION
     }
 
     /**
@@ -90,7 +90,7 @@ public class ChatEvent extends Event implements Cancellable {
      * @param value           the String to be replaced
      * @throws IllegalArgumentException if one of the args are null; if one of the
      *                                  args are empty; if the placeholder name
-     *                                  equals "clan", "nick-color", "player",
+     *                                  equals "union", "nick-color", "player",
      *                                  "rank" or "message"
      */
     public void addPlaceholder(String placeholderName, String value) {
@@ -107,11 +107,12 @@ public class ChatEvent extends Event implements Cancellable {
 
         }
 
-        if (placeholderName.equalsIgnoreCase("clan") || placeholderName.equalsIgnoreCase("player")
+        if (placeholderName.equalsIgnoreCase("union") || placeholderName.equalsIgnoreCase("player")
                 || placeholderName.equalsIgnoreCase("rank") || placeholderName.equalsIgnoreCase("message"))
         {
 
-            throw new IllegalArgumentException("placeholderName must not be [clan, nick-color, player, rank, message]");
+            throw new IllegalArgumentException(
+                    "placeholderName must not be [union, nick-color, player, rank, message]");
 
         }
 
@@ -135,7 +136,7 @@ public class ChatEvent extends Event implements Cancellable {
      *
      * @return the receivers
      */
-    public List<ClanPlayer> getReceivers() {
+    public List<UnionPlayer> getReceivers() {
 
         return receivers;
 
@@ -174,7 +175,7 @@ public class ChatEvent extends Event implements Cancellable {
      *
      * @return the sender
      */
-    public ClanPlayer getSender() {
+    public UnionPlayer getSender() {
 
         return sender;
 

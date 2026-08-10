@@ -762,7 +762,7 @@ public class ChatBlock {
 
     }
 
-    public static void sendMessage(@Nullable ClanPlayer receiver, @NotNull String msg) {
+    public static void sendMessage(@Nullable UnionPlayer receiver, @NotNull String msg) {
 
         if (receiver == null) {
 
@@ -774,7 +774,7 @@ public class ChatBlock {
 
     }
 
-    // ClanCommands#setbanner, LandCommands#Allow/BlockCommand/verify,
+    // UnionCommands#setbanner, LandCommands#Allow/BlockCommand/verify,
     // StaffCommands#kick, etc
     public static void sendMessageKey(@Nullable CommandSender receiver, @NotNull String key, @NotNull Object... args) {
 
@@ -782,9 +782,9 @@ public class ChatBlock {
 
     }
 
-    public static void sendMessageKey(@NotNull ClanPlayer clanPlayer, @NotNull String key, @NotNull Object... args) {
+    public static void sendMessageKey(@NotNull UnionPlayer unionPlayer, @NotNull String key, @NotNull Object... args) {
 
-        sendMessageKey(clanPlayer.toPlayer(), key, args);
+        sendMessageKey(unionPlayer.toPlayer(), key, args);
 
     }
 

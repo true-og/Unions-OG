@@ -1,9 +1,8 @@
 package net.trueog.unionsog.ui.frames;
 
 import com.cryptomorin.xseries.XMaterial;
-import net.trueog.unionsog.Clan;
-import net.trueog.unionsog.ClanPlayer;
-import net.trueog.unionsog.RankPermission;
+import net.trueog.unionsog.Union;
+import net.trueog.unionsog.UnionPlayer;
 import net.trueog.unionsog.ui.InventoryDrawer;
 import net.trueog.unionsog.ui.SCComponent;
 import net.trueog.unionsog.ui.SCComponentImpl;
@@ -23,25 +22,24 @@ import static net.trueog.unionsog.UnionsOG.lang;
 
 public class RosterFrame extends SCFrame {
 
-    private final Clan subject;
+    private final Union subject;
     private final boolean staff;
-    private final List<ClanPlayer> allMembers;
+    private final List<UnionPlayer> allMembers;
     private final Paginator paginator;
 
-    public RosterFrame(Player viewer, SCFrame parent, Clan subject) {
+    public RosterFrame(Player viewer, SCFrame parent, Union subject) {
 
         this(viewer, parent, subject, false);
 
     }
 
-    public RosterFrame(Player viewer, SCFrame parent, Clan subject, boolean staff) {
+    public RosterFrame(Player viewer, SCFrame parent, Union subject, boolean staff) {
 
         super(parent, viewer);
         this.subject = subject;
         this.staff = staff;
 
-        allMembers = subject.getLeaders();
-        allMembers.addAll(subject.getNonLeaders());
+        allMembers = subject.getMembers();
         paginator = new Paginator(getSize() - 9, allMembers.size());
 
     }
@@ -64,7 +62,7 @@ public class RosterFrame extends SCFrame {
             SCComponent invite = new SCComponentImpl(lang("gui.roster.invite.title", getViewer()),
                     Collections.singletonList(lang("gui.roster.invite.lore", getViewer())), XMaterial.LIME_WOOL, 4);
             invite.setListener(ClickType.LEFT, () -> InventoryDrawer.open(new InviteFrame(this, getViewer())));
-            invite.setPermission(ClickType.LEFT, RankPermission.INVITE);
+            invite.setPermission(ClickType.LEFT, "unionsog.member.invite");
             add(invite);
 
         } else {
@@ -79,7 +77,7 @@ public class RosterFrame extends SCFrame {
         int slot = 9;
         for (int i = paginator.getMinIndex(); paginator.isValidIndex(i); i++) {
 
-            ClanPlayer cp = allMembers.get(i);
+            UnionPlayer cp = allMembers.get(i);
             SCComponent playerComponent = Components.getPlayerComponent(this, getViewer(), cp, slot, true);
             if (staff) {
 

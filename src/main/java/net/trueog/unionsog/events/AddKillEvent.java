@@ -1,6 +1,6 @@
 package net.trueog.unionsog.events;
 
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.UnionPlayer;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -10,10 +10,10 @@ public class AddKillEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
     private boolean cancelled = false;
-    private final ClanPlayer victim;
-    private final ClanPlayer attacker;
+    private final UnionPlayer victim;
+    private final UnionPlayer attacker;
 
-    public AddKillEvent(@NotNull ClanPlayer attacker, @NotNull ClanPlayer victim) {
+    public AddKillEvent(@NotNull UnionPlayer attacker, @NotNull UnionPlayer victim) {
 
         this.attacker = attacker;
         this.victim = victim;
@@ -27,13 +27,13 @@ public class AddKillEvent extends Event implements Cancellable {
 
     }
 
-    public ClanPlayer getAttacker() {
+    public UnionPlayer getAttacker() {
 
         return attacker;
 
     }
 
-    public ClanPlayer getVictim() {
+    public UnionPlayer getVictim() {
 
         return victim;
 

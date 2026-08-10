@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LegacyUnionsDatabaseMigrationDatabaseTest {
 
-    private static final String RANKS_JSON = "{\"ranks\":[],\"defaultRank\":null}";
     private Connection connection;
 
     @BeforeEach
@@ -48,19 +47,19 @@ class LegacyUnionsDatabaseMigrationDatabaseTest {
 
         final UUID firstUnion = UUID.fromString("11111111-1111-1111-1111-111111111111");
         final UUID secondUnion = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
-        final UUID leader = UUID.fromString("11111111-2222-3333-4444-555555555555");
+        final UUID founder = UUID.fromString("11111111-2222-3333-4444-555555555555");
         final UUID member = UUID.fromString("22222222-3333-4444-5555-666666666666");
         final UUID orphan = UUID.fromString("33333333-4444-5555-6666-777777777777");
         final UUID missingUnion = UUID.fromString("ffffffff-ffff-ffff-ffff-ffffffffffff");
 
-        insertLegacyUnion(firstUnion, "Alpha Union", "&4Alpha-Tag", leader, "First description", "Legacy|MOTD",
+        insertLegacyUnion(firstUnion, "Alpha Union", "&4Alpha-Tag", founder, "First description", "Legacy|MOTD",
                 "dark_red", "default,world,-12.5,64,23.25,90,10");
         insertLegacyUnion(secondUnion, "Second Union", "Alpha Tag", null, null, null, "yellow", null);
-        insertLegacyPlayer(leader, firstUnion);
+        insertLegacyPlayer(founder, firstUnion);
         insertLegacyPlayer(member, secondUnion);
         insertLegacyPlayer(orphan, missingUnion);
 
-        final Map<UUID, String> playerNames = Map.of(leader, "Alice", orphan, "Orphan");
+        final Map<UUID, String> playerNames = Map.of(founder, "Alice", orphan, "Orphan");
         final LegacyUnionsDatabaseMigration.Result result = migration(playerNames).migrate();
 
         assertFalse(result.alreadyApplied());
@@ -69,7 +68,6 @@ class LegacyUnionsDatabaseMigrationDatabaseTest {
         assertEquals(1, result.placeholderNames());
         assertEquals(1, result.adjustedTags());
         assertEquals(1, result.orphanedMemberships());
-        assertEquals(1, result.unionsWithoutLeaders());
 
         try (PreparedStatement statement = connection.prepareStatement(
                 "SELECT `color_tag`, `description`, `packed_bb`, `flags`, `balance` FROM `sc_clans` WHERE `tag` = ?;"))
@@ -94,9 +92,9 @@ class LegacyUnionsDatabaseMigrationDatabaseTest {
         }
 
         assertEquals(1, countRows("sc_clans", "`tag` = 'alphatagaaaaaaaa'"));
-        assertPlayer(leader, "Alice", "alphatag", true, true);
-        assertPlayer(member, "2222222233334444", "alphatagaaaaaaaa", false, false);
-        assertPlayer(orphan, "Orphan", "", false, false);
+        assertPlayer(founder, "Alice", "alphatag");
+        assertPlayer(member, "2222222233334444", "alphatagaaaaaaaa");
+        assertPlayer(orphan, "Orphan", "");
         assertEquals(1, countRows("sc_unionsog_migrations", null));
 
         final LegacyUnionsDatabaseMigration.Result repeated = migration(playerNames).migrate();
@@ -162,7 +160,7 @@ class LegacyUnionsDatabaseMigrationDatabaseTest {
 
         final LegacyUnionsDatabaseMigrationRunner.MigrationStartupException failure = assertThrows(
                 LegacyUnionsDatabaseMigrationRunner.MigrationStartupException.class,
-                () -> LegacyUnionsDatabaseMigrationRunner.migrateOrThrow(connection, "sc_", RANKS_JSON, uuid -> null));
+                () -> LegacyUnionsDatabaseMigrationRunner.migrateOrThrow(connection, "sc_", uuid -> null));
 
         assertTrue(failure.getMessage().contains("Plugin startup was aborted"));
         assertTrue(failure.getCause() instanceof SQLException);
@@ -171,7 +169,7 @@ class LegacyUnionsDatabaseMigrationDatabaseTest {
 
     private LegacyUnionsDatabaseMigration migration(Map<UUID, String> playerNames) {
 
-        return new LegacyUnionsDatabaseMigration(connection, "sc_", RANKS_JSON, playerNames::get);
+        return new LegacyUnionsDatabaseMigration(connection, "sc_", playerNames::get);
 
     }
 
@@ -298,7 +296,7 @@ class LegacyUnionsDatabaseMigrationDatabaseTest {
 
     }
 
-    private void assertPlayer(UUID uuid, String name, String tag, boolean leader, boolean trusted) throws SQLException {
+    private void assertPlayer(UUID uuid, String name, String tag) throws SQLException {
 
         try (PreparedStatement statement = connection
                 .prepareStatement("SELECT `name`, `tag`, `leader`, `trusted` FROM `sc_players` WHERE `uuid` = ?;"))
@@ -310,8 +308,9 @@ class LegacyUnionsDatabaseMigrationDatabaseTest {
                 assertTrue(row.next());
                 assertEquals(name, row.getString("name"));
                 assertEquals(tag, row.getString("tag"));
-                assertEquals(leader, row.getBoolean("leader"));
-                assertEquals(trusted, row.getBoolean("trusted"));
+                // Unions have no leaders, so the retained column keeps its default.
+                assertFalse(row.getBoolean("leader"));
+                assertTrue(row.getBoolean("trusted"));
 
             }
 

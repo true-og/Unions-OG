@@ -1,7 +1,7 @@
 package net.trueog.unionsog.ui.frames;
 
 import com.cryptomorin.xseries.XMaterial;
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.UnionPlayer;
 import net.trueog.unionsog.UnionsOG;
 import net.trueog.unionsog.ui.InventoryDrawer;
 import net.trueog.unionsog.ui.SCComponent;
@@ -25,19 +25,19 @@ import static net.trueog.unionsog.UnionsOG.lang;
 public class LeaderboardFrame extends SCFrame {
 
     private final Paginator paginator;
-    private final List<ClanPlayer> clanPlayers;
-    private final RankingNumberResolver<ClanPlayer, BigDecimal> rankingResolver;
+    private final List<UnionPlayer> unionPlayers;
+    private final RankingNumberResolver<UnionPlayer, BigDecimal> rankingResolver;
 
     public LeaderboardFrame(Player viewer, SCFrame parent) {
 
         super(parent, viewer);
 
         UnionsOG plugin = UnionsOG.getInstance();
-        clanPlayers = plugin.getClanManager().getAllClanPlayers();
+        unionPlayers = plugin.getUnionManager().getAllUnionPlayers();
 
-        rankingResolver = new RankingNumberResolver<>(clanPlayers, c -> KDRFormat.toBigDecimal(c.getKDR()), false,
+        rankingResolver = new RankingNumberResolver<>(unionPlayers, c -> KDRFormat.toBigDecimal(c.getKDR()), false,
                 plugin.getSettingsManager().getRankingType());
-        paginator = new Paginator(getSize() - 9, this.clanPlayers);
+        paginator = new Paginator(getSize() - 9, this.unionPlayers);
 
     }
 
@@ -60,14 +60,14 @@ public class LeaderboardFrame extends SCFrame {
         int slot = 9;
         for (int i = paginator.getMinIndex(); paginator.isValidIndex(i); i++) {
 
-            ClanPlayer cp = clanPlayers.get(i);
+            UnionPlayer cp = unionPlayers.get(i);
             SCComponent c = new SCComponentImpl(
                     lang("gui.leaderboard.player.title", getViewer(), rankingResolver.getRankingNumber(cp),
                             cp.getName()),
                     Arrays.asList(
-                            cp.getClan() == null ? lang("gui.playerdetails.player.lore.noclan", getViewer())
-                                    : lang("gui.playerdetails.player.lore.clan", getViewer(),
-                                            cp.getClan().getColorTag(), cp.getClan().getName()),
+                            cp.getUnion() == null ? lang("gui.playerdetails.player.lore.nounion", getViewer())
+                                    : lang("gui.playerdetails.player.lore.union", getViewer(),
+                                            cp.getUnion().getColorTag(), cp.getUnion().getName()),
                             lang("gui.playerdetails.player.lore.kdr", getViewer(), KDRFormat.format(cp.getKDR())),
                             lang("gui.playerdetails.player.lore.last.seen", getViewer(),
                                     cp.getLastSeenString(getViewer()))),
@@ -113,7 +113,7 @@ public class LeaderboardFrame extends SCFrame {
     @Override
     public @NotNull String getTitle() {
 
-        return lang("gui.leaderboard.title", getViewer(), clanPlayers.size());
+        return lang("gui.leaderboard.title", getViewer(), unionPlayers.size());
 
     }
 

@@ -15,7 +15,7 @@ public class ChatFormatMigration extends ConfigMigration {
 
     }
 
-    public void migrateClanChat() {
+    public void migrateUnionChat() {
 
         if (config.getString("clanchat.name-color") == null) {
 
@@ -26,28 +26,28 @@ public class ChatFormatMigration extends ConfigMigration {
         StringBuilder sb = new StringBuilder();
 
         sb.append('&');
-        sb.append(settings.getColored(CLANCHAT_BRACKET_COLOR));
-        sb.append(settings.getString(CLANCHAT_BRACKET_LEFT));
-        sb.append("%clan%");
+        sb.append(settings.getColored(UNIONCHAT_BRACKET_COLOR));
+        sb.append(settings.getString(UNIONCHAT_BRACKET_LEFT));
+        sb.append("%union%");
         sb.append("&");
-        sb.append(settings.getColored(CLANCHAT_BRACKET_COLOR));
-        sb.append(settings.getString(CLANCHAT_BRACKET_RIGHT));
+        sb.append(settings.getColored(UNIONCHAT_BRACKET_COLOR));
+        sb.append(settings.getString(UNIONCHAT_BRACKET_RIGHT));
         sb.append(" ");
         sb.append('&');
-        sb.append(settings.getColored(CLANCHAT_NAME_COLOR));
-        sb.append(settings.getString(CLANCHAT_PLAYER_BRACKET_LEFT));
+        sb.append(settings.getColored(UNIONCHAT_NAME_COLOR));
+        sb.append(settings.getString(UNIONCHAT_PLAYER_BRACKET_LEFT));
         sb.append("%nick-color%");
         sb.append("%player%");
         sb.append('&');
-        sb.append(settings.getColored(CLANCHAT_NAME_COLOR));
-        sb.append(settings.getString(CLANCHAT_PLAYER_BRACKET_RIGHT));
-        sb.append(" %rank%: ");
+        sb.append(settings.getColored(UNIONCHAT_NAME_COLOR));
+        sb.append(settings.getString(UNIONCHAT_PLAYER_BRACKET_RIGHT));
+        sb.append(": ");
         sb.append('&');
-        sb.append(settings.getColored(CLANCHAT_MESSAGE_COLOR));
+        sb.append(settings.getColored(UNIONCHAT_MESSAGE_COLOR));
         sb.append("%message%");
 
         config.set("clanchat.format", sb.toString());
-        config.set("clanchat.rank", "&f[%rank%&f]");
+        config.set("clanchat.rank", "&f[&f]");
         config.set("clanchat.rank.color", null);
         config.set("clanchat.name-color", null);
         config.set("clanchat.player-bracket", null);
@@ -76,7 +76,7 @@ public class ChatFormatMigration extends ConfigMigration {
         sb.append(settings.getColored(ALLYCHAT_BRACKET_COLOR));
         sb.append(settings.getString(ALLYCHAT_BRACKET_RIGHT));
         sb.append(" ");
-        sb.append("&4<%clan%&4> ");
+        sb.append("&4<%union%&4> ");
         sb.append('&');
         sb.append(settings.getColored(ALLYCHAT_BRACKET_COLOR));
         sb.append(settings.getString(ALLYCHAT_PLAYER_BRACKET_LEFT));
@@ -85,13 +85,13 @@ public class ChatFormatMigration extends ConfigMigration {
         sb.append('&');
         sb.append(settings.getColored(ALLYCHAT_BRACKET_COLOR));
         sb.append(settings.getString(ALLYCHAT_PLAYER_BRACKET_RIGHT));
-        sb.append(" %rank%: ");
+        sb.append(": ");
         sb.append('&');
         sb.append(settings.getColored(ALLYCHAT_MESSAGE_COLOR));
         sb.append("%message%");
 
         config.set("allychat.format", sb.toString());
-        config.set("allychat.rank", "&f[%rank%&f]");
+        config.set("allychat.rank", "&f[&f]");
         config.set("allychat.tag-color", null);
         config.set("allychat.name-color", null);
         config.set("allychat.player-bracket", null);
@@ -103,7 +103,7 @@ public class ChatFormatMigration extends ConfigMigration {
     @Override
     public void migrate() {
 
-        migrateClanChat();
+        migrateUnionChat();
         migrateAllyChat();
 
     }

@@ -1,6 +1,6 @@
 package net.trueog.unionsog.events;
 
-import net.trueog.unionsog.Clan;
+import net.trueog.unionsog.Union;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
@@ -8,20 +8,20 @@ import org.bukkit.event.player.PlayerEvent;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * @deprecated use {@link ClanBalanceUpdateEvent}
+ * @deprecated use {@link UnionBalanceUpdateEvent}
  */
 @Deprecated
 public class BankDepositEvent extends PlayerEvent implements Cancellable {
 
     private static final HandlerList HANDLER_LIST = new HandlerList();
-    private final Clan clan;
+    private final Union union;
     private double amount;
     private boolean cancelled;
 
-    public BankDepositEvent(@NotNull Player who, @NotNull Clan clan, double amount) {
+    public BankDepositEvent(@NotNull Player who, @NotNull Union union, double amount) {
 
         super(who);
-        this.clan = clan;
+        this.union = union;
         this.amount = amount;
 
     }
@@ -39,15 +39,15 @@ public class BankDepositEvent extends PlayerEvent implements Cancellable {
 
     }
 
-    public @NotNull Clan getClan() {
+    public @NotNull Union getUnion() {
 
-        return clan;
+        return union;
 
     }
 
     public double getOldBalance() {
 
-        return clan.getBalance();
+        return union.getBalance();
 
     }
 

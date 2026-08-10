@@ -1,25 +1,28 @@
 package net.trueog.unionsog.conversation;
 
-import net.trueog.unionsog.Clan;
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.Union;
+import net.trueog.unionsog.UnionPlayer;
+import net.trueog.unionsog.ProposalType;
+import net.trueog.unionsog.UnionsOG;
 import org.bukkit.conversations.Prompt;
 
 import static net.trueog.unionsog.UnionsOG.lang;
+import static org.bukkit.ChatColor.AQUA;
 import static org.bukkit.ChatColor.RED;
 
 public class DisbandPrompt extends ConfirmationPrompt {
 
     @Override
-    protected Prompt confirm(ClanPlayer sender, Clan clan) {
+    protected Prompt confirm(UnionPlayer sender, Union union) {
 
-        if (clan.isPermanent()) {
+        if (union.isPermanent()) {
 
             return new MessagePromptImpl(RED + lang("cannot.disband.permanent", sender));
 
         }
 
-        clan.disband(sender.toPlayer(), true, false);
-        return new MessagePromptImpl(RED + lang("clan.has.been.disbanded", sender, clan.getName()));
+        UnionsOG.getInstance().getProposalManager().propose(sender, union, ProposalType.DISBAND, "");
+        return new MessagePromptImpl(AQUA + lang("proposal.opened.confirmation", sender));
 
     }
 

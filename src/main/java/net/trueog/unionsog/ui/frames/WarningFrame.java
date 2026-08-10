@@ -1,10 +1,6 @@
 package net.trueog.unionsog.ui.frames;
 
 import com.cryptomorin.xseries.XMaterial;
-import net.trueog.unionsog.ClanPlayer;
-import net.trueog.unionsog.PermissionLevel;
-import net.trueog.unionsog.RankPermission;
-import net.trueog.unionsog.UnionsOG;
 import net.trueog.unionsog.ui.SCComponent;
 import net.trueog.unionsog.ui.SCComponentImpl;
 import net.trueog.unionsog.ui.SCFrame;
@@ -18,10 +14,9 @@ import static net.trueog.unionsog.UnionsOG.lang;
 
 public class WarningFrame extends SCFrame {
 
-    private final UnionsOG plugin = UnionsOG.getInstance();
-    private final Object permission;
+    private final String permission;
 
-    public WarningFrame(@NotNull SCFrame parent, @NotNull Player viewer, @NotNull Object permission) {
+    public WarningFrame(@NotNull SCFrame parent, @NotNull Player viewer, @NotNull String permission) {
 
         super(parent, viewer);
         this.permission = permission;
@@ -45,28 +40,10 @@ public class WarningFrame extends SCFrame {
 
     }
 
-    private void addNoPermissionComponent(Object permission, int slot) {
+    private void addNoPermissionComponent(String permission, int slot) {
 
-        List<String> lore;
-        if (permission instanceof String) {
-
-            lore = Collections.singletonList(lang("gui.warning.no.permission.plugin.lore", getViewer()));
-            ClanPlayer cp = plugin.getClanManager().getAnyClanPlayer(getViewer().getUniqueId());
-            if (((String) permission).contains("unionsog.leader") && !cp.isLeader()) {
-
-                lore = Collections.singletonList(lang("gui.warning.no.permission.leader.lore", getViewer()));
-
-            }
-
-        } else {
-
-            RankPermission p = (RankPermission) permission;
-            String level = p.getPermissionLevel() == PermissionLevel.LEADER ? lang("leader", getViewer())
-                    : lang("trusted", getViewer());
-            lore = Collections
-                    .singletonList(lang("gui.warning.no.permission.rank.lore", getViewer(), level, p.toString()));
-
-        }
+        List<String> lore = Collections
+                .singletonList(lang("gui.warning.no.permission.plugin.lore", getViewer(), permission));
 
         SCComponent perm = new SCComponentImpl(lang("gui.warning.no.permission.title", getViewer()), lore,
                 XMaterial.BARRIER, slot);

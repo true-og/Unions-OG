@@ -1,7 +1,7 @@
 package net.trueog.unionsog.listeners;
 
 import net.trueog.unionsog.*;
-import net.trueog.unionsog.ClanPlayer.Channel;
+import net.trueog.unionsog.UnionPlayer.Channel;
 import net.trueog.unionsog.managers.PermissionsManager;
 import net.trueog.unionsog.managers.SettingsManager;
 import org.bukkit.Bukkit;
@@ -15,8 +15,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-import static net.trueog.unionsog.ClanPlayer.Channel.CLAN;
-import static net.trueog.unionsog.ClanPlayer.Channel.NONE;
+import static net.trueog.unionsog.UnionPlayer.Channel.UNION;
+import static net.trueog.unionsog.UnionPlayer.Channel.NONE;
 import static net.trueog.unionsog.UnionsOG.lang;
 import static net.trueog.unionsog.chat.SCMessage.Source.SPIGOT;
 import static net.trueog.unionsog.managers.SettingsManager.ConfigField.*;
@@ -42,16 +42,16 @@ public class SCPlayerListener extends SCListener {
         String[] split = event.getMessage().substring(1).split(" ");
         String command = split[0];
 
-        if (settingsManager.is(CLANCHAT_TAG_BASED)) {
+        if (settingsManager.is(UNIONCHAT_TAG_BASED)) {
 
-            Clan clan = plugin.getClanManager().getClan(command);
-            if (clan == null || !clan.isMember(event.getPlayer())) {
+            Union union = plugin.getUnionManager().getUnion(command);
+            if (union == null || !union.isMember(event.getPlayer())) {
 
                 return;
 
             }
 
-            String replaced = event.getMessage().replaceFirst(command, settingsManager.getString(COMMANDS_CLAN_CHAT));
+            String replaced = event.getMessage().replaceFirst(command, settingsManager.getString(COMMANDS_UNION_CHAT));
             event.setMessage(replaced);
 
         }
@@ -68,19 +68,20 @@ public class SCPlayerListener extends SCListener {
 
         }
 
-        ClanPlayer cp = plugin.getClanManager().getAnyClanPlayer(player.getUniqueId());
+        UnionPlayer cp = plugin.getUnionManager().getAnyUnionPlayer(player.getUniqueId());
         String tagLabel = cp != null && cp.isTagEnabled() ? cp.getTagLabel() : null;
         if (settingsManager.is(CHAT_COMPATIBILITY_MODE) && settingsManager.is(DISPLAY_CHAT_TAGS)) {
 
             if (tagLabel != null) {
 
-                if (player.getDisplayName().contains("{clan}")) {
+                if (player.getDisplayName().contains("{union}") || player.getDisplayName().contains("{clan}")) {
 
-                    player.setDisplayName(player.getDisplayName().replace("{clan}", tagLabel));
+                    player.setDisplayName(
+                            player.getDisplayName().replace("{union}", tagLabel).replace("{clan}", tagLabel));
 
-                } else if (event.getFormat().contains("{clan}")) {
+                } else if (event.getFormat().contains("{union}") || event.getFormat().contains("{clan}")) {
 
-                    event.setFormat(event.getFormat().replace("{clan}", tagLabel));
+                    event.setFormat(event.getFormat().replace("{union}", tagLabel).replace("{clan}", tagLabel));
 
                 } else {
 
@@ -91,14 +92,14 @@ public class SCPlayerListener extends SCListener {
 
             } else {
 
-                event.setFormat(event.getFormat().replace("{clan}", ""));
+                event.setFormat(event.getFormat().replace("{union}", "").replace("{clan}", ""));
                 event.setFormat(event.getFormat().replace("tagLabel", ""));
 
             }
 
         } else {
 
-            plugin.getClanManager().updateDisplayName(player);
+            plugin.getUnionManager().updateDisplayName(player);
 
         }
 
@@ -114,21 +115,23 @@ public class SCPlayerListener extends SCListener {
 
         }
 
-        ClanPlayer cp = plugin.getClanManager().getCreateClanPlayer(player.getUniqueId());
+        UnionPlayer cp = plugin.getUnionManager().getCreateUnionPlayer(player.getUniqueId());
 
         updatePlayerName(player);
-        plugin.getClanManager().updateLastSeen(player);
-        plugin.getClanManager().updateDisplayName(player);
+        plugin.getUnionManager().updateLastSeen(player);
+        plugin.getUnionManager().updateDisplayName(player);
 
         plugin.getPermissionsManager().addPlayerPermissions(cp);
 
-        if (settingsManager.is(BB_SHOW_ON_LOGIN) && cp.isBbEnabled() && cp.getClan() != null) {
+        if (settingsManager.is(BB_SHOW_ON_LOGIN) && cp.isBbEnabled() && cp.getUnion() != null) {
 
-            cp.getClan().displayBb(player, settingsManager.getInt(BB_LOGIN_SIZE));
+            cp.getUnion().displayBb(player, settingsManager.getInt(BB_LOGIN_SIZE));
 
         }
 
-        plugin.getPermissionsManager().addClanPermissions(cp);
+        plugin.getPermissionsManager().addUnionPermissions(cp);
+
+        plugin.getProposalManager().remind(player);
 
     }
 
@@ -142,11 +145,11 @@ public class SCPlayerListener extends SCListener {
 
         }
 
-        Clan clan = plugin.getClanManager().getClanByPlayerUniqueId(player.getUniqueId());
+        Union union = plugin.getUnionManager().getUnionByPlayerUniqueId(player.getUniqueId());
         Location home;
-        if (clan != null && (home = clan.getHomeLocation()) != null) {
+        if (union != null && (home = union.getHomeLocation()) != null) {
 
-            String homeServer = new Flags(clan.getFlags()).getString("homeServer", "");
+            String homeServer = new Flags(union.getFlags()).getString("homeServer", "");
             if (homeServer.isEmpty() || plugin.getProxyManager().getServerName().equals(homeServer)) {
 
                 event.setRespawnLocation(plugin.getTeleportManager().getSafe(home));
@@ -160,15 +163,15 @@ public class SCPlayerListener extends SCListener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
 
-        ClanPlayer cp = plugin.getClanManager().getClanPlayer(event.getPlayer());
+        UnionPlayer cp = plugin.getUnionManager().getUnionPlayer(event.getPlayer());
         if (cp != null) {
 
-            Clan clan = Objects.requireNonNull(cp.getClan());
+            Union union = Objects.requireNonNull(cp.getUnion());
             Bukkit.getScheduler().runTask(plugin, () -> {
 
-                if (clan.getOnlineMembers().isEmpty()) {
+                if (union.getOnlineMembers().isEmpty()) {
 
-                    plugin.getProtectionManager().setWarExpirationTime(cp.getClan(),
+                    plugin.getProtectionManager().setWarExpirationTime(cp.getUnion(),
                             settingsManager.getMinutes(WAR_DISCONNECT_EXPIRATION_TIME));
 
                 }
@@ -183,8 +186,8 @@ public class SCPlayerListener extends SCListener {
 
         }
 
-        plugin.getPermissionsManager().removeClanPlayerPermissions(cp);
-        plugin.getClanManager().updateLastSeen(event.getPlayer());
+        plugin.getPermissionsManager().removeUnionPlayerPermissions(cp);
+        plugin.getUnionManager().updateLastSeen(event.getPlayer());
         plugin.getRequestManager().endPendingRequest(event.getPlayer().getName());
 
     }
@@ -198,13 +201,13 @@ public class SCPlayerListener extends SCListener {
 
         }
 
-        plugin.getClanManager().updateLastSeen(event.getPlayer());
+        plugin.getUnionManager().updateLastSeen(event.getPlayer());
 
     }
 
     private void registerChatListener() {
 
-        EventPriority priority = EventPriority.valueOf(settingsManager.getString(CLANCHAT_LISTENER_PRIORITY));
+        EventPriority priority = EventPriority.valueOf(settingsManager.getString(UNIONCHAT_LISTENER_PRIORITY));
         plugin.getServer().getPluginManager().registerEvent(AsyncPlayerChatEvent.class, this, priority, (l, e) -> {
 
             if (!(e instanceof AsyncPlayerChatEvent)) {
@@ -215,7 +218,7 @@ public class SCPlayerListener extends SCListener {
 
             AsyncPlayerChatEvent event = (AsyncPlayerChatEvent) e;
             Player player = event.getPlayer();
-            ClanPlayer cp = plugin.getClanManager().getClanPlayer(player.getUniqueId());
+            UnionPlayer cp = plugin.getUnionManager().getUnionPlayer(player.getUniqueId());
             if (cp == null || isBlacklistedWorld(player)) {
 
                 return;
@@ -227,7 +230,7 @@ public class SCPlayerListener extends SCListener {
 
                 PermissionsManager pm = plugin.getPermissionsManager();
                 if ((channel == Channel.ALLY && !pm.has(player, "unionsog.member.ally"))
-                        || (channel == CLAN && !pm.has(player, "unionsog.member.chat")))
+                        || (channel == UNION && !pm.has(player, "unionsog.member.chat")))
                 {
 
                     ChatBlock.sendMessage(player, ChatColor.RED + lang("insufficient.permissions", player));
@@ -246,10 +249,10 @@ public class SCPlayerListener extends SCListener {
 
     private void updatePlayerName(@NotNull final Player player) {
 
-        final ClanPlayer cp = plugin.getClanManager().getAnyClanPlayer(player.getUniqueId());
+        final UnionPlayer cp = plugin.getUnionManager().getAnyUnionPlayer(player.getUniqueId());
 
-        ClanPlayer duplicate = null;
-        for (ClanPlayer other : plugin.getClanManager().getAllClanPlayers()) {
+        UnionPlayer duplicate = null;
+        for (UnionPlayer other : plugin.getUnionManager().getAllUnionPlayers()) {
 
             if (other.getName().equals(player.getName()) && !other.getUniqueId().equals(player.getUniqueId())) {
 

@@ -1,7 +1,7 @@
 package net.trueog.unionsog.managers;
 
 import net.trueog.unionsog.*;
-import net.trueog.unionsog.events.ClanBalanceUpdateEvent;
+import net.trueog.unionsog.events.UnionBalanceUpdateEvent;
 import net.trueog.unionsog.loggers.BankLogger;
 import net.trueog.unionsog.loggers.BankOperator;
 import net.trueog.unionsog.migrations.legacy.LegacyUnionsDatabaseMigrationRunner;
@@ -42,8 +42,8 @@ public final class StorageManager {
     private final UnionsOG plugin;
     private DBCore core;
     private final HashMap<String, ChatBlock> chatBlocks = new HashMap<>();
-    private final Set<Clan> modifiedClans = new HashSet<>();
-    private final Set<ClanPlayer> modifiedClanPlayers = new HashSet<>();
+    private final Set<Union> modifiedUnions = new HashSet<>();
+    private final Set<UnionPlayer> modifiedUnionPlayers = new HashSet<>();
 
     /**
      *
@@ -157,6 +157,18 @@ public final class StorageManager {
 
                 }
 
+                if (!core.existsTable(getPrefixedTable("proposals"))) {
+
+                    plugin.getLogger().info("Creating table: " + getPrefixedTable("proposals"));
+
+                    String query = "CREATE TABLE IF NOT EXISTS `" + getPrefixedTable("proposals") + "` ("
+                            + " `tag` varchar(25) NOT NULL," + " `type` varchar(32) NOT NULL,"
+                            + " `target` varchar(255) NOT NULL," + " `proposer` varchar(255) NOT NULL,"
+                            + " `created_at` bigint NOT NULL," + " `votes` text NOT NULL," + " PRIMARY KEY  (`tag`));";
+                    core.execute(query);
+
+                }
+
             } else {
 
                 plugin.getServer().getConsoleSender()
@@ -222,6 +234,18 @@ public final class StorageManager {
 
                 }
 
+                if (!core.existsTable(getPrefixedTable("proposals"))) {
+
+                    plugin.getLogger().info("Creating table: " + getPrefixedTable("proposals"));
+
+                    String query = "CREATE TABLE IF NOT EXISTS `" + getPrefixedTable("proposals") + "` ("
+                            + " `tag` varchar(25) NOT NULL," + " `type` varchar(32) NOT NULL,"
+                            + " `target` varchar(255) NOT NULL," + " `proposer` varchar(255) NOT NULL,"
+                            + " `created_at` bigint NOT NULL," + " `votes` text NOT NULL," + " PRIMARY KEY  (`tag`));";
+                    core.execute(query);
+
+                }
+
             } else {
 
                 plugin.getServer().getConsoleSender()
@@ -247,35 +271,35 @@ public final class StorageManager {
      */
     public void importFromDatabase() {
 
-        plugin.getClanManager().cleanData();
+        plugin.getUnionManager().cleanData();
 
-        List<Clan> clans = retrieveClans();
-        purgeClans(clans);
+        List<Union> unions = retrieveUnions();
+        purgeUnions(unions);
 
-        for (Clan clan : clans) {
+        for (Union union : unions) {
 
-            plugin.getClanManager().importClan(clan);
-
-        }
-
-        for (Clan clan : clans) {
-
-            clan.validateWarring();
+            plugin.getUnionManager().importUnion(union);
 
         }
 
-        if (!clans.isEmpty()) {
+        for (Union union : unions) {
 
-            plugin.getLogger().info(MessageFormat.format(lang("clans"), clans.size()));
+            union.validateWarring();
 
         }
 
-        List<ClanPlayer> cps = retrieveClanPlayers();
-        purgeClanPlayers(cps);
+        if (!unions.isEmpty()) {
 
-        for (ClanPlayer cp : cps) {
+            plugin.getLogger().info(MessageFormat.format(lang("unions"), unions.size()));
 
-            Clan tm = cp.getClan();
+        }
+
+        List<UnionPlayer> cps = retrieveUnionPlayers();
+        purgeUnionPlayers(cps);
+
+        for (UnionPlayer cp : cps) {
+
+            Union tm = cp.getUnion();
 
             if (tm != null) {
 
@@ -283,33 +307,33 @@ public final class StorageManager {
 
             }
 
-            plugin.getClanManager().importClanPlayer(cp);
+            plugin.getUnionManager().importUnionPlayer(cp);
 
         }
 
         if (!cps.isEmpty()) {
 
-            plugin.getLogger().info(MessageFormat.format(lang("clan.players"), cps.size()));
+            plugin.getLogger().info(MessageFormat.format(lang("union.players"), cps.size()));
 
         }
 
     }
 
     /**
-     * Import one ClanPlayer data from database to memory Used for BungeeCord Reload
-     * ClanPlayer and your Clan
+     * Import one UnionPlayer data from database to memory Used for BungeeCord
+     * Reload UnionPlayer and your Union
      *
      */
     @Deprecated
     public void importFromDatabaseOnePlayer(Player player) {
 
-        plugin.getClanManager().deleteClanPlayerFromMemory(player.getUniqueId());
+        plugin.getUnionManager().deleteUnionPlayerFromMemory(player.getUniqueId());
 
-        ClanPlayer cp = retrieveOneClanPlayer(player.getUniqueId());
+        UnionPlayer cp = retrieveOneUnionPlayer(player.getUniqueId());
 
         if (cp != null) {
 
-            Clan tm = cp.getClan();
+            Union tm = cp.getUnion();
 
             if (tm != null) {
 
@@ -317,7 +341,7 @@ public final class StorageManager {
 
             }
 
-            plugin.getClanManager().importClanPlayer(cp);
+            plugin.getUnionManager().importUnionPlayer(cp);
 
             plugin.getLogger().info("ClanPlayer Reloaded: " + player.getName() + ", UUID: " + player.getUniqueId());
 
@@ -325,44 +349,44 @@ public final class StorageManager {
 
     }
 
-    private void purgeClans(List<Clan> clans) {
+    private void purgeUnions(List<Union> unions) {
 
-        List<Clan> purge = new ArrayList<>();
+        List<Union> purge = new ArrayList<>();
 
-        for (Clan clan : clans) {
+        for (Union union : unions) {
 
-            if (clan.isPermanent()) {
+            if (union.isPermanent()) {
 
                 continue;
 
             }
 
-            int purgeClan = plugin.getSettingsManager().getInt(PURGE_INACTIVE_CLAN_DAYS);
-            if (clan.getInactiveDays() > purgeClan && purgeClan > 0) {
+            int purgeUnion = plugin.getSettingsManager().getInt(PURGE_INACTIVE_UNION_DAYS);
+            if (union.getInactiveDays() > purgeUnion && purgeUnion > 0) {
 
-                purge.add(clan);
+                purge.add(union);
 
             }
 
         }
 
-        for (Clan clan : purge) {
+        for (Union union : purge) {
 
-            plugin.getLogger().info(lang("purging.clan", clan.getName()));
-            for (ClanPlayer member : clan.getMembers()) {
+            plugin.getLogger().info(lang("purging.union", union.getName()));
+            for (UnionPlayer member : union.getMembers()) {
 
-                clan.removePlayerFromClan(member.getUniqueId());
+                union.removePlayerFromUnion(member.getUniqueId());
 
             }
 
-            deleteClan(clan);
-            clans.remove(clan);
+            deleteUnion(union);
+            unions.remove(union);
 
         }
 
     }
 
-    private void purgeClanPlayers(List<ClanPlayer> cps) {
+    private void purgeUnionPlayers(List<UnionPlayer> cps) {
 
         int purgePlayers = plugin.getSettingsManager().getInt(PURGE_INACTIVE_PLAYER_DAYS);
         if (purgePlayers < 1) {
@@ -371,12 +395,12 @@ public final class StorageManager {
 
         }
 
-        List<ClanPlayer> purge = new ArrayList<>();
+        List<UnionPlayer> purge = new ArrayList<>();
 
-        for (ClanPlayer cp : cps) {
+        for (UnionPlayer cp : cps) {
 
-            // let the clan be purged first
-            if (cp.isLeader() && cp.getClan() != null) {
+            // let the union be purged first
+            if (cp.getUnion() != null) {
 
                 continue;
 
@@ -390,10 +414,10 @@ public final class StorageManager {
 
         }
 
-        for (ClanPlayer cp : purge) {
+        for (UnionPlayer cp : purge) {
 
             plugin.getLogger().info(lang("purging.player.data", cp.getName()));
-            deleteClanPlayer(cp);
+            deleteUnionPlayer(cp);
             cps.remove(cp);
 
         }
@@ -401,12 +425,12 @@ public final class StorageManager {
     }
 
     /**
-     * Retrieves all simple clans from the database
+     * Retrieves all unions from the database
      *
      */
-    public List<Clan> retrieveClans() {
+    public List<Union> retrieveUnions() {
 
-        List<Clan> out = new ArrayList<>();
+        List<Union> out = new ArrayList<>();
 
         String query = "SELECT * FROM `" + getPrefixedTable("clans") + "`;";
         ResultSet res = core.select(query);
@@ -428,7 +452,6 @@ public final class StorageManager {
                         String packed_rivals = res.getString("packed_rivals");
                         String packed_bb = res.getString("packed_bb");
                         String flags = res.getString("flags");
-                        String ranksJson = res.getString("ranks");
                         long founded = res.getLong("founded");
                         long last_used = res.getLong("last_used");
                         double balance = res.getDouble("balance");
@@ -448,27 +471,25 @@ public final class StorageManager {
 
                         }
 
-                        Clan clan = new Clan();
-                        clan.setFlags(flags);
-                        clan.setFriendlyFire(friendly_fire);
-                        clan.setTag(tag);
-                        clan.setColorTag(color_tag);
-                        clan.setName(name);
-                        clan.setDescription(description);
-                        clan.setPackedAllies(packed_allies);
-                        clan.setPackedRivals(packed_rivals);
-                        clan.setPackedBb(packed_bb);
-                        clan.setFounded(founded);
-                        clan.setLastUsed(last_used);
-                        clan.setBalance(BankOperator.INTERNAL, ClanBalanceUpdateEvent.Cause.LOADING,
+                        Union union = new Union();
+                        union.setFlags(flags);
+                        union.setFriendlyFire(friendly_fire);
+                        union.setTag(tag);
+                        union.setColorTag(color_tag);
+                        union.setName(name);
+                        union.setDescription(description);
+                        union.setPackedAllies(packed_allies);
+                        union.setPackedRivals(packed_rivals);
+                        union.setPackedBb(packed_bb);
+                        union.setFounded(founded);
+                        union.setLastUsed(last_used);
+                        union.setBalance(BankOperator.INTERNAL, UnionBalanceUpdateEvent.Cause.LOADING,
                                 BankLogger.Operation.SET, balance);
-                        clan.setMemberFee(feeValue);
-                        clan.setMemberFeeEnabled(feeEnabled);
-                        clan.setRanks(Helper.ranksFromJson(ranksJson));
-                        clan.setDefaultRank(Helper.defaultRankFromJson(ranksJson));
-                        clan.setBanner(banner);
+                        union.setMemberFee(feeValue);
+                        union.setMemberFeeEnabled(feeEnabled);
+                        union.setBanner(banner);
 
-                        out.add(clan);
+                        out.add(union);
 
                     } catch (Exception ex) {
 
@@ -492,14 +513,14 @@ public final class StorageManager {
     }
 
     /**
-     * Retrieves one Clan from the database Used for BungeeCord Reload ClanPlayer
-     * and your Clan
+     * Retrieves one Union from the database Used for BungeeCord Reload UnionPlayer
+     * and your Union
      */
-    public @Nullable Clan retrieveOneClan(String tagClan) {
+    public @Nullable Union retrieveOneUnion(String tagUnion) {
 
-        Clan out = null;
+        Union out = null;
 
-        String query = "SELECT * FROM  `" + getPrefixedTable("clans") + "` WHERE `tag` = '" + tagClan + "';";
+        String query = "SELECT * FROM  `" + getPrefixedTable("clans") + "` WHERE `tag` = '" + tagUnion + "';";
         ResultSet res = core.select(query);
 
         if (res != null) {
@@ -519,7 +540,6 @@ public final class StorageManager {
                         String packed_rivals = res.getString("packed_rivals");
                         String packed_bb = res.getString("packed_bb");
                         String flags = res.getString("flags");
-                        String ranksJson = res.getString("ranks");
                         long founded = res.getLong("founded");
                         long last_used = res.getLong("last_used");
                         double balance = res.getDouble("balance");
@@ -539,27 +559,25 @@ public final class StorageManager {
 
                         }
 
-                        Clan clan = new Clan();
-                        clan.setFlags(flags);
-                        clan.setFriendlyFire(friendly_fire);
-                        clan.setTag(tag);
-                        clan.setColorTag(color_tag);
-                        clan.setName(name);
-                        clan.setDescription(description);
-                        clan.setPackedAllies(packed_allies);
-                        clan.setPackedRivals(packed_rivals);
-                        clan.setPackedBb(packed_bb);
-                        clan.setFounded(founded);
-                        clan.setLastUsed(last_used);
-                        clan.setBalance(BankOperator.INTERNAL, ClanBalanceUpdateEvent.Cause.LOADING,
+                        Union union = new Union();
+                        union.setFlags(flags);
+                        union.setFriendlyFire(friendly_fire);
+                        union.setTag(tag);
+                        union.setColorTag(color_tag);
+                        union.setName(name);
+                        union.setDescription(description);
+                        union.setPackedAllies(packed_allies);
+                        union.setPackedRivals(packed_rivals);
+                        union.setPackedBb(packed_bb);
+                        union.setFounded(founded);
+                        union.setLastUsed(last_used);
+                        union.setBalance(BankOperator.INTERNAL, UnionBalanceUpdateEvent.Cause.LOADING,
                                 BankLogger.Operation.SET, balance);
-                        clan.setMemberFee(feeValue);
-                        clan.setMemberFeeEnabled(feeEnabled);
-                        clan.setRanks(Helper.ranksFromJson(ranksJson));
-                        clan.setDefaultRank(Helper.defaultRankFromJson(ranksJson));
-                        clan.setBanner(banner);
+                        union.setMemberFee(feeValue);
+                        union.setMemberFeeEnabled(feeEnabled);
+                        union.setBanner(banner);
 
-                        out = clan;
+                        out = union;
 
                     } catch (Exception ex) {
 
@@ -583,12 +601,12 @@ public final class StorageManager {
     }
 
     /**
-     * Retrieves all clan players from the database
+     * Retrieves all union players from the database
      *
      */
-    public List<ClanPlayer> retrieveClanPlayers() {
+    public List<UnionPlayer> retrieveUnionPlayers() {
 
-        List<ClanPlayer> out = new ArrayList<>();
+        List<UnionPlayer> out = new ArrayList<>();
 
         String query = "SELECT * FROM  `" + getPrefixedTable("players") + "`;";
         ResultSet res = core.select(query);
@@ -604,7 +622,6 @@ public final class StorageManager {
                         String uuid = res.getString("uuid");
                         String name = res.getString("name");
                         String tag = res.getString("tag");
-                        boolean leader = res.getBoolean("leader");
                         boolean friendly_fire = res.getBoolean("friendly_fire");
                         boolean trusted = res.getBoolean("trusted");
                         int neutral_kills = res.getInt("neutral_kills");
@@ -615,7 +632,7 @@ public final class StorageManager {
                         long last_seen = res.getLong("last_seen");
                         long join_date = res.getLong("join_date");
                         String flags = res.getString("flags");
-                        String packed_past_clans = ChatUtils.parseColors(res.getString("packed_past_clans"));
+                        String packed_past_unions = ChatUtils.parseColors(res.getString("packed_past_clans"));
                         String resign_times = res.getString("resign_times");
                         Locale locale = Helper.forLanguageTag(res.getString("locale"));
 
@@ -625,7 +642,7 @@ public final class StorageManager {
 
                         }
 
-                        ClanPlayer cp = new ClanPlayer();
+                        UnionPlayer cp = new UnionPlayer();
                         if (uuid != null) {
 
                             cp.setUniqueId(UUID.fromString(uuid));
@@ -634,7 +651,6 @@ public final class StorageManager {
 
                         cp.setFlags(flags);
                         cp.setName(name);
-                        cp.setLeader(leader);
                         cp.setFriendlyFire(friendly_fire);
                         cp.setNeutralKills(neutral_kills);
                         cp.setRivalKills(rival_kills);
@@ -643,18 +659,18 @@ public final class StorageManager {
                         cp.setDeaths(deaths);
                         cp.setLastSeen(last_seen);
                         cp.setJoinDate(join_date);
-                        cp.setPackedPastClans(packed_past_clans);
-                        cp.setTrusted(leader || trusted);
+                        cp.setPackedPastUnions(packed_past_unions);
+                        cp.setTrusted(trusted);
                         cp.setResignTimes(Helper.resignTimesFromJson(resign_times));
                         cp.setLocale(locale);
 
                         if (!tag.isEmpty()) {
 
-                            Clan clan = plugin.getClanManager().getClan(tag);
+                            Union union = plugin.getUnionManager().getUnion(tag);
 
-                            if (clan != null) {
+                            if (union != null) {
 
-                                cp.setClan(clan);
+                                cp.setUnion(union);
 
                             }
 
@@ -684,12 +700,12 @@ public final class StorageManager {
     }
 
     /**
-     * Retrieves one clan player from the database Used for BungeeCord Reload
-     * ClanPlayer and your Clan
+     * Retrieves one union player from the database Used for BungeeCord Reload
+     * UnionPlayer and your Union
      */
-    public @Nullable ClanPlayer retrieveOneClanPlayer(UUID playerUniqueId) {
+    public @Nullable UnionPlayer retrieveOneUnionPlayer(UUID playerUniqueId) {
 
-        ClanPlayer out = null;
+        UnionPlayer out = null;
 
         String query = "SELECT * FROM `" + getPrefixedTable("players") + "` WHERE `uuid` = '"
                 + playerUniqueId.toString() + "';";
@@ -706,7 +722,6 @@ public final class StorageManager {
                         String uuid = res.getString("uuid");
                         String name = res.getString("name");
                         String tag = res.getString("tag");
-                        boolean leader = res.getBoolean("leader");
                         boolean friendly_fire = res.getBoolean("friendly_fire");
                         boolean trusted = res.getBoolean("trusted");
                         int neutral_kills = res.getInt("neutral_kills");
@@ -717,7 +732,7 @@ public final class StorageManager {
                         long last_seen = res.getLong("last_seen");
                         long join_date = res.getLong("join_date");
                         String flags = res.getString("flags");
-                        String packed_past_clans = ChatUtils.parseColors(res.getString("packed_past_clans"));
+                        String packed_past_unions = ChatUtils.parseColors(res.getString("packed_past_clans"));
                         String resign_times = res.getString("resign_times");
                         Locale locale = Helper.forLanguageTag(res.getString("locale"));
 
@@ -727,7 +742,7 @@ public final class StorageManager {
 
                         }
 
-                        ClanPlayer cp = new ClanPlayer();
+                        UnionPlayer cp = new UnionPlayer();
                         if (uuid != null) {
 
                             cp.setUniqueId(UUID.fromString(uuid));
@@ -736,7 +751,6 @@ public final class StorageManager {
 
                         cp.setFlags(flags);
                         cp.setName(name);
-                        cp.setLeader(leader);
                         cp.setFriendlyFire(friendly_fire);
                         cp.setNeutralKills(neutral_kills);
                         cp.setRivalKills(rival_kills);
@@ -745,39 +759,39 @@ public final class StorageManager {
                         cp.setDeaths(deaths);
                         cp.setLastSeen(last_seen);
                         cp.setJoinDate(join_date);
-                        cp.setPackedPastClans(packed_past_clans);
-                        cp.setTrusted(leader || trusted);
+                        cp.setPackedPastUnions(packed_past_unions);
+                        cp.setTrusted(trusted);
                         cp.setResignTimes(Helper.resignTimesFromJson(resign_times));
                         cp.setLocale(locale);
 
                         if (!tag.isEmpty()) {
 
-                            Clan clanDB = retrieveOneClan(tag);
-                            Clan clan = plugin.getClanManager().getClan(tag);
+                            Union unionDB = retrieveOneUnion(tag);
+                            Union union = plugin.getUnionManager().getUnion(tag);
 
-                            if (clan != null && clanDB != null) {
+                            if (union != null && unionDB != null) {
 
-                                Clan clanReSync = UnionsOG.getInstance().getClanManager().getClan(tag);
-                                clanReSync.setFlags(clanDB.getFlags());
-                                clanReSync.setFriendlyFire(clanDB.isFriendlyFire());
-                                clanReSync.setTag(clanDB.getTag());
-                                clanReSync.setColorTag(clanDB.getColorTag());
-                                clanReSync.setName(clanDB.getName());
-                                clanReSync.setPackedAllies(clanDB.getPackedAllies());
-                                clanReSync.setPackedRivals(clanDB.getPackedRivals());
-                                clanReSync.setPackedBb(clanDB.getPackedBb());
-                                clanReSync.setFounded(clanDB.getFounded());
-                                clanReSync.setLastUsed(clanDB.getLastUsed());
-                                clanReSync.setBalance(BankOperator.INTERNAL, ClanBalanceUpdateEvent.Cause.LOADING,
-                                        BankLogger.Operation.SET, clanDB.getBalance());
-                                cp.setClan(clanReSync);
+                                Union unionReSync = UnionsOG.getInstance().getUnionManager().getUnion(tag);
+                                unionReSync.setFlags(unionDB.getFlags());
+                                unionReSync.setFriendlyFire(unionDB.isFriendlyFire());
+                                unionReSync.setTag(unionDB.getTag());
+                                unionReSync.setColorTag(unionDB.getColorTag());
+                                unionReSync.setName(unionDB.getName());
+                                unionReSync.setPackedAllies(unionDB.getPackedAllies());
+                                unionReSync.setPackedRivals(unionDB.getPackedRivals());
+                                unionReSync.setPackedBb(unionDB.getPackedBb());
+                                unionReSync.setFounded(unionDB.getFounded());
+                                unionReSync.setLastUsed(unionDB.getLastUsed());
+                                unionReSync.setBalance(BankOperator.INTERNAL, UnionBalanceUpdateEvent.Cause.LOADING,
+                                        BankLogger.Operation.SET, unionDB.getBalance());
+                                cp.setUnion(unionReSync);
 
                             } else {
 
-                                plugin.getClanManager().importClan(clanDB);
-                                clanDB.validateWarring();
-                                Clan newClan = plugin.getClanManager().getClan(clanDB.getTag());
-                                cp.setClan(newClan);
+                                plugin.getUnionManager().importUnion(unionDB);
+                                unionDB.validateWarring();
+                                Union newUnion = plugin.getUnionManager().getUnion(unionDB.getTag());
+                                cp.setUnion(newUnion);
 
                             }
 
@@ -807,44 +821,44 @@ public final class StorageManager {
     }
 
     /**
-     * Insert a clan into the database
+     * Insert a union into the database
      *
      */
-    public void insertClan(Clan clan) {
+    public void insertUnion(Union union) {
 
-        plugin.getProxyManager().sendUpdate(clan);
+        plugin.getProxyManager().sendUpdate(union);
 
         String query = "INSERT INTO `" + getPrefixedTable("clans")
                 + "` (`banner`, `ranks`, `description`, `fee_enabled`, `fee_value`, `verified`, `tag`,"
                 + " `color_tag`, `name`, `friendly_fire`, `founded`, `last_used`, `packed_allies`, `packed_rivals`, "
                 + "`packed_bb`, `cape_url`, `flags`, `balance`) ";
-        String values = "VALUES ( '" + Helper.escapeQuotes(YAMLSerializer.serialize(clan.getBanner())) + "','"
-                + Helper.escapeQuotes(Helper.ranksToJson(clan.getRanks(), clan.getDefaultRank())) + "','"
-                + Helper.escapeQuotes(clan.getDescription()) + "'," + (clan.isMemberFeeEnabled() ? 1 : 0) + ","
-                + Helper.escapeQuotes(String.valueOf(clan.getMemberFee())) + ",1,'" + Helper.escapeQuotes(clan.getTag())
-                + "','" + Helper.escapeQuotes(clan.getColorTag()) + "','" + Helper.escapeQuotes(clan.getName()) + "',"
-                + (clan.isFriendlyFire() ? 1 : 0) + ",'" + clan.getFounded() + "','" + clan.getLastUsed() + "','"
-                + Helper.escapeQuotes(clan.getPackedAllies()) + "','" + Helper.escapeQuotes(clan.getPackedRivals())
-                + "','" + Helper.escapeQuotes(clan.getPackedBb()) + "','" + Helper.escapeQuotes(clan.getCapeUrl())
-                + "','" + Helper.escapeQuotes(clan.getFlags()) + "','"
-                + Helper.escapeQuotes(String.valueOf(clan.getBalance())) + "');";
+        String values = "VALUES ( '" + Helper.escapeQuotes(YAMLSerializer.serialize(union.getBanner())) + "','','"
+                + Helper.escapeQuotes(union.getDescription()) + "'," + (union.isMemberFeeEnabled() ? 1 : 0) + ","
+                + Helper.escapeQuotes(String.valueOf(union.getMemberFee())) + ",1,'"
+                + Helper.escapeQuotes(union.getTag()) + "','" + Helper.escapeQuotes(union.getColorTag()) + "','"
+                + Helper.escapeQuotes(union.getName()) + "'," + (union.isFriendlyFire() ? 1 : 0) + ",'"
+                + union.getFounded() + "','" + union.getLastUsed() + "','"
+                + Helper.escapeQuotes(union.getPackedAllies()) + "','" + Helper.escapeQuotes(union.getPackedRivals())
+                + "','" + Helper.escapeQuotes(union.getPackedBb()) + "','" + Helper.escapeQuotes(union.getCapeUrl())
+                + "','" + Helper.escapeQuotes(union.getFlags()) + "','"
+                + Helper.escapeQuotes(String.valueOf(union.getBalance())) + "');";
         core.executeUpdate(query + values);
 
     }
 
     /**
-     * Update a clan to the database asynchronously
+     * Update a union to the database asynchronously
      *
      */
     @Deprecated
-    public void updateClanAsync(final Clan clan) {
+    public void updateUnionAsync(final Union union) {
 
         new BukkitRunnable() {
 
             @Override
             public void run() {
 
-                updateClan(clan);
+                updateUnion(union);
 
             }
 
@@ -857,7 +871,7 @@ public final class StorageManager {
      *
      * @param cp to update
      */
-    public void updatePlayerNameAsync(final @NotNull ClanPlayer cp) {
+    public void updatePlayerNameAsync(final @NotNull UnionPlayer cp) {
 
         new BukkitRunnable() {
 
@@ -877,7 +891,7 @@ public final class StorageManager {
      *
      * @param cp to update
      */
-    public void updatePlayerName(final @NotNull ClanPlayer cp) {
+    public void updatePlayerName(final @NotNull UnionPlayer cp) {
 
         String query = "UPDATE `" + getPrefixedTable("players") + "` SET `name` = '" + cp.getName() + "' WHERE uuid = '"
                 + cp.getUniqueId() + "';";
@@ -886,52 +900,52 @@ public final class StorageManager {
     }
 
     /**
-     * Update a clan to the database
+     * Update a union to the database
      *
      */
-    public void updateClan(Clan clan) {
+    public void updateUnion(Union union) {
 
-        updateClan(clan, true);
+        updateUnion(union, true);
 
     }
 
     /**
-     * Update a clan to the database
+     * Update a union to the database
      *
-     * @param clan           clan to update
+     * @param union          union to update
      *
-     * @param updateLastUsed should the clan's last used time be updated as well?
+     * @param updateLastUsed should the union's last used time be updated as well?
      */
-    public void updateClan(Clan clan, boolean updateLastUsed) {
+    public void updateUnion(Union union, boolean updateLastUsed) {
 
         if (updateLastUsed) {
 
-            clan.updateLastUsed();
+            union.updateLastUsed();
 
         }
 
-        plugin.getProxyManager().sendUpdate(clan);
+        plugin.getProxyManager().sendUpdate(union);
         if (plugin.getSettingsManager().is(PERFORMANCE_SAVE_PERIODICALLY)) {
 
-            modifiedClans.add(clan);
+            modifiedUnions.add(union);
             return;
 
         }
 
-        try (PreparedStatement st = prepareUpdateClanStatement(core.getConnection())) {
+        try (PreparedStatement st = prepareUpdateUnionStatement(core.getConnection())) {
 
-            setValues(st, clan);
+            setValues(st, union);
             st.executeUpdate();
 
         } catch (SQLException ex) {
 
-            plugin.getLogger().log(Level.SEVERE, String.format("Error updating Clan %s", clan.getTag()), ex);
+            plugin.getLogger().log(Level.SEVERE, String.format("Error updating Clan %s", union.getTag()), ex);
 
         }
 
     }
 
-    private PreparedStatement prepareUpdateClanStatement(Connection connection) throws SQLException {
+    private PreparedStatement prepareUpdateUnionStatement(Connection connection) throws SQLException {
 
         String sql = "UPDATE `" + getPrefixedTable("clans")
                 + "` SET ranks = ?, banner = ?, description = ?, fee_enabled = ?, fee_value = ?, "
@@ -941,74 +955,214 @@ public final class StorageManager {
 
     }
 
-    private void setValues(PreparedStatement statement, Clan clan) throws SQLException {
+    private void setValues(PreparedStatement statement, Union union) throws SQLException {
 
-        statement.setString(1, Helper.ranksToJson(clan.getRanks(), clan.getDefaultRank()));
-        statement.setString(2, YAMLSerializer.serialize(clan.getBanner()));
-        statement.setString(3, clan.getDescription());
-        statement.setInt(4, clan.isMemberFeeEnabled() ? 1 : 0);
-        statement.setDouble(5, clan.getMemberFee());
+        statement.setString(1, "");
+        statement.setString(2, YAMLSerializer.serialize(union.getBanner()));
+        statement.setString(3, union.getDescription());
+        statement.setInt(4, union.isMemberFeeEnabled() ? 1 : 0);
+        statement.setDouble(5, union.getMemberFee());
         statement.setInt(6, 1);
-        statement.setString(7, clan.getTag());
-        statement.setString(8, clan.getColorTag());
-        statement.setString(9, clan.getName());
-        statement.setInt(10, clan.isFriendlyFire() ? 1 : 0);
-        statement.setLong(11, clan.getFounded());
-        statement.setLong(12, clan.getLastUsed());
-        statement.setString(13, clan.getPackedAllies());
-        statement.setString(14, clan.getPackedRivals());
-        statement.setString(15, clan.getPackedBb());
-        statement.setDouble(16, clan.getBalance());
-        statement.setString(17, clan.getFlags());
-        statement.setString(18, clan.getTag());
+        statement.setString(7, union.getTag());
+        statement.setString(8, union.getColorTag());
+        statement.setString(9, union.getName());
+        statement.setInt(10, union.isFriendlyFire() ? 1 : 0);
+        statement.setLong(11, union.getFounded());
+        statement.setLong(12, union.getLastUsed());
+        statement.setString(13, union.getPackedAllies());
+        statement.setString(14, union.getPackedRivals());
+        statement.setString(15, union.getPackedBb());
+        statement.setDouble(16, union.getBalance());
+        statement.setString(17, union.getFlags());
+        statement.setString(18, union.getTag());
 
     }
 
     /**
-     * Delete a clan from the database
+     * Delete a union from the database
      */
-    public void deleteClan(Clan clan) {
+    /**
+     * Retrieves all open proposals from the database
+     *
+     * @return the proposals, keyed by union tag
+     */
+    public Map<String, Proposal> retrieveProposals() {
 
-        plugin.getProxyManager().sendDelete(clan);
-        String query = "DELETE FROM `" + getPrefixedTable("clans") + "` WHERE tag = '" + clan.getTag() + "';";
+        Map<String, Proposal> out = new HashMap<>();
+        String query = "SELECT * FROM `" + getPrefixedTable("proposals") + "`;";
+
+        try (ResultSet res = core.select(query)) {
+
+            if (res == null) {
+
+                return out;
+
+            }
+
+            while (res.next()) {
+
+                String tag = res.getString("tag");
+                ProposalType type = ProposalType.fromName(res.getString("type"));
+                UUID proposer = parseUuid(res.getString("proposer"));
+                if (type == null || proposer == null) {
+
+                    continue;
+
+                }
+
+                Proposal proposal = new Proposal(type, tag, proposer, res.getString("target"),
+                        res.getLong("created_at"));
+                proposal.putVotes(votesFromString(res.getString("votes")));
+                out.put(tag, proposal);
+
+            }
+
+        } catch (SQLException ex) {
+
+            plugin.getLogger().log(Level.SEVERE, "Error retrieving proposals", ex);
+
+        }
+
+        return out;
+
+    }
+
+    /**
+     * Inserts or updates a proposal. A union can only have one open proposal, so
+     * the union's tag identifies the row.
+     */
+    public void saveProposal(Proposal proposal) {
+
+        deleteProposal(proposal.getUnionTag());
+
+        String query = "INSERT INTO `" + getPrefixedTable("proposals")
+                + "` (`tag`, `type`, `target`, `proposer`, `created_at`, `votes`) VALUES ('"
+                + Helper.escapeQuotes(proposal.getUnionTag()) + "','" + proposal.getType().name() + "','"
+                + Helper.escapeQuotes(proposal.getTarget()) + "','" + proposal.getProposer() + "','"
+                + proposal.getCreatedAt() + "','" + votesToString(proposal.getVotes()) + "');";
+        core.executeUpdate(query);
+
+    }
+
+    public void deleteProposal(String unionTag) {
+
+        String query = "DELETE FROM `" + getPrefixedTable("proposals") + "` WHERE tag = '"
+                + Helper.escapeQuotes(unionTag) + "';";
+        core.executeUpdate(query);
+
+    }
+
+    private @Nullable UUID parseUuid(@Nullable String uuid) {
+
+        if (uuid == null) {
+
+            return null;
+
+        }
+
+        try {
+
+            return UUID.fromString(uuid);
+
+        } catch (IllegalArgumentException ex) {
+
+            return null;
+
+        }
+
+    }
+
+    private String votesToString(Map<UUID, Boolean> votes) {
+
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<UUID, Boolean> vote : votes.entrySet()) {
+
+            if (sb.length() > 0) {
+
+                sb.append(',');
+
+            }
+
+            sb.append(vote.getKey()).append('=').append(vote.getValue() ? '1' : '0');
+
+        }
+
+        return sb.toString();
+
+    }
+
+    private Map<UUID, Boolean> votesFromString(@Nullable String votes) {
+
+        Map<UUID, Boolean> out = new LinkedHashMap<>();
+        if (votes == null || votes.isEmpty()) {
+
+            return out;
+
+        }
+
+        for (String vote : votes.split(",")) {
+
+            String[] parts = vote.split("=");
+            if (parts.length != 2) {
+
+                continue;
+
+            }
+
+            UUID voter = parseUuid(parts[0]);
+            if (voter != null) {
+
+                out.put(voter, "1".equals(parts[1]));
+
+            }
+
+        }
+
+        return out;
+
+    }
+
+    public void deleteUnion(Union union) {
+
+        plugin.getProxyManager().sendDelete(union);
+        String query = "DELETE FROM `" + getPrefixedTable("clans") + "` WHERE tag = '" + union.getTag() + "';";
         core.executeUpdate(query);
 
     }
 
     /**
-     * Insert a clan player into the database
+     * Insert a union player into the database
      *
      */
-    public void insertClanPlayer(ClanPlayer cp) {
+    public void insertUnionPlayer(UnionPlayer cp) {
 
         plugin.getProxyManager().sendUpdate(cp);
 
         String query = "INSERT INTO `" + getPrefixedTable("players")
                 + "` (`uuid`, `name`, `leader`, `tag`, `friendly_fire`, `neutral_kills`, "
                 + "`rival_kills`, `civilian_kills`, `deaths`, `last_seen`, `join_date`, `packed_past_clans`, `flags`) ";
-        String values = "VALUES ('" + cp.getUniqueId().toString() + "', '" + cp.getName() + "',"
-                + (cp.isLeader() ? 1 : 0) + ",'" + Helper.escapeQuotes(cp.getTag()) + "',"
-                + (cp.isFriendlyFire() ? 1 : 0) + "," + cp.getNeutralKills() + "," + cp.getRivalKills() + ","
-                + cp.getCivilianKills() + "," + cp.getDeaths() + ",'" + cp.getLastSeen() + "',' " + cp.getJoinDate()
-                + "','" + Helper.escapeQuotes(cp.getPackedPastClans()) + "','" + Helper.escapeQuotes(cp.getFlags())
-                + "');";
+        String values = "VALUES ('" + cp.getUniqueId().toString() + "', '" + cp.getName() + "'," + 0 + ",'"
+                + Helper.escapeQuotes(cp.getTag()) + "'," + (cp.isFriendlyFire() ? 1 : 0) + "," + cp.getNeutralKills()
+                + "," + cp.getRivalKills() + "," + cp.getCivilianKills() + "," + cp.getDeaths() + ",'"
+                + cp.getLastSeen() + "',' " + cp.getJoinDate() + "','" + Helper.escapeQuotes(cp.getPackedPastUnions())
+                + "','" + Helper.escapeQuotes(cp.getFlags()) + "');";
         core.executeUpdate(query + values);
 
     }
 
     /**
-     * Update a clan player to the database asynchronously
+     * Update a union player to the database asynchronously
      *
      */
     @Deprecated
-    public void updateClanPlayerAsync(final ClanPlayer cp) {
+    public void updateUnionPlayerAsync(final UnionPlayer cp) {
 
         new BukkitRunnable() {
 
             @Override
             public void run() {
 
-                updateClanPlayer(cp);
+                updateUnionPlayer(cp);
 
             }
 
@@ -1017,21 +1171,21 @@ public final class StorageManager {
     }
 
     /**
-     * Update a clan player to the database
+     * Update a union player to the database
      *
      */
-    public void updateClanPlayer(ClanPlayer cp) {
+    public void updateUnionPlayer(UnionPlayer cp) {
 
         cp.updateLastSeen();
         plugin.getProxyManager().sendUpdate(cp);
         if (plugin.getSettingsManager().is(PERFORMANCE_SAVE_PERIODICALLY)) {
 
-            modifiedClanPlayers.add(cp);
+            modifiedUnionPlayers.add(cp);
             return;
 
         }
 
-        try (PreparedStatement st = prepareUpdateClanPlayerStatement(core.getConnection())) {
+        try (PreparedStatement st = prepareUpdateUnionPlayerStatement(core.getConnection())) {
 
             setValues(st, cp);
             st.executeUpdate();
@@ -1044,7 +1198,7 @@ public final class StorageManager {
 
     }
 
-    private PreparedStatement prepareUpdateClanPlayerStatement(Connection connection) throws SQLException {
+    private PreparedStatement prepareUpdateUnionPlayerStatement(Connection connection) throws SQLException {
 
         String sql = "UPDATE `" + getPrefixedTable("players")
                 + "` SET locale = ?, resign_times = ?, leader = ?, tag = ?, friendly_fire = ?,"
@@ -1054,11 +1208,11 @@ public final class StorageManager {
 
     }
 
-    private void setValues(PreparedStatement statement, ClanPlayer cp) throws SQLException {
+    private void setValues(PreparedStatement statement, UnionPlayer cp) throws SQLException {
 
         statement.setString(1, Helper.toLanguageTag(cp.getLocale()));
         statement.setString(2, Helper.resignTimesToJson(cp.getResignTimes()));
-        statement.setInt(3, cp.isLeader() ? 1 : 0);
+        statement.setInt(3, 0);
         statement.setString(4, cp.getTag());
         statement.setInt(5, cp.isFriendlyFire() ? 1 : 0);
         statement.setInt(6, cp.getNeutralKills());
@@ -1067,7 +1221,7 @@ public final class StorageManager {
         statement.setInt(9, cp.getCivilianKills());
         statement.setInt(10, cp.getDeaths());
         statement.setLong(11, cp.getLastSeen());
-        statement.setString(12, cp.getPackedPastClans());
+        statement.setString(12, cp.getPackedPastUnions());
         statement.setInt(13, cp.isTrusted() ? 1 : 0);
         statement.setString(14, cp.getFlags());
         statement.setString(15, cp.getName());
@@ -1076,15 +1230,15 @@ public final class StorageManager {
     }
 
     /**
-     * Delete a clan player from the database
+     * Delete a union player from the database
      */
-    public void deleteClanPlayer(ClanPlayer cp) {
+    public void deleteUnionPlayer(UnionPlayer cp) {
 
-        final Clan clan = cp.getClan();
-        if (clan != null) {
+        final Union union = cp.getUnion();
+        if (union != null) {
 
-            clan.addBbWithoutSaving(MessageFormat.format(lang("has.been.purged"), cp.getName()));
-            updateClan(clan, false);
+            union.addBbWithoutSaving(MessageFormat.format(lang("has.been.purged"), cp.getName()));
+            updateUnion(union, false);
 
         }
 
@@ -1117,7 +1271,7 @@ public final class StorageManager {
      * @param victim   the victim
      * @param type     the kill type
      */
-    public void insertKill(@NotNull ClanPlayer attacker, @NotNull ClanPlayer victim, @NotNull String type,
+    public void insertKill(@NotNull UnionPlayer attacker, @NotNull UnionPlayer victim, @NotNull String type,
             @NotNull LocalDateTime time)
     {
 
@@ -1474,13 +1628,13 @@ public final class StorageManager {
 
         logMigrationStart();
 
-        List<ClanPlayer> cps = retrieveClanPlayers();
+        List<UnionPlayer> cps = retrieveUnionPlayers();
         Map<String, UUID> uuidMap = fetchUUIDs(cps);
 
         int totalPlayers = cps.size();
         for (int i = 0; i < totalPlayers; i++) {
 
-            ClanPlayer cp = cps.get(i);
+            UnionPlayer cp = cps.get(i);
             try {
 
                 UUID uuid = uuidMap.get(cp.getName());
@@ -1519,7 +1673,7 @@ public final class StorageManager {
 
     }
 
-    private Map<String, UUID> fetchUUIDs(List<ClanPlayer> clanPlayers) {
+    private Map<String, UUID> fetchUUIDs(List<UnionPlayer> unionPlayers) {
 
         Map<String, UUID> uuidMap = new HashMap<>();
 
@@ -1527,11 +1681,11 @@ public final class StorageManager {
 
             if (UnionsOG.getInstance().getServer().getOnlineMode()) {
 
-                uuidMap = UUIDFetcher.fetchUUIDsForClanPlayers(clanPlayers);
+                uuidMap = UUIDFetcher.fetchUUIDsForUnionPlayers(unionPlayers);
 
             } else {
 
-                uuidMap = clanPlayers.stream().collect(Collectors.toMap(ClanPlayer::getName, player -> UUID
+                uuidMap = unionPlayers.stream().collect(Collectors.toMap(UnionPlayer::getName, player -> UUID
                         .nameUUIDFromBytes(("OfflinePlayer:" + player.getName()).getBytes(StandardCharsets.UTF_8))));
 
             }
@@ -1576,7 +1730,7 @@ public final class StorageManager {
 
         if (totalPlayers > 0) {
 
-            plugin.getLogger().info(MessageFormat.format(lang("clan.players"), totalPlayers));
+            plugin.getLogger().info(MessageFormat.format(lang("union.players"), totalPlayers));
 
         }
 
@@ -1589,7 +1743,7 @@ public final class StorageManager {
     }
 
     /**
-     * Saves modified Clans and ClanPlayers to the database
+     * Saves modified Unions and UnionPlayers to the database
      * 
      * @since 2.10.2
      *
@@ -1599,11 +1753,11 @@ public final class StorageManager {
      */
     public void saveModified() {
 
-        try (PreparedStatement pst = prepareUpdateClanPlayerStatement(core.getConnection())) {
+        try (PreparedStatement pst = prepareUpdateUnionPlayerStatement(core.getConnection())) {
 
             // removing purged players
-            modifiedClanPlayers.retainAll(plugin.getClanManager().getAllClanPlayers());
-            for (ClanPlayer cp : modifiedClanPlayers) {
+            modifiedUnionPlayers.retainAll(plugin.getUnionManager().getAllUnionPlayers());
+            for (UnionPlayer cp : modifiedUnionPlayers) {
 
                 setValues(pst, cp);
                 pst.addBatch();
@@ -1612,7 +1766,7 @@ public final class StorageManager {
 
             pst.executeBatch();
 
-            modifiedClanPlayers.clear();
+            modifiedUnionPlayers.clear();
 
         } catch (SQLException ex) {
 
@@ -1620,20 +1774,20 @@ public final class StorageManager {
 
         }
 
-        try (PreparedStatement pst = prepareUpdateClanStatement(core.getConnection())) {
+        try (PreparedStatement pst = prepareUpdateUnionStatement(core.getConnection())) {
 
-            // removing disbanded clans
-            modifiedClans.retainAll(plugin.getClanManager().getClans());
-            for (Clan clan : modifiedClans) {
+            // removing disbanded unions
+            modifiedUnions.retainAll(plugin.getUnionManager().getUnions());
+            for (Union union : modifiedUnions) {
 
-                setValues(pst, clan);
+                setValues(pst, union);
                 pst.addBatch();
 
             }
 
             pst.executeBatch();
 
-            modifiedClans.clear();
+            modifiedUnions.clear();
 
         } catch (SQLException ex) {
 

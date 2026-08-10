@@ -6,7 +6,7 @@ import co.aikar.commands.CommandIssuer;
 import co.aikar.commands.PaperCommandManager;
 import co.aikar.locales.MessageKey;
 import co.aikar.locales.MessageKeyProvider;
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.UnionPlayer;
 import net.trueog.unionsog.Helper;
 import net.trueog.unionsog.UnionsOG;
 import net.trueog.unionsog.commands.completions.AbstractAsyncCompletion;
@@ -65,7 +65,7 @@ public class SCCommandManager extends PaperCommandManager {
 
     private void registerDependencies() {
 
-        registerDependency(ClanManager.class, plugin.getClanManager());
+        registerDependency(UnionManager.class, plugin.getUnionManager());
         registerDependency(SettingsManager.class, plugin.getSettingsManager());
         registerDependency(StorageManager.class, plugin.getStorageManager());
         registerDependency(PermissionsManager.class, plugin.getPermissionsManager());
@@ -220,7 +220,7 @@ public class SCCommandManager extends PaperCommandManager {
             // TODO: start - remove with UnionBankZeroMigration once union bank accounts
             // exist. Union banks hold no real value yet, so their commands stay
             // unregistered.
-            if (c == net.trueog.unionsog.commands.clan.BankCommand.class
+            if (c == net.trueog.unionsog.commands.union.BankCommand.class
                     || c == net.trueog.unionsog.commands.staff.BankCommand.class)
             {
 
@@ -247,24 +247,23 @@ public class SCCommandManager extends PaperCommandManager {
     private void addReplacements() {
 
         SettingsManager sm = plugin.getSettingsManager();
-        getCommandReplacements().addReplacements("basic_conditions", "not_blacklisted|not_banned", "clan",
-                getClanCommandAliases(sm), "deny", sm.getString(COMMANDS_DENY) + "|deny", "more",
+        getCommandReplacements().addReplacements("basic_conditions", "not_blacklisted|not_banned", "union",
+                getUnionCommandAliases(sm), "deny", sm.getString(COMMANDS_DENY) + "|deny", "more",
                 sm.getString(COMMANDS_MORE), "ally_chat", sm.getString(COMMANDS_ALLY), "accept",
-                sm.getString(COMMANDS_ACCEPT) + "|accept", "clan_chat", sm.getString(COMMANDS_CLAN_CHAT));
+                sm.getString(COMMANDS_ACCEPT) + "|accept", "union_chat", sm.getString(COMMANDS_UNION_CHAT));
 
         SUBCOMMANDS.forEach(s -> processReplacement(s, "", ".command", true));
         COMPLETIONS.forEach(s -> processReplacement(s, "compl:", ".completion", false));
 
     }
 
-    private String getClanCommandAliases(SettingsManager sm) {
+    private String getUnionCommandAliases(SettingsManager sm) {
 
         Set<String> aliases = new LinkedHashSet<>();
-        aliases.add(sm.getString(COMMANDS_CLAN));
+        aliases.add(sm.getString(COMMANDS_UNION));
         aliases.add("union");
         aliases.add("unions");
-        aliases.add("clan");
-        aliases.add("clans");
+        // clan and clans are not aliases; GroupAliasCommand redirects them.
         return String.join("|", aliases);
 
     }
@@ -316,7 +315,7 @@ public class SCCommandManager extends PaperCommandManager {
 
     private void processReplacement(String key, String prefix, String suffix, boolean hasFallback) {
 
-        String replacement = optionalLang(key + suffix, (ClanPlayer) null);
+        String replacement = optionalLang(key + suffix, (UnionPlayer) null);
         if (replacement == null) {
 
             replacement = key;
@@ -336,16 +335,14 @@ public class SCCommandManager extends PaperCommandManager {
 
     static {
 
-        SUBCOMMANDS = Arrays.asList("setbanner", "resetkdr", "place", "rank", "home", "war", "regroup", "mostkilled",
-                "kills", "globalff", "reload", "unban", "ban", "disband", "resign", "ff", "clanff", "demote", "promote",
-                "untrust", "trust", "purge", "bank", "kick", "invite", "toggle", "modtag", "bb", "display", "clear",
-                "rival", "ally", "add", "remove", "stats", "coords", "vitals", "rivalries", "alliances", "leaderboard",
-                "allow", "block", "auto", "check", "assign", "unassign", "delete", "me", "setdisplayname",
-                "permissions", "tag", "deposit", "withdraw", "set", "status", "tp", "all", "everyone", "lookup",
-                "roster", "profile", "list", "create", "description", "start", "end", "admin", "help", "mod",
-                "setdefault", "removedefault", "land", "break", "interact", "place_block", "damage", "interact_entity",
-                "container", "permanent", "take", "give", "join", "leave", "mute", "confirm", "balance", "discord",
-                "rename", "locale", "color");
+        SUBCOMMANDS = Arrays.asList("setbanner", "resetkdr", "place", "home", "war", "regroup", "mostkilled", "kills",
+                "globalff", "reload", "unban", "ban", "disband", "resign", "ff", "unionff", "vote", "yes", "no",
+                "purge", "bank", "kick", "invite", "toggle", "modtag", "bb", "display", "clear", "rival", "ally", "add",
+                "remove", "stats", "coords", "vitals", "rivalries", "alliances", "leaderboard", "allow", "block",
+                "auto", "check", "delete", "me", "tag", "deposit", "withdraw", "set", "status", "tp", "all", "everyone",
+                "lookup", "roster", "profile", "list", "create", "description", "start", "end", "admin", "help", "mod",
+                "land", "break", "interact", "place_block", "damage", "interact_entity", "container", "permanent",
+                "take", "give", "join", "leave", "mute", "confirm", "balance", "discord", "rename", "locale", "color");
 
         COMPLETIONS = Arrays.asList("tag", "name");
 

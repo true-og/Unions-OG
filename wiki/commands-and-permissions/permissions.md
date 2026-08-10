@@ -4,134 +4,147 @@ description: null
 
 # Permissions
 
-## SuperPerms Nodes \(Some auto added\)
+All Unions-OG permissions live under `unionsog.*`.
 
-These super permission nodes are a quick way to setup SimpleClans, some are automatically given \(See Auto Added\). If you wish to setup individual permissions to groups you will need to deny these auto added super permission nodes and setup permissions one by one after.
+> [!IMPORTANT]
+> Unions are flat. There is no `unionsog.leader.*` tree, and no rank,
+> promotion or demotion nodes. Everything a member can do inside their union
+> lives under `unionsog.member.*`.
 
-| Permission | Description |
-| :--- | :--- |
-| `simpleclans.anyone.*` \(Auto added\) | Permissions for anyone |
-| `simpleclans.member.*` \(Auto added\) | Permissions for those who can be clan members |
-| `simpleclans.leader.*` \(Auto added\) | Permissions for those who can be clan leaders |
-| `simpleclans.mod.*` \(Auto added to OPS\) | Permissions for moderators |
-| `simpleclans.admin.*` \(Auto added to OPS\) | Permissions for admins |
+## Node groups \(some auto added\)
 
-## Individual Nodes
+These group nodes are the quick way to set Unions-OG up. If you want to grant
+permissions individually, deny the group node and add the individual nodes
+instead.
 
-\(You don't need to add these as they are all included if you've already added the node groups \(above\). They are only included here as reference in case you want to toggle a couple of them off individually. Then you can just drop those in, set to false, along with the node groups.\)
+| Permission | Default | Description |
+| :--- | :--- | :--- |
+| `unionsog.anyone.*` | everyone | Permissions for anyone |
+| `unionsog.member.*` | everyone | Permissions for those who can be union members |
+| `unionsog.member.land.*` | off | Permissions for allowing/blocking actions in claimed land |
+| `unionsog.mod.*` | operators | Permissions for moderators |
+| `unionsog.admin.*` | operators | Permissions for admins |
 
-### Anyone Nodes
+## Individual nodes
 
-| Permission | Description |
-| :--- | :--- |
-| `simpleclans.anyone.alliances` | Can view alliances by clan |
-| `simpleclans.anyone.leaderboard` | Can view the leaderboard |
-| `simpleclans.anyone.list` | Can list simpleclans |
-| `simpleclans.anyone.lookup` | Can lookup a player's info |
-| `simpleclans.anyone.profile` | Can view a clan's profile |
-| `simpleclans.anyone.rivalries` | Can view rivalries by clan |
-| `simpleclans.anyone.roster` | Can view a clan's member list |
+You do not need to add these if you already granted the group nodes above.
+They are listed so you can toggle individual permissions off.
 
-### Member Nodes
+### Anyone nodes
 
 | Permission | Description |
 | :--- | :--- |
-| `simpleclans.member.abstain` | Can abstain |
-| `simpleclans.member.accept` | Can accept |
-| `simpleclans.member.ally` | Can use ally chat |
-| `simpleclans.member.chat` | Can use clan chat |
-| `simpleclans.member.bank` | Can use the clan bank |
-| `simpleclans.member.bb-add` | Can add to his clan's bulletin board |
-| `simpleclans.member.bb-toggle` | Can toggle the bulletin board on/off |
-| `simpleclans.member.bb` | Can view his clan's bulletin board |
-| `simpleclans.member.can-join` | Can join clans |
-| `simpleclans.member.coords` | Can view his clan's coords |
-| `simpleclans.member.deny` | Can deny |
-| `simpleclans.member.ff` | Can toggle his own friendly fire |
-| `simpleclans.member.home` | Can tp to home base |
-| `simpleclans.member.kills` | Can view his and other's kills |
-| `simpleclans.member.lookup` | Can view his own player info |
-| `simpleclans.member.profile` | Can view his own clan's profile |
-| `simpleclans.member.resign` | Can resign from his clan |
-| `simpleclans.member.roster` | Can view his own clan's member list |
-| `simpleclans.member.stats` | Can view his clan stats |
-| `simpleclans.member.vitals` | Can view his clan's vitals |
-| `simpleclans.member.toggle.bb` | Can toggle bb on/off |
-| `simpleclans.member.tag-toggle` | Can hide/show their clan tag |
-| `simpleclans.member.fee-check` | Allows the member to check how much is the fee and if it's enabled |
-| `simpleclans.member.bypass-fee` | Can bypass the member fee |
+| `unionsog.anyone.alliances` | Can view alliances by union |
+| `unionsog.anyone.invite-toggle` | Can toggle union invites on/off |
+| `unionsog.anyone.leaderboard` | Can view the leaderboard |
+| `unionsog.anyone.list` | Can list unions |
+| `unionsog.anyone.list.balance` | Can list unions by balance |
+| `unionsog.anyone.locale` | Can set their language |
+| `unionsog.anyone.lookup` | Can look up a player's info |
+| `unionsog.anyone.profile` | Can view a union's profile |
+| `unionsog.anyone.rivalries` | Can view rivalries by union |
+| `unionsog.anyone.roster` | Can view a union's member list |
 
-### Leader Nodes
+### Member nodes
 
 | Permission | Description |
 | :--- | :--- |
-| `simpleclans.leader.fee` | allows the user to toggle the fee and set its value |
-| `simpleclans.leader.ally` | Can ally his clan with other clans |
-| `simpleclans.leader.create` | Can create clans |
-| `simpleclans.leader.verify` | Can verify their clan |
-| `simpleclans.leader.demote` | Can demote clan leaders to normal players |
-| `simpleclans.leader.disband` | Can disband his own clan |
-| `simpleclans.leader.ff` | Can toggle his clan's friendly fire |
-| `simpleclans.leader.home-set` | Can set home base |
-| `simpleclans.leader.regroup.me` | Can teleport the entire clan to themself |
-| `simpleclans.leader.regroup.home` | Can teleport the entire clan to homebase |
-| `simpleclans.leader.invite` | Can invite players into his clan |
-| `simpleclans.leader.kick` | Can kick players form his clan |
-| `simpleclans.leader.color` | Can set his clan's color |
-| `simpleclans.leader.description` | Can modify their clan's description |
-| `simpleclans.leader.coloredrank` | Can use color codes in rank display names |
-| `simpleclans.leader.promotable` | Can be promoted to clan leader |
-| `simpleclans.leader.promote` | Can promote players to clan leaders |
-| `simpleclans.leader.rank.assign` | Can assign a rank to a user |
-| `simpleclans.leader.rank.unassign` | Can unassign a player from a rank |
-| `simpleclans.leader.rank.create` | Can create a new rank |
-| `simpleclans.leader.rank.delete` | Can delete a new rank |
-| `simpleclans.leader.rank.list` | Can list all the ranks |
-| `simpleclans.leader.rank.setdisplayname` | Can set the display name of the rank |
-| `simpleclans.leader.rank.permissions.add` | Can add permissions to a rank |
-| `simpleclans.leader.rank.permissions.available` | Can list all available permissions |
-| `simpleclans.leader.rank.permissions.list` | Can list the rank's permissions |
-| `simpleclans.leader.rank.permissions.remove` | Can remove permissions from a rank |
-| `simpleclans.leader.rival` | Can start a rivalry with another clan |
-| `simpleclans.leader.settrust` | Can set trust levels for members |
-| `simpleclans.leader.war` | Can start wars |
-| `simpleclans.leader.setbanner` | Can set his clan's banner |
-| `simpleclans.leader.withdraw-toggle:` | Can toggle clan bank withdraw |
-| `simpleclans.leader.deposit-toggle:` | Can toggle clan bank deposit |
-| `simpleclans.leader.bb-clear` | Clan clear their clan's bb |
+| `unionsog.member.can-join` | Can join unions |
+| `unionsog.member.create` | Can create unions |
+| `unionsog.member.resign` | Can resign from their union |
+| `unionsog.member.rename` | Can rename their union |
+| `unionsog.member.description` | Can modify their union's description |
+| `unionsog.member.color` | Can set their union's color |
+| `unionsog.member.modtag` | Can modify their union's tag |
+| `unionsog.member.coloredtag` | Can use color codes in tags |
+| `unionsog.member.setbanner` | Can set their union's banner |
+| `unionsog.member.invite` | Can invite players into their union |
+| `unionsog.member.kick` | Can kick members from their union |
+| `unionsog.member.ally-set` | Can add and remove their union's allies |
+| `unionsog.member.rival` | Can start and end a rivalry with another union |
+| `unionsog.member.union-ff` | Can toggle their union's friendly fire |
+| `unionsog.member.ff` | Can toggle their own friendly fire |
+| `unionsog.member.home` | Can teleport to the home base |
+| `unionsog.member.home-set` | Can propose moving the home base, and clear it |
+| `unionsog.member.regroup.home` | Can regroup the union to the home base |
+| `unionsog.member.regroup.me` | Can regroup the union to themself |
+| `unionsog.member.discord.create` | Can create a Discord channel for their union |
+| `unionsog.member.land` | Can use land commands |
+| `unionsog.member.bank` | Can use union banks |
+| `unionsog.member.bb` | Can view their union's bulletin board |
+| `unionsog.member.bb-add` | Can post to the bulletin board |
+| `unionsog.member.bb-clear` | Can clear the bulletin board |
+| `unionsog.member.bb-toggle` | Can toggle the bulletin board on login |
+| `unionsog.member.chat` | Can use union chat |
+| `unionsog.member.chat.color` | Can use colors in chat |
+| `unionsog.member.chat.format` | Can use formats in chat \(off by default\) |
+| `unionsog.member.ally` | Can use ally chat |
+| `unionsog.member.coords` | Can view their union's coords |
+| `unionsog.member.kills` | Can view their and others' kills |
+| `unionsog.member.lookup` | Can view their own player info |
+| `unionsog.member.profile` | Can view their own union's profile |
+| `unionsog.member.roster` | Can view their own union's member list |
+| `unionsog.member.stats` | Can view their union's stats |
+| `unionsog.member.vitals` | Can view their union's vitals |
+| `unionsog.member.tag-toggle` | Can hide their own union tag |
 
-### Mod Nodes
+#### Voting nodes
 
-| Permission | Description |
-| :--- | :--- |
-| `simpleclans.mod.ban` | Can ban players from the entire plugin |
-| `simpleclans.mod.bypass` | Can bypass restrictions |
-| `simpleclans.mod.disband` | Can disband any clan |
-| `simpleclans.mod.globalff` | Can turn off global friendly fire protection |
-| `simpleclans.mod.home` | Can set other clan's home |
-| `simpleclans.mod.hometp` | Can teleport to all clans homes |
-| `simpleclans.mod.staffgui` | Can open the staff GUI |
-| `simpleclans.mod.place` | Can manually place players in clans |
-| `simpleclans.mod.keep-items` | Can keep items when teleporting home |
-| `simpleclans.mod.mostkilled` | Can view his and other's clans mostkilled |
-| `simpleclans.mod.nopvpinwar` | Can bypass PvP in wars |
-| `simpleclans.mod.unban` | Can unban players from the entire plugin |
-| `simpleclans.mod.verify` | Can verify clans |
-
-### Admin Nodes
+See [Proposals and Voting](proposals-and-voting.md).
 
 | Permission | Description |
 | :--- | :--- |
-| `simpleclans.admin.resetkdr` | Can reset a player's or everyone's KDR |
-| `simpleclans.admin.purge` | Can purge a player |
-| `simpleclans.admin.demote` | Can demote a player back to member |
-| `simpleclans.admin.promote` | Can promote players to clan leaders |
-| `simpleclans.admin.all-seeing-eye` | Can see all clan chats |
-| `simpleclans.admin.reload` | Can reload configuration |
+| `unionsog.member.vote` | Can vote on their union's proposals |
+| `unionsog.member.disband` | Can propose disbanding their union |
+| `unionsog.member.war` | Can propose a war and answer war requests |
 
-### Other Nodes
+### Mod nodes
 
-| Permission | Node |
+| Permission | Description |
 | :--- | :--- |
-| `simpleclans.other.kdr-exempt` | The player's KDR is not affected on killing/dying \(check Known Issues\) |
-| `simpleclans.vip.resetkdr` | Can reset their KDR |
+| `unionsog.mod.ban` | Can ban and unban players from the entire plugin |
+| `unionsog.mod.bypass` | Can bypass restrictions |
+| `unionsog.mod.disband` | Can disband any union, bypassing the vote |
+| `unionsog.mod.kick` | Can kick any player |
+| `unionsog.mod.rename` | Can rename any union |
+| `unionsog.mod.modtag` | Can change any union's tag |
+| `unionsog.mod.globalff` | Can turn off global friendly fire protection |
+| `unionsog.mod.home` | Can set any union's home |
+| `unionsog.mod.hometp` | Can teleport to any union's home |
+| `unionsog.mod.keep-items` | Can keep items when teleporting home |
+| `unionsog.mod.mostkilled` | Can view most killed counts |
+| `unionsog.mod.nopvpinwar` | Can bypass PvP in wars |
+| `unionsog.mod.place` | Can manually place players in unions |
+| `unionsog.mod.locale` | Can set players' language |
+| `unionsog.mod.staffgui` | Can open the staff GUI |
+| `unionsog.mod.bb` | Can view any union's bulletin board |
+| `unionsog.mod.bb-add` | Can post to any union's bulletin board |
+| `unionsog.mod.bb-clear` | Can clear any union's bulletin board |
+
+### Admin nodes
+
+| Permission | Description |
+| :--- | :--- |
+| `unionsog.admin.reload` | Can reload the configuration |
+| `unionsog.admin.purge` | Can purge a player |
+| `unionsog.admin.permanent` | Can toggle a union's permanent status |
+| `unionsog.admin.resetkdr` | Can reset a player's or everyone's KDR |
+| `unionsog.admin.all-seeing-eye` | Can see all union chats |
+| `unionsog.admin.bank.status` | Can check a union's balance |
+| `unionsog.admin.bank.give` | Can give money to a union |
+| `unionsog.admin.bank.take` | Can take money from a union |
+| `unionsog.admin.bank.set` | Can set a union's balance |
+
+### Other nodes
+
+| Permission | Description |
+| :--- | :--- |
+| `unionsog.other.kdr-exempt` | The player's KDR is not affected on killing/dying \(see Known Issues\). Off by default |
+| `unionsog.vip.resetkdr` | Can reset their own KDR |
+| `unionsog.vip.teleport-delay` | Bypasses the teleport delay |
+
+## Removed nodes
+
+The upstream nodes for leaders, ranks, trust, verification and member fees no
+longer exist. If your permission plugin still grants `simpleclans.*` or
+`unionsog.leader.*` nodes, they are inert and can be deleted.

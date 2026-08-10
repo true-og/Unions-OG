@@ -1,10 +1,10 @@
 package net.trueog.unionsog.hooks.papi;
 
-import net.trueog.unionsog.Clan;
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.Union;
+import net.trueog.unionsog.UnionPlayer;
 import net.trueog.unionsog.Helper;
 import net.trueog.unionsog.UnionsOG;
-import net.trueog.unionsog.managers.ClanManager;
+import net.trueog.unionsog.managers.UnionManager;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -20,19 +20,19 @@ import java.util.regex.Pattern;
 
 public class UnionsOGPlaceholderEngine {
 
-    private static final Pattern TOP_CLANS_PATTERN = Pattern.compile("(?<strip>^topclans_(?<position>\\d+)_)clan_");
+    private static final Pattern TOP_UNIONS_PATTERN = Pattern.compile("(?<strip>^topclans_(?<position>\\d+)_)clan_");
     private static final Pattern TOP_PLAYERS_PATTERN = Pattern.compile("(?<strip>^topplayers_(?<position>\\d+)_)");
-    private static final String CLAN_COLOR_TAG_PLACEHOLDER = "clan_color_tag";
-    private static final String NO_CLAN_COLOR_TAG = "&8None";
+    private static final String UNION_COLOR_TAG_PLACEHOLDER = "clan_color_tag";
+    private static final String NO_UNION_COLOR_TAG = "&8None";
 
     private final UnionsOG plugin;
-    private final ClanManager clanManager;
+    private final UnionManager unionManager;
     private final Map<String, PlaceholderResolver> resolvers = new HashMap<>();
 
     public UnionsOGPlaceholderEngine(@NotNull UnionsOG plugin) {
 
         this.plugin = plugin;
-        clanManager = plugin.getClanManager();
+        unionManager = plugin.getUnionManager();
         registerResolvers();
 
     }
@@ -43,8 +43,8 @@ public class UnionsOGPlaceholderEngine {
         LinkedHashSet<String> allPlaceholders = new LinkedHashSet<>();
         addLegacyPlaceholders(identifier + "_", getPlayerPlaceholders(), allPlaceholders);
         addLegacyPlaceholders(identifier + "_", getPlayerAliases(), allPlaceholders);
-        addLegacyPlaceholders(identifier + "_clan_", getClanPlaceholders(), allPlaceholders);
-        addLegacyPlaceholders(identifier + "_union_", getUnionPlaceholders(), allPlaceholders);
+        addLegacyPlaceholders(identifier + "_clan_", getUnionPlaceholders(), allPlaceholders);
+        addLegacyPlaceholders(identifier + "_union_", getUnionPlaceholdersAndAliases(), allPlaceholders);
         return new ArrayList<>(allPlaceholders);
 
     }
@@ -52,14 +52,14 @@ public class UnionsOGPlaceholderEngine {
     @NotNull
     public List<String> getPlayerPlaceholders() {
 
-        return getPlaceholderNames(ClanPlayer.class);
+        return getPlaceholderNames(UnionPlayer.class);
 
     }
 
     @NotNull
     public List<String> getPlayerAliases() {
 
-        return getAliases(ClanPlayer.class);
+        return getAliases(UnionPlayer.class);
 
     }
 
@@ -71,22 +71,22 @@ public class UnionsOGPlaceholderEngine {
     }
 
     @NotNull
-    public List<String> getClanPlaceholders() {
+    public List<String> getUnionPlaceholders() {
 
-        return getPlaceholderNames(Clan.class);
+        return getPlaceholderNames(Union.class);
 
     }
 
     @NotNull
-    public List<String> getUnionPlaceholders() {
+    public List<String> getUnionPlaceholdersAndAliases() {
 
-        return combine(getClanPlaceholders(), getAliases(Clan.class));
+        return combine(getUnionPlaceholders(), getAliases(Union.class));
 
     }
 
     @Nullable
     public String resolveRelational(@Nullable Player player1, @Nullable Player player2, @NotNull String params,
-            @NotNull String sameClanColor, @NotNull String rivalColor, @NotNull String allyColor)
+            @NotNull String sameUnionColor, @NotNull String rivalColor, @NotNull String allyColor)
     {
 
         if (player1 == null || player2 == null) {
@@ -97,17 +97,18 @@ public class UnionsOGPlaceholderEngine {
 
         if (params.equalsIgnoreCase("color")) {
 
-            ClanPlayer cp1 = clanManager.getClanPlayer(player1);
+            UnionPlayer cp1 = unionManager.getUnionPlayer(player1);
             if (cp1 == null) {
 
                 return "";
 
             }
 
-            // noinspection ConstantConditions -- getClanPlayer != null == getClan() != null
-            if (cp1.getClan().isMember(player2)) {
+            // noinspection ConstantConditions -- getUnionPlayer != null == getUnion() !=
+            // null
+            if (cp1.getUnion().isMember(player2)) {
 
-                return sameClanColor;
+                return sameUnionColor;
 
             }
 
@@ -136,22 +137,22 @@ public class UnionsOGPlaceholderEngine {
 
         params = normalizePlaceholder(params);
 
-        ClanPlayer cp = null;
+        UnionPlayer cp = null;
         if (player != null) {
 
-            cp = clanManager.getAnyClanPlayer(player.getUniqueId());
+            cp = unionManager.getAnyUnionPlayer(player.getUniqueId());
 
         }
 
-        Clan clan = cp != null ? cp.getClan() : null;
+        Union union = cp != null ? cp.getUnion() : null;
 
-        Matcher matcher = TOP_CLANS_PATTERN.matcher(params);
+        Matcher matcher = TOP_UNIONS_PATTERN.matcher(params);
         if (matcher.find()) {
 
             int position = Integer.parseInt(matcher.group("position"));
-            clan = getFromPosition(clanManager.getClans(), position, clanManager::sortClansByKDR);
+            union = getFromPosition(unionManager.getUnions(), position, unionManager::sortUnionsByKDR);
             params = params.replace(matcher.group("strip"), "");
-            return getValue(player, null, clan, params);
+            return getValue(player, null, union, params);
 
         }
 
@@ -159,33 +160,33 @@ public class UnionsOGPlaceholderEngine {
         if (matcher.find()) {
 
             int position = Integer.parseInt(matcher.group("position"));
-            cp = getFromPosition(clanManager.getAllClanPlayers(), position, clanManager::sortClanPlayersByKDR);
-            clan = cp != null ? cp.getClan() : null;
+            cp = getFromPosition(unionManager.getAllUnionPlayers(), position, unionManager::sortUnionPlayersByKDR);
+            union = cp != null ? cp.getUnion() : null;
             params = params.replace(matcher.group("strip"), "");
-            return getValue(player, cp, clan, params);
+            return getValue(player, cp, union, params);
 
         }
 
         if (cp == null) {
 
-            return getNoClanValue(params);
+            return getNoUnionValue(params);
 
         }
 
-        if (clan == null && CLAN_COLOR_TAG_PLACEHOLDER.equals(params)) {
+        if (union == null && UNION_COLOR_TAG_PLACEHOLDER.equals(params)) {
 
-            return NO_CLAN_COLOR_TAG;
+            return NO_UNION_COLOR_TAG;
 
         }
 
-        return getValue(player, cp, clan, params);
+        return getValue(player, cp, union, params);
 
     }
 
     @NotNull
-    private String getNoClanValue(@NotNull String placeholder) {
+    private String getNoUnionValue(@NotNull String placeholder) {
 
-        return CLAN_COLOR_TAG_PLACEHOLDER.equals(placeholder) ? NO_CLAN_COLOR_TAG : "";
+        return UNION_COLOR_TAG_PLACEHOLDER.equals(placeholder) ? NO_UNION_COLOR_TAG : "";
 
     }
 
@@ -210,13 +211,13 @@ public class UnionsOGPlaceholderEngine {
     }
 
     @NotNull
-    private String getValue(@Nullable OfflinePlayer player, @Nullable ClanPlayer cp, @Nullable Clan clan,
+    private String getValue(@Nullable OfflinePlayer player, @Nullable UnionPlayer cp, @Nullable Union union,
             @NotNull String placeholder)
     {
 
         if (placeholder.startsWith("clan_")) {
 
-            return getValue(player, clan, placeholder.substring("clan_".length()));
+            return getValue(player, union, placeholder.substring("clan_".length()));
 
         }
 

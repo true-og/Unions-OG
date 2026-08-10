@@ -1,6 +1,6 @@
 package net.trueog.unionsog.uuid;
 
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.UnionPlayer;
 import net.trueog.unionsog.UnionsOG;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -44,7 +44,7 @@ public class UUIDMigration {
 
         } else {
 
-            for (ClanPlayer cp : UnionsOG.getInstance().getClanManager().getAllClanPlayers()) {
+            for (UnionPlayer cp : UnionsOG.getInstance().getUnionManager().getAllUnionPlayers()) {
 
                 if (cp.getName().equalsIgnoreCase(playerName)) {
 

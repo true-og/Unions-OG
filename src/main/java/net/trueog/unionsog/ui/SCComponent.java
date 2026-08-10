@@ -1,6 +1,5 @@
 package net.trueog.unionsog.ui;
 
-import net.trueog.unionsog.RankPermission;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -20,9 +19,9 @@ import java.util.Set;
 public abstract class SCComponent {
 
     private final HashMap<ClickType, Runnable> listeners = new HashMap<>();
-    private final HashMap<ClickType, Object> permissions = new HashMap<>();
+    private final HashMap<ClickType, String> permissions = new HashMap<>();
     private final Set<ClickType> confirmationRequired = new HashSet<>();
-    private @Nullable Object lorePermission;
+    private @Nullable String lorePermission;
 
     @NotNull
     public abstract ItemStack getItem();
@@ -42,12 +41,6 @@ public abstract class SCComponent {
 
     }
 
-    public void setLorePermission(@Nullable RankPermission permission) {
-
-        lorePermission = permission;
-
-    }
-
     public void setLorePermission(@Nullable String permission) {
 
         lorePermission = permission;
@@ -55,15 +48,9 @@ public abstract class SCComponent {
     }
 
     @Nullable
-    public Object getLorePermission() {
+    public String getLorePermission() {
 
         return lorePermission;
-
-    }
-
-    public void setPermission(@NotNull ClickType click, @Nullable RankPermission permission) {
-
-        permissions.put(click, permission);
 
     }
 
@@ -74,7 +61,7 @@ public abstract class SCComponent {
     }
 
     @Nullable
-    public Object getPermission(@NotNull ClickType click) {
+    public String getPermission(@NotNull ClickType click) {
 
         return permissions.get(click);
 

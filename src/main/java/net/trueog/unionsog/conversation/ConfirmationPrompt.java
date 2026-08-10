@@ -1,9 +1,9 @@
 package net.trueog.unionsog.conversation;
 
-import net.trueog.unionsog.Clan;
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.Union;
+import net.trueog.unionsog.UnionPlayer;
 import net.trueog.unionsog.UnionsOG;
-import net.trueog.unionsog.managers.ClanManager;
+import net.trueog.unionsog.managers.UnionManager;
 import org.bukkit.conversations.ConversationContext;
 import org.bukkit.conversations.Prompt;
 import org.bukkit.conversations.StringPrompt;
@@ -20,9 +20,9 @@ import static org.bukkit.ChatColor.RED;
 
 abstract public class ConfirmationPrompt extends StringPrompt {
 
-    protected abstract Prompt confirm(ClanPlayer sender, Clan clan);
+    protected abstract Prompt confirm(UnionPlayer sender, Union union);
 
-    protected Prompt decline(ClanPlayer sender) {
+    protected Prompt decline(UnionPlayer sender) {
 
         return new MessagePromptImpl(RED + lang(getDeclineTextKey(), sender));
 
@@ -50,16 +50,16 @@ abstract public class ConfirmationPrompt extends StringPrompt {
 
         Player player = (Player) cc.getForWhom();
         String yes = lang("yes", player);
-        ClanManager cm = Objects.requireNonNull(plugin).getClanManager();
-        ClanPlayer cp = cm.getCreateClanPlayer(player.getUniqueId());
-        Clan clan = cp.getClan();
-        if (clan == null) {
+        UnionManager cm = Objects.requireNonNull(plugin).getUnionManager();
+        UnionPlayer cp = cm.getCreateUnionPlayer(player.getUniqueId());
+        Union union = cp.getUnion();
+        if (union == null) {
 
             return END_OF_CONVERSATION;
 
         }
 
-        return yes.equalsIgnoreCase(input) ? confirm(cp, clan) : decline(cp);
+        return yes.equalsIgnoreCase(input) ? confirm(cp, union) : decline(cp);
 
     }
 

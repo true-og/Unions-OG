@@ -16,7 +16,7 @@ public class Chat extends MessageListener {
     public void accept(ByteArrayDataInput data) {
 
         SCMessage message = getGson().fromJson(data.readUTF(), SCMessage.class);
-        if (message.getSender().getClan() == null) {
+        if (message.getSender().getUnion() == null) {
 
             return;
 

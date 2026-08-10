@@ -4,8 +4,8 @@ import co.aikar.commands.BukkitCommandIssuer;
 import co.aikar.commands.ConditionContext;
 import co.aikar.commands.ConditionFailedException;
 import co.aikar.commands.InvalidCommandArgument;
-import net.trueog.unionsog.Clan;
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.Union;
+import net.trueog.unionsog.UnionPlayer;
 import net.trueog.unionsog.UnionsOG;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -26,19 +26,13 @@ public class CanVoteCondition extends AbstractCommandCondition {
     public void validateCondition(ConditionContext<BukkitCommandIssuer> context) throws InvalidCommandArgument {
 
         Player player = Conditions.assertPlayer(context.getIssuer());
-        ClanPlayer cp = clanManager.getCreateClanPlayer(player.getUniqueId());
-        Clan clan = cp.getClan();
-        if (clan != null) {
+        UnionPlayer cp = unionManager.getCreateUnionPlayer(player.getUniqueId());
+        Union union = cp.getUnion();
+        if (union != null) {
 
-            if (!requestManager.hasRequest(clan.getTag())) {
+            if (!requestManager.hasRequest(union.getTag())) {
 
                 throw new ConditionFailedException(lang("nothing.to.vote", player));
-
-            }
-
-            if (!clan.isLeader(player)) {
-
-                throw new ConditionFailedException(RED + lang("no.leader.permissions", player));
 
             }
 

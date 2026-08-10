@@ -1,7 +1,7 @@
 package net.trueog.unionsog.chat.handlers;
 
 import net.trueog.unionsog.ChatBlock;
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.UnionPlayer;
 import net.trueog.unionsog.chat.ChatHandler;
 import net.trueog.unionsog.chat.SCMessage;
 import net.trueog.unionsog.events.ChatEvent;
@@ -47,7 +47,7 @@ public class SpigotChatHandler implements ChatHandler {
 
                 plugin.getLogger().info(ChatUtils.stripColors(formattedMessage));
 
-                for (ClanPlayer cp : message.getReceivers()) {
+                for (UnionPlayer cp : message.getReceivers()) {
 
                     ChatBlock.sendMessage(cp, formattedMessage);
 
@@ -59,7 +59,7 @@ public class SpigotChatHandler implements ChatHandler {
 
     }
 
-    private String stripColorsAndFormatsPerPermission(ClanPlayer sender, String message) {
+    private String stripColorsAndFormatsPerPermission(UnionPlayer sender, String message) {
 
         if (!permissionsManager.has(sender.toPlayer(), "unionsog.member.chat.color")) {
 

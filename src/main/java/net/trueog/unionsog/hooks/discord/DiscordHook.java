@@ -16,13 +16,13 @@ import github.scarsz.discordsrv.dependencies.kyori.adventure.text.Component;
 import github.scarsz.discordsrv.objects.managers.AccountLinkManager;
 import github.scarsz.discordsrv.util.DiscordUtil;
 import github.scarsz.discordsrv.util.MessageUtil;
-import net.trueog.unionsog.Clan;
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.Union;
+import net.trueog.unionsog.UnionPlayer;
 import net.trueog.unionsog.UnionsOG;
 import net.trueog.unionsog.events.*;
 import net.trueog.unionsog.hooks.discord.exceptions.*;
 import net.trueog.unionsog.managers.ChatManager;
-import net.trueog.unionsog.managers.ClanManager;
+import net.trueog.unionsog.managers.UnionManager;
 import net.trueog.unionsog.managers.SettingsManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 
 import static github.scarsz.discordsrv.dependencies.jda.api.Permission.MANAGE_CHANNEL;
 import static github.scarsz.discordsrv.dependencies.jda.api.Permission.VIEW_CHANNEL;
-import static net.trueog.unionsog.ClanPlayer.Channel.CLAN;
+import static net.trueog.unionsog.UnionPlayer.Channel.UNION;
 import static net.trueog.unionsog.UnionsOG.lang;
 import static net.trueog.unionsog.chat.SCMessage.Source.DISCORD;
 import static net.trueog.unionsog.hooks.discord.DiscordHook.DiscordAction.ADD;
@@ -58,13 +58,13 @@ import static net.trueog.unionsog.managers.SettingsManager.ConfigField.*;
  * Manages events:
  * </p>
  * <ul>
- * <li>Clan creation/deletion</li>
- * <li>ClanPlayer joining/resigning</li>
+ * <li>Union creation/deletion</li>
+ * <li>UnionPlayer joining/resigning</li>
  * <li>Player linking/unlinking</li>
- * <li>ClanPlayer promoting/demoting</li>
+ * <li>UnionPlayer promoting/demoting</li>
  * </ul>
  * <p>
- * Currently, works with clan chat only.
+ * Currently, works with union chat only.
  */
 public class DiscordHook implements Listener {
 
@@ -73,10 +73,10 @@ public class DiscordHook implements Listener {
     private final UnionsOG plugin;
     private final SettingsManager settingsManager;
     private final ChatManager chatManager;
-    private final ClanManager clanManager;
+    private final UnionManager unionManager;
     private final AccountLinkManager accountManager = DiscordSRV.getPlugin().getAccountLinkManager();
     private final List<String> textCategories;
-    private final List<String> clanTags;
+    private final List<String> unionTags;
     private final List<String> whitelist;
 
     public DiscordHook(UnionsOG plugin) {
@@ -84,13 +84,13 @@ public class DiscordHook implements Listener {
         this.plugin = plugin;
         settingsManager = plugin.getSettingsManager();
         chatManager = plugin.getChatManager();
-        clanManager = plugin.getClanManager();
+        unionManager = plugin.getUnionManager();
 
         textCategories = settingsManager.getStringList(DISCORDCHAT_TEXT_CATEGORY_IDS).stream()
                 .filter(this::categoryExists).collect(Collectors.toList());
         whitelist = settingsManager.getStringList(DISCORDCHAT_TEXT_WHITELIST);
 
-        clanTags = clanManager.getClans().stream().map(Clan::getTag).collect(Collectors.toList());
+        unionTags = unionManager.getUnions().stream().map(Union::getTag).collect(Collectors.toList());
 
         setupDiscord();
 
@@ -115,25 +115,25 @@ public class DiscordHook implements Listener {
 
             }
 
-            ClanPlayer clanPlayer = clanManager.getClanPlayer(uuid);
-            if (clanPlayer == null) {
+            UnionPlayer unionPlayer = unionManager.getUnionPlayer(uuid);
+            if (unionPlayer == null) {
 
                 return;
 
             }
 
-            Clan clan = clanPlayer.getClan();
-            if (clan == null) {
+            Union union = unionPlayer.getUnion();
+            if (union == null) {
 
                 return;
 
             }
 
-            if (!Objects.equals(textChannel.getName(), clan.getTag())) {
+            if (!Objects.equals(textChannel.getName(), union.getTag())) {
 
                 String channelLink = "<#" + textChannel.getId() + ">";
                 sendPrivateMessage(textChannel, eventMessage,
-                        lang("cannot.send.discord.message", clanPlayer, channelLink));
+                        lang("cannot.send.discord.message", unionPlayer, channelLink));
                 return;
 
             }
@@ -168,33 +168,33 @@ public class DiscordHook implements Listener {
             }
 
             // DiscordSRV end
-            chatManager.processChat(DISCORD, CLAN, clanPlayer, message);
+            chatManager.processChat(DISCORD, UNION, unionPlayer, message);
 
         }
 
     }
 
     @EventHandler
-    public void onClanDisband(DisbandClanEvent event) {
+    public void onUnionDisband(DisbandUnionEvent event) {
 
-        deleteChannel(event.getClan().getTag());
+        deleteChannel(event.getUnion().getTag());
 
     }
 
     @EventHandler
-    public void onClanCreate(CreateClanEvent event) {
+    public void onUnionCreate(CreateUnionEvent event) {
 
         try {
 
             if (settingsManager.is(DISCORDCHAT_AUTO_CREATION)) {
 
-                createChannel(event.getClan().getTag());
+                createChannel(event.getUnion().getTag());
 
             }
 
         } catch (DiscordHookException ex) {
 
-            // Clan is not following the conditions, categories are fulled or discord
+            // Union is not following the conditions, categories are fulled or discord
             // reaches the limit, nothing to do here.
             UnionsOG.debug(ex.getMessage());
 
@@ -203,116 +203,83 @@ public class DiscordHook implements Listener {
     }
 
     @EventHandler
-    public void onPlayerClanLeave(PlayerKickedClanEvent event) {
+    public void onPlayerUnionLeave(PlayerKickedUnionEvent event) {
 
-        ClanPlayer clanPlayer = event.getClanPlayer();
-        Clan clan = event.getClan();
-        Member member = getMember(clanPlayer);
-        if (member == null || clan == null) {
+        UnionPlayer unionPlayer = event.getUnionPlayer();
+        Union union = event.getUnion();
+        Member member = getMember(unionPlayer);
+        if (member == null || union == null) {
 
             return;
 
         }
 
-        updateViewPermission(member, clan, REMOVE);
-        updateLeaderRole(member, clanPlayer, REMOVE);
+        updateViewPermission(member, union, REMOVE);
 
     }
 
     @EventHandler
-    public void onPlayerClanJoin(PlayerJoinedClanEvent event) {
+    public void onPlayerUnionJoin(PlayerJoinedUnionEvent event) {
 
-        ClanPlayer clanPlayer = event.getClanPlayer();
-        Clan clan = event.getClan();
-        Member member = getMember(clanPlayer);
-        if (member == null || clan == null) {
-
-            return;
-
-        }
-
-        if (!createChannelSilently(clanPlayer)) {
+        UnionPlayer unionPlayer = event.getUnionPlayer();
+        Union union = event.getUnion();
+        Member member = getMember(unionPlayer);
+        if (member == null || union == null) {
 
             return;
 
         }
 
-        updateViewPermission(member, clan, ADD);
-
-    }
-
-    @EventHandler
-    public void onPlayerPromote(PlayerPromoteEvent event) {
-
-        ClanPlayer clanPlayer = event.getClanPlayer();
-        Member member = getMember(clanPlayer);
-        if (member == null) {
+        if (!createChannelSilently(unionPlayer)) {
 
             return;
 
         }
 
-        updateLeaderRole(member, clanPlayer, ADD);
-
-    }
-
-    @EventHandler
-    public void onPlayerDemote(PlayerDemoteEvent event) {
-
-        ClanPlayer clanPlayer = event.getClanPlayer();
-        Member member = getMember(clanPlayer);
-        if (member == null) {
-
-            return;
-
-        }
-
-        updateLeaderRole(member, clanPlayer, REMOVE);
+        updateViewPermission(member, union, ADD);
 
     }
 
     @Subscribe
     public void onPlayerLinking(AccountLinkedEvent event) {
 
-        ClanPlayer clanPlayer = clanManager.getClanPlayer(event.getPlayer());
+        UnionPlayer unionPlayer = unionManager.getUnionPlayer(event.getPlayer());
         Member member = getGuild().getMember(event.getUser());
-        if (clanPlayer == null || member == null) {
+        if (unionPlayer == null || member == null) {
 
             return;
 
         }
 
-        Clan clan = clanPlayer.getClan();
-        if (clan == null) {
+        Union union = unionPlayer.getUnion();
+        if (union == null) {
 
             return;
 
         }
 
-        if (!createChannelSilently(clanPlayer)) {
+        if (!createChannelSilently(unionPlayer)) {
 
             return;
 
         }
 
-        updateViewPermission(member, clan, ADD);
-        updateLeaderRole(member, clanPlayer, ADD);
+        updateViewPermission(member, union, ADD);
 
     }
 
     @Subscribe
     public void onPlayerUnlinking(AccountUnlinkedEvent event) {
 
-        ClanPlayer clanPlayer = clanManager.getClanPlayer(event.getPlayer());
+        UnionPlayer unionPlayer = unionManager.getUnionPlayer(event.getPlayer());
         Member member = getGuild().getMember(event.getDiscordUser());
-        if (clanPlayer == null || clanPlayer.getClan() == null || member == null) {
+        if (unionPlayer == null || unionPlayer.getUnion() == null || member == null) {
 
             return;
 
         }
 
-        updateViewPermission(member, clanPlayer.getClan(), REMOVE);
-        updateLeaderRole(member, clanPlayer, REMOVE);
+        updateViewPermission(member, unionPlayer.getUnion(), REMOVE);
 
     }
 
@@ -327,9 +294,9 @@ public class DiscordHook implements Listener {
 
         resetPermissions(discordTagChannels);
 
-        UnionsOG.debug("ClanTags before creating: " + String.join(",", clanTags));
+        UnionsOG.debug("ClanTags before creating: " + String.join(",", unionTags));
         createChannels(discordTagChannels);
-        UnionsOG.debug("ClanTags after creating: " + String.join(",", clanTags));
+        UnionsOG.debug("ClanTags after creating: " + String.join(",", unionTags));
 
     }
 
@@ -337,52 +304,6 @@ public class DiscordHook implements Listener {
     public Guild getGuild() {
 
         return DiscordSRV.getPlugin().getMainGuild();
-
-    }
-
-    /**
-     * @return A leader role from guild, otherwise creates one.
-     */
-    @NotNull
-    public Role getLeaderRole() {
-
-        Role role = getGuild().getRoleById(settingsManager.getString(DISCORDCHAT_LEADER_ID));
-
-        if (role == null || !role.getName().equals(settingsManager.getString(DISCORDCHAT_LEADER_ROLE))) {
-
-            role = getGuild().createRole().setName(settingsManager.getString(DISCORDCHAT_LEADER_ROLE))
-                    .setColor(getLeaderColor()).setMentionable(true).complete();
-
-            settingsManager.set(DISCORDCHAT_LEADER_ID, role.getId());
-            settingsManager.save();
-
-        }
-
-        return role;
-
-    }
-
-    /**
-     * @return A leader color from configuration
-     */
-    public Color getLeaderColor() {
-
-        String[] colors = settingsManager.getString(DISCORDCHAT_LEADER_COLOR).replaceAll("\\s", "").split(",");
-        try {
-
-            int red = Integer.parseInt(colors[0]);
-            int green = Integer.parseInt(colors[1]);
-            int blue = Integer.parseInt(colors[2]);
-            int alpha = Integer.parseInt(colors[3]);
-
-            return new Color(red, green, blue, alpha);
-
-        } catch (IllegalArgumentException ex) {
-
-            plugin.getLogger().warning("Color is invalid, using default color: " + ex.getMessage());
-            return Color.RED;
-
-        }
 
     }
 
@@ -431,23 +352,23 @@ public class DiscordHook implements Listener {
      * otherwise creates one.
      *
      * <p>
-     * Sets positive {@link Permission#VIEW_CHANNEL} permission to all linked clan
+     * Sets positive {@link Permission#VIEW_CHANNEL} permission to all linked union
      * members.
      * </p>
      *
-     * @param clanTag the clan tag
-     * @throws InvalidChannelException  no one member is linked or clan is not in
+     * @param unionTag the union tag
+     * @throws InvalidChannelException  no one member is linked or union is not in
      *                                  the whitelist.
      * @throws ChannelExistsException   if channel is already exist
      * @throws CategoriesLimitException if categories reached the limit.
      * @throws ChannelsLimitException   if discord reached the channels limit.
      */
-    public void createChannel(@NotNull String clanTag)
+    public void createChannel(@NotNull String unionTag)
             throws InvalidChannelException, CategoriesLimitException, ChannelsLimitException, ChannelExistsException
     {
 
-        validateChannel(clanTag);
-        Map<ClanPlayer, Member> discordClanPlayers = getDiscordPlayers(clanManager.getClan(clanTag));
+        validateChannel(unionTag);
+        Map<UnionPlayer, Member> discordUnionPlayers = getDiscordPlayers(unionManager.getUnion(unionTag));
 
         if (getChannels().size() >= settingsManager.getInt(DISCORDCHAT_TEXT_LIMIT)) {
 
@@ -468,25 +389,24 @@ public class DiscordHook implements Listener {
 
         try {
 
-            availableCategory.createTextChannel(clanTag).complete();
+            availableCategory.createTextChannel(unionTag).complete();
             UnionsOG.debug(String.format("[%s] Creating a discord text channel for %s clan",
-                    Thread.currentThread().getId(), clanTag));
+                    Thread.currentThread().getId(), unionTag));
 
         } catch (ErrorResponseException ex) {
 
             Response response = ex.getResponse();
-            plugin.getLogger().warning(String.format("Could not create a channel for clan %s, error %d - %s", clanTag,
+            plugin.getLogger().warning(String.format("Could not create a channel for clan %s, error %d - %s", unionTag,
                     response.code, response.message));
             return;
 
         }
 
-        for (Map.Entry<ClanPlayer, Member> entry : discordClanPlayers.entrySet()) {
+        for (Map.Entry<UnionPlayer, Member> entry : discordUnionPlayers.entrySet()) {
 
-            // The map is formed from clan#getMembers (so the clan exists)
+            // The map is formed from union#getMembers (so the union exists)
             // noinspection ConstantConditions
-            updateViewPermission(entry.getValue(), entry.getKey().getClan(), ADD);
-            updateLeaderRole(entry.getValue(), entry.getKey(), ADD);
+            updateViewPermission(entry.getValue(), entry.getKey().getUnion(), ADD);
 
         }
 
@@ -520,13 +440,13 @@ public class DiscordHook implements Listener {
     }
 
     /**
-     * Checks if a channel with the specified clan tag exists
+     * Checks if a channel with the specified union tag exists
      *
      * @see #categoryExists(String)
      */
-    public boolean channelExists(String clanTag) {
+    public boolean channelExists(String unionTag) {
 
-        return getChannel(clanTag).isPresent();
+        return getChannel(unionTag).isPresent();
 
     }
 
@@ -638,9 +558,9 @@ public class DiscordHook implements Listener {
     }
 
     @Nullable
-    public Member getMember(@NotNull ClanPlayer clanPlayer) {
+    public Member getMember(@NotNull UnionPlayer unionPlayer) {
 
-        String discordId = accountManager.getDiscordId(clanPlayer.getUniqueId());
+        String discordId = accountManager.getDiscordId(unionPlayer.getUniqueId());
         return DiscordUtil.getMemberById(discordId);
 
     }
@@ -648,12 +568,12 @@ public class DiscordHook implements Listener {
     private void clearChannels(Map<String, TextChannel> discordTagChannels) {
 
         // Removes abandoned channels
-        ArrayList<String> clansToDelete = new ArrayList<>(discordTagChannels.keySet());
-        clansToDelete.removeAll(clanTags);
-        clansToDelete.forEach(clanChannel -> {
+        ArrayList<String> unionsToDelete = new ArrayList<>(discordTagChannels.keySet());
+        unionsToDelete.removeAll(unionTags);
+        unionsToDelete.forEach(unionChannel -> {
 
-            deleteChannel(clanChannel);
-            discordTagChannels.remove(clanChannel);
+            deleteChannel(unionChannel);
+            discordTagChannels.remove(unionChannel);
 
         });
 
@@ -661,15 +581,15 @@ public class DiscordHook implements Listener {
         Iterator<String> iterator = discordTagChannels.keySet().iterator();
         while (iterator.hasNext()) {
 
-            String clanChannel = iterator.next();
+            String unionChannel = iterator.next();
             try {
 
-                validateChannel(clanChannel);
+                validateChannel(unionChannel);
 
             } catch (InvalidChannelException ex) {
 
                 UnionsOG.debug(ex.getMessage());
-                deleteChannel(clanChannel);
+                deleteChannel(unionChannel);
                 iterator.remove();
 
             } catch (ChannelExistsException | ChannelsLimitException ex) {
@@ -682,13 +602,13 @@ public class DiscordHook implements Listener {
 
     }
 
-    private void resetPermissions(Map<String, TextChannel> discordClanChannels) {
+    private void resetPermissions(Map<String, TextChannel> discordUnionChannels) {
 
-        for (Map.Entry<String, TextChannel> channelEntry : discordClanChannels.entrySet()) {
+        for (Map.Entry<String, TextChannel> channelEntry : discordUnionChannels.entrySet()) {
 
             TextChannel channel = channelEntry.getValue();
-            Clan clan = clanManager.getClan(channelEntry.getKey());
-            Map<ClanPlayer, Member> discordPlayers = getDiscordPlayers(clan);
+            Union union = unionManager.getUnion(channelEntry.getKey());
+            Map<UnionPlayer, Member> discordPlayers = getDiscordPlayers(union);
 
             for (Member member : discordPlayers.values()) {
 
@@ -705,7 +625,7 @@ public class DiscordHook implements Listener {
 
     }
 
-    private void createChannels(Map<String, TextChannel> discordClanChannels) {
+    private void createChannels(Map<String, TextChannel> discordUnionChannels) {
 
         if (!settingsManager.is(DISCORDCHAT_AUTO_CREATION)) {
 
@@ -714,13 +634,13 @@ public class DiscordHook implements Listener {
         }
 
         // Removes already used discord channels from creation
-        clanTags.removeAll(discordClanChannels.keySet());
+        unionTags.removeAll(discordUnionChannels.keySet());
 
-        for (String clan : clanTags) {
+        for (String union : unionTags) {
 
             try {
 
-                createChannel(clan);
+                createChannel(union);
 
             } catch (CategoriesLimitException | ChannelsLimitException ex) {
 
@@ -745,82 +665,64 @@ public class DiscordHook implements Listener {
 
     }
 
-    private void validateChannel(@NotNull String clanTag)
+    private void validateChannel(@NotNull String unionTag)
             throws InvalidChannelException, ChannelExistsException, ChannelsLimitException
     {
 
-        Clan clan = clanManager.getClan(clanTag);
-        if (clan == null) {
+        Union union = unionManager.getUnion(unionTag);
+        if (union == null) {
 
-            throw new InvalidChannelException(String.format("Clan %s is null", clanTag));
-
-        }
-
-        Map<ClanPlayer, Member> discordClanPlayers = getDiscordPlayers(clan);
-        if (discordClanPlayers.isEmpty()) {
-
-            throw new InvalidChannelException(String.format("Clan %s doesn't have any linked players", clanTag),
-                    "your.clan.doesnt.have.any.linked.player");
+            throw new InvalidChannelException(String.format("Clan %s is null", unionTag));
 
         }
 
-        if (discordClanPlayers.size() < settingsManager.getInt(DISCORDCHAT_MINIMUM_LINKED_PLAYERS)) {
+        Map<UnionPlayer, Member> discordUnionPlayers = getDiscordPlayers(union);
+        if (discordUnionPlayers.isEmpty()) {
 
-            throw new InvalidChannelException(String.format("Clan %s doesn't have minimum linked players", clanTag),
-                    "your.clan.doesnt.have.minimum.linked.player");
-
-        }
-
-        if (!whitelist.isEmpty() && !whitelist.contains(clan.getTag())) {
-
-            throw new InvalidChannelException(String.format("Clan %s is not listed on the whitelist", clanTag),
-                    "your.clan.is.not.on.the.whitelist");
+            throw new InvalidChannelException(String.format("Clan %s doesn't have any linked players", unionTag),
+                    "your.union.doesnt.have.any.linked.player");
 
         }
 
-        if (channelExists(clanTag)) {
+        if (discordUnionPlayers.size() < settingsManager.getInt(DISCORDCHAT_MINIMUM_LINKED_PLAYERS)) {
 
-            throw new ChannelExistsException(String.format("Channel %s is already exist", clanTag),
-                    "your.clan.already.has.channel");
+            throw new InvalidChannelException(String.format("Clan %s doesn't have minimum linked players", unionTag),
+                    "your.union.doesnt.have.minimum.linked.player");
+
+        }
+
+        if (!whitelist.isEmpty() && !whitelist.contains(union.getTag())) {
+
+            throw new InvalidChannelException(String.format("Clan %s is not listed on the whitelist", unionTag),
+                    "your.union.is.not.on.the.whitelist");
+
+        }
+
+        if (channelExists(unionTag)) {
+
+            throw new ChannelExistsException(String.format("Channel %s is already exist", unionTag),
+                    "your.union.already.has.channel");
 
         }
 
     }
 
     @NotNull
-    private Map<ClanPlayer, Member> getDiscordPlayers(@NotNull Clan clan) {
+    private Map<UnionPlayer, Member> getDiscordPlayers(@NotNull Union union) {
 
-        Map<ClanPlayer, Member> discordClanPlayers = new HashMap<>();
-        for (ClanPlayer cp : clan.getMembers()) {
+        Map<UnionPlayer, Member> discordUnionPlayers = new HashMap<>();
+        for (UnionPlayer cp : union.getMembers()) {
 
             Member member = getMember(cp);
             if (member != null) {
 
-                discordClanPlayers.put(cp, member);
+                discordUnionPlayers.put(cp, member);
 
             }
 
         }
 
-        return discordClanPlayers;
-
-    }
-
-    private void updateLeaderRole(@NotNull Member member, @NotNull ClanPlayer clanPlayer, DiscordAction action) {
-
-        if (action == ADD && clanPlayer.isLeader()) {
-
-            getGuild().addRoleToMember(member, getLeaderRole()).queue();
-            UnionsOG.debug(
-                    String.format("Added leader role to %s (%s) discord member", member.getNickname(), member.getId()));
-
-        } else {
-
-            getGuild().removeRoleFromMember(member, getLeaderRole()).queue();
-            UnionsOG.debug(String.format("Revoked leader role from %s (%s) discord member", member.getNickname(),
-                    member.getId()));
-
-        }
+        return discordUnionPlayers;
 
     }
 
@@ -851,9 +753,9 @@ public class DiscordHook implements Listener {
 
     }
 
-    private void updateViewPermission(@NotNull Member member, @NotNull Clan clan, DiscordAction action) {
+    private void updateViewPermission(@NotNull Member member, @NotNull Union union, DiscordAction action) {
 
-        String tag = clan.getTag();
+        String tag = union.getTag();
         Optional<TextChannel> channel = getChannel(tag);
         if (channel.isPresent()) {
 
@@ -865,10 +767,10 @@ public class DiscordHook implements Listener {
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    private boolean createChannelSilently(ClanPlayer clanPlayer) {
+    private boolean createChannelSilently(UnionPlayer unionPlayer) {
 
-        Clan clan = clanPlayer.getClan();
-        if (clan == null || !settingsManager.is(DISCORDCHAT_AUTO_CREATION)) {
+        Union union = unionPlayer.getUnion();
+        if (union == null || !settingsManager.is(DISCORDCHAT_AUTO_CREATION)) {
 
             return false;
 
@@ -876,11 +778,11 @@ public class DiscordHook implements Listener {
 
         try {
 
-            createChannel(clan.getTag());
+            createChannel(union.getTag());
 
         } catch (DiscordHookException ex) {
 
-            // Clan is not following the conditions, categories are fulled or discord
+            // Union is not following the conditions, categories are fulled or discord
             // reaches the limit, nothing to do here.
             UnionsOG.debug(ex.getMessage());
 

@@ -13,21 +13,21 @@ import static net.trueog.unionsog.managers.SettingsManager.ConfigField.REQUEST_M
  */
 public final class Request {
 
-    private List<ClanPlayer> acceptors = new ArrayList<>();
-    private Clan clan;
+    private List<UnionPlayer> acceptors = new ArrayList<>();
+    private Union union;
     private String msg;
     private String target;
-    private ClanRequest type;
-    private ClanPlayer requester;
+    private UnionRequest type;
+    private UnionPlayer requester;
     private int askCount;
 
-    public Request(ClanRequest type, @Nullable List<ClanPlayer> acceptors, ClanPlayer requester, String target,
-            Clan clan, String msg)
+    public Request(UnionRequest type, @Nullable List<UnionPlayer> acceptors, UnionPlayer requester, String target,
+            Union union, String msg)
     {
 
         this.type = type;
         this.target = target;
-        this.clan = clan;
+        this.union = union;
         this.msg = msg;
         if (acceptors != null) {
 
@@ -44,7 +44,7 @@ public final class Request {
     /**
      * @return the type
      */
-    public ClanRequest getType() {
+    public UnionRequest getType() {
 
         return type;
 
@@ -53,7 +53,7 @@ public final class Request {
     /**
      * @param type the type to set
      */
-    public void setType(ClanRequest type) {
+    public void setType(UnionRequest type) {
 
         this.type = type;
 
@@ -62,7 +62,7 @@ public final class Request {
     /**
      * @return the acceptors
      */
-    public List<ClanPlayer> getAcceptors() {
+    public List<UnionPlayer> getAcceptors() {
 
         return Collections.unmodifiableList(acceptors);
 
@@ -71,27 +71,27 @@ public final class Request {
     /**
      * @param acceptors the acceptors to set
      */
-    public void setAcceptors(List<ClanPlayer> acceptors) {
+    public void setAcceptors(List<UnionPlayer> acceptors) {
 
         this.acceptors = acceptors;
 
     }
 
     /**
-     * @return the clan
+     * @return the union
      */
-    public Clan getClan() {
+    public Union getUnion() {
 
-        return clan;
+        return union;
 
     }
 
     /**
-     * @param clan the clan to set
+     * @param union the union to set
      */
-    public void setClan(Clan clan) {
+    public void setUnion(Union union) {
 
-        this.clan = clan;
+        this.union = union;
 
     }
 
@@ -133,7 +133,7 @@ public final class Request {
 
     public void vote(String playerName, VoteResult vote) {
 
-        for (ClanPlayer cp : acceptors) {
+        for (UnionPlayer cp : acceptors) {
 
             if (cp.getName().equalsIgnoreCase(playerName)) {
 
@@ -148,7 +148,7 @@ public final class Request {
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean votingFinished() {
 
-        for (ClanPlayer cp : acceptors) {
+        for (UnionPlayer cp : acceptors) {
 
             if (cp.getVote() == null) {
 
@@ -166,7 +166,7 @@ public final class Request {
 
         List<String> out = new ArrayList<>();
 
-        for (ClanPlayer cp : acceptors) {
+        for (UnionPlayer cp : acceptors) {
 
             if (cp.getVote() != null && cp.getVote().equals(VoteResult.DENY)) {
 
@@ -184,7 +184,7 @@ public final class Request {
 
         List<String> out = new ArrayList<>();
 
-        for (ClanPlayer cp : acceptors) {
+        for (UnionPlayer cp : acceptors) {
 
             if (cp.getVote() != null && cp.getVote().equals(VoteResult.ACCEPT)) {
 
@@ -203,7 +203,7 @@ public final class Request {
      */
     public void cleanVotes() {
 
-        for (ClanPlayer cp : acceptors) {
+        for (UnionPlayer cp : acceptors) {
 
             cp.setVote(null);
 
@@ -214,7 +214,7 @@ public final class Request {
     /**
      * @return the requester
      */
-    public ClanPlayer getRequester() {
+    public UnionPlayer getRequester() {
 
         return requester;
 
@@ -223,7 +223,7 @@ public final class Request {
     /**
      * @param requester the requester to set
      */
-    public void setRequester(ClanPlayer requester) {
+    public void setRequester(UnionPlayer requester) {
 
         this.requester = requester;
 

@@ -1,6 +1,6 @@
 package net.trueog.unionsog.hooks.papi.resolvers;
 
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.UnionPlayer;
 import net.trueog.unionsog.UnionsOG;
 import net.trueog.unionsog.hooks.papi.PlaceholderResolver;
 import net.trueog.unionsog.utils.VanishUtils;
@@ -42,7 +42,7 @@ public class ListSizeResolver extends PlaceholderResolver {
             if (config.containsKey("filter_vanished")) {
 
                 size = String.valueOf(VanishUtils
-                        .getNonVanished(player != null ? player.getPlayer() : null, (List<ClanPlayer>) result).size());
+                        .getNonVanished(player != null ? player.getPlayer() : null, (List<UnionPlayer>) result).size());
 
             }
 

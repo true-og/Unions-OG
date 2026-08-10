@@ -1,7 +1,7 @@
 package net.trueog.unionsog.hooks.papi;
 
-import net.trueog.unionsog.Clan;
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.Union;
+import net.trueog.unionsog.UnionPlayer;
 import net.trueog.unionsog.UnionsOG;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
@@ -29,8 +29,8 @@ public abstract class PlaceholderResolver {
      * Resolves the placeholder and returns its value
      *
      * @param player      the player involved in the placeholder request
-     * @param object      the subject of the Placeholder, usually a {@link Clan} or
-     *                    a {@link ClanPlayer}
+     * @param object      the subject of the Placeholder, usually a {@link Union} or
+     *                    a {@link UnionPlayer}
      * @param method      the annotated method
      * @param placeholder the placeholder to resolve
      * @param config      configuration for the resolver

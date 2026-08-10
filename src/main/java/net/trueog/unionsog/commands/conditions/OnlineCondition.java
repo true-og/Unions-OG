@@ -1,9 +1,9 @@
 package net.trueog.unionsog.commands.conditions;
 
 import co.aikar.commands.*;
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.UnionPlayer;
 import net.trueog.unionsog.UnionsOG;
-import net.trueog.unionsog.commands.ClanPlayerInput;
+import net.trueog.unionsog.commands.UnionPlayerInput;
 import net.trueog.unionsog.utils.VanishUtils;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -12,7 +12,7 @@ import static net.trueog.unionsog.UnionsOG.debug;
 import static net.trueog.unionsog.UnionsOG.lang;
 
 @SuppressWarnings("unused")
-public class OnlineCondition extends AbstractParameterCondition<ClanPlayerInput> {
+public class OnlineCondition extends AbstractParameterCondition<UnionPlayerInput> {
 
     public OnlineCondition(@NotNull UnionsOG plugin) {
 
@@ -21,20 +21,20 @@ public class OnlineCondition extends AbstractParameterCondition<ClanPlayerInput>
     }
 
     @Override
-    public Class<ClanPlayerInput> getType() {
+    public Class<UnionPlayerInput> getType() {
 
-        return ClanPlayerInput.class;
+        return UnionPlayerInput.class;
 
     }
 
     @Override
     public void validateCondition(ConditionContext<BukkitCommandIssuer> context,
-            BukkitCommandExecutionContext execContext, ClanPlayerInput value) throws InvalidCommandArgument
+            BukkitCommandExecutionContext execContext, UnionPlayerInput value) throws InvalidCommandArgument
     {
 
-        ClanPlayer clanPlayer = value.getClanPlayer();
-        debug(String.format("OnlineCondition -> %s %s", clanPlayer.getName(), clanPlayer.getUniqueId()));
-        Player player = clanPlayer.toPlayer();
+        UnionPlayer unionPlayer = value.getUnionPlayer();
+        debug(String.format("OnlineCondition -> %s %s", unionPlayer.getName(), unionPlayer.getUniqueId()));
+        Player player = unionPlayer.toPlayer();
 
         if (player != null) {
 

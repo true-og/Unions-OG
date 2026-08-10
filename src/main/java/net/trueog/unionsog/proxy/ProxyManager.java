@@ -1,7 +1,7 @@
 package net.trueog.unionsog.proxy;
 
-import net.trueog.unionsog.Clan;
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.Union;
+import net.trueog.unionsog.UnionPlayer;
 import net.trueog.unionsog.chat.SCMessage;
 
 public interface ProxyManager {
@@ -14,12 +14,12 @@ public interface ProxyManager {
 
     void sendMessage(String target, String message);
 
-    void sendUpdate(Clan clan);
+    void sendUpdate(Union union);
 
-    void sendUpdate(ClanPlayer cp);
+    void sendUpdate(UnionPlayer cp);
 
-    void sendDelete(Clan clan);
+    void sendDelete(Union union);
 
-    void sendDelete(ClanPlayer cp);
+    void sendDelete(UnionPlayer cp);
 
 }

@@ -3,9 +3,9 @@ package net.trueog.unionsog.commands.staff;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import net.trueog.unionsog.ChatBlock;
-import net.trueog.unionsog.Clan;
-import net.trueog.unionsog.commands.ClanInput;
-import net.trueog.unionsog.managers.ClanManager;
+import net.trueog.unionsog.Union;
+import net.trueog.unionsog.commands.UnionInput;
+import net.trueog.unionsog.managers.UnionManager;
 import net.trueog.unionsog.managers.SettingsManager;
 import net.trueog.unionsog.managers.StorageManager;
 import org.bukkit.entity.Player;
@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 import static net.trueog.unionsog.UnionsOG.lang;
 import static org.bukkit.ChatColor.RED;
 
-@CommandAlias("%clan")
+@CommandAlias("%union")
 @Conditions("%basic_conditions")
 @Subcommand("%mod %bb")
 public class BbCommand extends BaseCommand {
@@ -21,42 +21,42 @@ public class BbCommand extends BaseCommand {
     @Dependency
     private StorageManager storage;
     @Dependency
-    private ClanManager cm;
+    private UnionManager cm;
 
     @Dependency
     private SettingsManager settings;
 
     @Subcommand("%display")
     @CommandPermission("unionsog.mod.bb")
-    @CommandCompletion("@clans")
+    @CommandCompletion("@unions")
     @Description("{@@command.description.mod.bb.display}")
-    public void display(Player sender, @Name("clan") ClanInput input) {
+    public void display(Player sender, @Name("union") UnionInput input) {
 
-        input.getClan().displayBb(sender);
+        input.getUnion().displayBb(sender);
 
     }
 
     @Subcommand("%clear")
     @CommandPermission("unionsog.mod.bb-clear")
-    @CommandCompletion("@clans")
+    @CommandCompletion("@unions")
     @Description("{@@command.description.mod.bb.clear}")
-    public void clear(Player player, @Name("clan") ClanInput input) {
+    public void clear(Player player, @Name("union") UnionInput input) {
 
-        input.getClan().clearBb();
+        input.getUnion().clearBb();
         ChatBlock.sendMessage(player, RED + lang("cleared.bb", player));
 
     }
 
     @Subcommand("%add")
     @CommandPermission("unionsog.mod.bb-add")
-    @CommandCompletion("@clans @nothing")
+    @CommandCompletion("@unions @nothing")
     @Description("{@@command.description.mod.bb.post}")
-    public void postMessage(Player player, @Name("clan") ClanInput input, @Name("message") String msg) {
+    public void postMessage(Player player, @Name("union") UnionInput input, @Name("message") String msg) {
 
-        Clan clan = input.getClan();
-        clan.addBb(lang("bulletin.board.message", player.getName(), msg));
-        clan.displayBb(player);
-        storage.updateClan(clan);
+        Union union = input.getUnion();
+        union.addBb(lang("bulletin.board.message", player.getName(), msg));
+        union.displayBb(player);
+        storage.updateUnion(union);
 
     }
 

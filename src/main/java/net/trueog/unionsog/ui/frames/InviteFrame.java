@@ -1,9 +1,8 @@
 package net.trueog.unionsog.ui.frames;
 
 import com.cryptomorin.xseries.XMaterial;
-import net.trueog.unionsog.RankPermission;
 import net.trueog.unionsog.UnionsOG;
-import net.trueog.unionsog.managers.ClanManager;
+import net.trueog.unionsog.managers.UnionManager;
 import net.trueog.unionsog.ui.*;
 import net.trueog.unionsog.utils.CurrencyFormat;
 import net.trueog.unionsog.utils.Paginator;
@@ -19,7 +18,7 @@ import java.util.stream.Collectors;
 
 import static net.trueog.unionsog.UnionsOG.lang;
 import static net.trueog.unionsog.managers.SettingsManager.ConfigField.ECONOMY_INVITE_PRICE;
-import static net.trueog.unionsog.managers.SettingsManager.ConfigField.ECONOMY_PURCHASE_CLAN_INVITE;
+import static net.trueog.unionsog.managers.SettingsManager.ConfigField.ECONOMY_PURCHASE_UNION_INVITE;
 
 public class InviteFrame extends SCFrame {
 
@@ -31,8 +30,8 @@ public class InviteFrame extends SCFrame {
 
         super(parent, viewer);
         this.plugin = UnionsOG.getInstance();
-        ClanManager cm = plugin.getClanManager();
-        players = plugin.getServer().getOnlinePlayers().stream().filter(p -> cm.getClanPlayer(p) == null)
+        UnionManager cm = plugin.getUnionManager();
+        players = plugin.getServer().getOnlinePlayers().stream().filter(p -> cm.getUnionPlayer(p) == null)
                 .collect(Collectors.toList());
         paginator = new Paginator(getSize() - 9, players.size());
 
@@ -58,7 +57,7 @@ public class InviteFrame extends SCFrame {
     @NotNull
     private SCComponent createPlayerComponent(@NotNull Player player, int slot) {
 
-        double price = plugin.getSettingsManager().is(ECONOMY_PURCHASE_CLAN_INVITE)
+        double price = plugin.getSettingsManager().is(ECONOMY_PURCHASE_UNION_INVITE)
                 ? plugin.getSettingsManager().getDouble(ECONOMY_INVITE_PRICE)
                 : 0;
         List<String> lore = new ArrayList<>();
@@ -72,7 +71,7 @@ public class InviteFrame extends SCFrame {
         Components.setOwningPlayer(c.getItem(), offlinePlayer);
         c.setListener(ClickType.LEFT,
                 () -> InventoryController.runSubcommand(getViewer(), "invite", false, player.getName()));
-        c.setPermission(ClickType.LEFT, RankPermission.INVITE);
+        c.setPermission(ClickType.LEFT, "unionsog.member.invite");
         return c;
 
     }

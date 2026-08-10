@@ -1,7 +1,6 @@
 package net.trueog.unionsog.managers;
 
 import com.cryptomorin.xseries.XMaterial;
-import net.trueog.unionsog.Rank;
 import net.trueog.unionsog.UnionsOG;
 import net.trueog.unionsog.utils.ChatUtils;
 import org.bukkit.Material;
@@ -209,7 +208,7 @@ public final class SettingsManager {
      */
     public boolean isDisallowedWord(String word) {
 
-        if (matchesAnyIgnoreCase(word, getString(COMMANDS_CLAN), "union", "unions", "clan", "clans")) {
+        if (matchesAnyIgnoreCase(word, getString(COMMANDS_UNION), "union", "unions", "clan", "clans")) {
 
             return true;
 
@@ -270,14 +269,14 @@ public final class SettingsManager {
     }
 
     /**
-     * Check whether a clan is unrivable
+     * Check whether a union is unrivable
      *
      * @param tag the tag
-     * @return whether the clan is unrivable
+     * @return whether the union is unrivable
      */
     public boolean isUnrivable(String tag) {
 
-        return getStringList(UNRIVABLE_CLANS).stream().map(String::toLowerCase)
+        return getStringList(UNRIVABLE_UNIONS).stream().map(String::toLowerCase)
                 .anyMatch(unrivable -> unrivable.equals(tag.toLowerCase()));
 
     }
@@ -355,29 +354,6 @@ public final class SettingsManager {
 
     }
 
-    @SuppressWarnings("unchecked")
-    public @NotNull Collection<Rank> getStarterRanks() {
-
-        List<Rank> ranks = new ArrayList<>();
-        List<Map<?, ?>> mapList = config.getMapList("clan.starter-ranks");
-        for (Map<?, ?> rankMap : mapList) {
-
-            Set<String> names = (Set<String>) rankMap.keySet();
-            for (String name : names) {
-
-                Map<String, Object> rank = (Map<String, Object>) rankMap.get(name);
-                String displayName = (String) rank.get("display-name");
-                List<String> permissions = (List<String>) rank.get("permissions");
-                ranks.add(new Rank(name, displayName, new HashSet<>(permissions)));
-
-            }
-
-        }
-
-        return ranks;
-
-    }
-
     public FileConfiguration getConfig() {
 
         return config;
@@ -394,14 +370,14 @@ public final class SettingsManager {
         TAMABLE_MOBS_SHARING("settings.tameable-mobs-sharing", false),
         TELEPORT_BLOCKS("settings.teleport-blocks", false),
         TELEPORT_HOME_ON_SPAWN("settings.teleport-home-on-spawn", false),
-        DROP_ITEMS_ON_CLAN_HOME("settings.drop-items-on-clan-home", false),
-        KEEP_ITEMS_ON_CLAN_HOME("settings.keep-items-on-clan-home", false), ITEM_LIST("settings.item-list"),
+        DROP_ITEMS_ON_UNION_HOME("settings.drop-items-on-union-home", false),
+        KEEP_ITEMS_ON_UNION_HOME("settings.keep-items-on-union-home", false), ITEM_LIST("settings.item-list"),
         DEBUG("settings.show-debug-info", false), ENABLE_AUTO_GROUPS("settings.enable-auto-groups", false),
         CHAT_COMPATIBILITY_MODE("settings.chat-compatibility-mode", true),
         RIVAL_LIMIT_PERCENT("settings.rival-limit-percent", 50),
         COLOR_CODE_FROM_PREFIX_FOR_NAME("settings.use-colorcode-from-prefix-for-name", true),
         DISPLAY_CHAT_TAGS("settings.display-chat-tags", true),
-        GLOBAL_FRIENDLY_FIRE("settings.global-friendly-fire", false), UNRIVABLE_CLANS("settings.unrivable-clans"),
+        GLOBAL_FRIENDLY_FIRE("settings.global-friendly-fire", false), UNRIVABLE_UNIONS("settings.unrivable-unions"),
         BLACKLISTED_WORLDS("settings.blacklisted-worlds"), BANNED_PLAYERS("settings.banned-players"),
         DISALLOWED_TAGS("settings.disallowed-tags"), LANGUAGE("settings.language", "en"),
         LANGUAGE_SELECTOR("settings.user-language-selector", true),
@@ -411,7 +387,7 @@ public final class SettingsManager {
         ENABLE_REJOIN_COOLDOWN("settings.rejoin-cooldown-enabled", false),
         RANKING_TYPE("settings.ranking-type", "DENSE"), LIST_DEFAULT_ORDER_BY("settings.list-default-order-by", "size"),
         LORE_LENGTH("settings.lore-length", 36), PVP_ONLY_WHILE_IN_WAR("settings.pvp-only-while-at-war", false),
-        PAST_CLANS_LIMIT("settings.past-clans-limit", 10),
+        PAST_UNIONS_LIMIT("settings.past-unions-limit", 10),
         USERNAME_REGEX("settings.username-regex", "^\\**[a-zA-Z0-9_$]{1,16}$"), TAG_REGEX("settings.tag-regex", ""),
         ACCEPT_OTHER_ALPHABETS_LETTERS("settings.accept-other-alphabets-letters-on-tag", false),
         DATE_TIME_PATTERN("settings.date-time-pattern", "HH:mm - dd/MM/yyyy"),
@@ -421,11 +397,9 @@ public final class SettingsManager {
          *
          */
         TAG_DEFAULT_COLOR("tag.default-color", "8"), TAG_BRACKET_COLOR("tag.bracket.color", "8"),
-        TAG_BRACKET_LEADER_COLOR("tag.bracket.leader-color", "4"), TAG_BRACKET_LEFT("tag.bracket.left", ""),
-        TAG_MAX_LENGTH("tag.max-length", 5), TAG_MIN_LENGTH("tag.min-length", 2),
-        TAG_BRACKET_RIGHT("tag.bracket.right", ""), TAG_SEPARATOR_COLOR("tag.separator.color", "8"),
-        TAG_SEPARATOR_LEADER_COLOR("tag.separator.leader-color", "4"), TAG_SEPARATOR_CHAR("tag.separator.char", " ."),
-        @Deprecated
+        TAG_BRACKET_LEFT("tag.bracket.left", ""), TAG_MAX_LENGTH("tag.max-length", 5),
+        TAG_MIN_LENGTH("tag.min-length", 2), TAG_BRACKET_RIGHT("tag.bracket.right", ""),
+        TAG_SEPARATOR_COLOR("tag.separator.color", "8"), TAG_SEPARATOR_CHAR("tag.separator.char", " ."), @Deprecated
         TAG_SEPARATOR_char("tag.separator.char", " ."),
         /*
          * ================ > War and Protection Settings ================
@@ -440,15 +414,13 @@ public final class SettingsManager {
         WAR_NORMAL_EXPIRATION_TIME("war-and-protection.war-normal-expiration-time", 0),
         WAR_DISCONNECT_EXPIRATION_TIME("war-and-protection.war-disconnect-expiration-time", 0),
         LAND_EDIT_ALL_LANDS("war-and-protection.edit-all-lands", false),
-        LAND_CREATION_ONLY_LEADERS("war-and-protection.land-creation.only-leaders", false),
-        LAND_CREATION_ONLY_ONE_PER_CLAN("war-and-protection.land-creation.only-one-per-clan", false),
+        LAND_CREATION_ONLY_ONE_PER_UNION("war-and-protection.land-creation.only-one-per-union", false),
         WAR_ACTIONS_CONTAINER("war-and-protection.war-actions.CONTAINER", true),
         WAR_ACTIONS_INTERACT("war-and-protection.war-actions.INTERACT", true),
         WAR_ACTIONS_BREAK("war-and-protection.war-actions.BREAK", true),
         WAR_ACTIONS_PLACE("war-and-protection.war-actions.PLACE", true),
         WAR_ACTIONS_DAMAGE("war-and-protection.war-actions.DAMAGE", true),
         WAR_ACTIONS_INTERACT_ENTITY("war-and-protection.war-actions.INTERACT_ENTITY", true),
-        WAR_START_REQUEST_ENABLED("war-and-protection.war-start.request-enabled", true),
         WAR_MAX_MEMBERS_DIFFERENCE("war-and-protection.war-start.members-online-max-difference", 5),
         /*
          * ================ > KDR Grinding Prevention Settings ================
@@ -463,17 +435,17 @@ public final class SettingsManager {
          *
          */
         COMMANDS_MORE("commands.more", "more"), COMMANDS_ALLY("commands.ally", "ally"),
-        COMMANDS_CLAN("commands.clan", "clan"), COMMANDS_ACCEPT("commands.accept", "accept"),
+        COMMANDS_UNION("commands.union", "union"), COMMANDS_ACCEPT("commands.accept", "accept"),
         COMMANDS_DENY("commands.deny", "deny"), COMMANDS_GLOBAL("commands.global", "global"),
-        COMMANDS_CLAN_CHAT("commands.clan_chat", "u"), COMMANDS_FORCE_PRIORITY("commands.force-priority", true),
+        COMMANDS_UNION_CHAT("commands.union_chat", "u"), COMMANDS_FORCE_PRIORITY("commands.force-priority", true),
         /*
          * ================ > Economy Settings ================
          *
          */
         ECONOMY_CREATION_PRICE("economy.creation-price", 100.0),
-        ECONOMY_PURCHASE_CLAN_CREATE("economy.purchase-clan-create", false),
+        ECONOMY_PURCHASE_UNION_CREATE("economy.purchase-union-create", false),
         ECONOMY_INVITE_PRICE("economy.invite-price", 20),
-        ECONOMY_PURCHASE_CLAN_INVITE("economy.purchase-clan-invite", false),
+        ECONOMY_PURCHASE_UNION_INVITE("economy.purchase-union-invite", false),
         ECONOMY_HOME_TELEPORT_PRICE("economy.home-teleport-price", 5.0),
         ECONOMY_PURCHASE_HOME_TELEPORT("economy.purchase-home-teleport", false),
         ECONOMY_HOME_TELEPORT_SET_PRICE("economy.home-teleport-set-price", 5.0),
@@ -491,46 +463,42 @@ public final class SettingsManager {
         KILL_WEIGHTS_NEUTRAL("kill-weights.neutral", 1.0), KILL_WEIGHTS_ALLY("kill-weights.ally", -1.0),
         KILL_WEIGHTS_DENY_SAME_IP_KILLS("kill-weights.deny-same-ip-kills", false),
         /*
-         * ================ > Clan Settings ================
+         * ================ > Union Settings ================
          *
          */
-        CLAN_TELEPORT_DELAY("clan.homebase-teleport-wait-secs", 10),
-        CLAN_HOMEBASE_CAN_BE_SET_ONLY_ONCE("clan.homebase-can-be-set-only-once", true),
-        CLAN_MIN_SIZE_TO_SET_RIVAL("clan.min-size-to-set-rival", 3),
-        CLAN_MIN_SIZE_TO_SET_ALLY("clan.min-size-to-set-ally", 3), CLAN_MAX_LENGTH("clan.max-length", 25),
-        CLAN_MIN_LENGTH("clan.min-length", 2), CLAN_MAX_DESCRIPTION_LENGTH("clan.max-description-length", 120),
-        CLAN_MIN_DESCRIPTION_LENGTH("clan.min-description-length", 10), CLAN_MAX_MEMBERS("clan.max-members", 25),
-        CLAN_MAX_ALLIANCES("clan.max-alliances", -1),
-        CLAN_CONFIRMATION_FOR_PROMOTE("clan.confirmation-for-promote", false),
-        CLAN_TRUST_MEMBERS_BY_DEFAULT("clan.trust-members-by-default", true),
-        CLAN_CONFIRMATION_FOR_DEMOTE("clan.confirmation-for-demote", false),
-        CLAN_PERCENTAGE_ONLINE_TO_DEMOTE("clan.percentage-online-to-demote", 100.0),
-        CLAN_FF_ON_BY_DEFAULT("clan.ff-on-by-default", false), CLAN_DEFAULT_RANK("clan.default-rank", "recruit"),
+        UNION_TELEPORT_DELAY("union.homebase-teleport-wait-secs", 10),
+        UNION_HOMEBASE_CAN_BE_SET_ONLY_ONCE("union.homebase-can-be-set-only-once", true),
+        UNION_MIN_SIZE_TO_SET_RIVAL("union.min-size-to-set-rival", 3),
+        UNION_MIN_SIZE_TO_SET_ALLY("union.min-size-to-set-ally", 3), UNION_MAX_LENGTH("union.max-length", 25),
+        UNION_MIN_LENGTH("union.min-length", 2), UNION_MAX_DESCRIPTION_LENGTH("union.max-description-length", 120),
+        UNION_MIN_DESCRIPTION_LENGTH("union.min-description-length", 10), UNION_MAX_MEMBERS("union.max-members", 25),
+        UNION_MAX_ALLIANCES("union.max-alliances", -1),
+        UNION_TRUST_MEMBERS_BY_DEFAULT("union.trust-members-by-default", true),
+        UNION_FF_ON_BY_DEFAULT("union.ff-on-by-default", false),
         /*
          * ================ > Page Settings ================
          */
-        PAGE_LEADER_COLOR("page.leader-color", "4"), PAGE_UNTRUSTED_COLOR("page.untrusted-color", "8"),
-        PAGE_TRUSTED_COLOR("page.trusted-color", "f"), PAGE_CLAN_NAME_COLOR("page.clan-name-color", "b"),
-        PAGE_SUBTITLE_COLOR("page.subtitle-color", "7"), PAGE_HEADINGS_COLOR("page.headings-color", "8"),
-        PAGE_SEPARATOR("page.separator", "-"), PAGE_SIZE("page.size", 100), HELP_SIZE("page.help-size", 10),
+        PAGE_UNTRUSTED_COLOR("page.untrusted-color", "8"), PAGE_TRUSTED_COLOR("page.trusted-color", "f"),
+        PAGE_UNION_NAME_COLOR("page.union-name-color", "b"), PAGE_SUBTITLE_COLOR("page.subtitle-color", "7"),
+        PAGE_HEADINGS_COLOR("page.headings-color", "8"), PAGE_SEPARATOR("page.separator", "-"),
+        PAGE_SIZE("page.size", 100), HELP_SIZE("page.help-size", 10),
         /*
-         * ================ > Clan Chat Settings ================
+         * ================ > Union Chat Settings ================
          *
          */
-        CLANCHAT_ENABLE("clanchat.enable", true), CLANCHAT_TAG_BASED("clanchat.tag-based-clan-chat", false),
-        CLANCHAT_ANNOUNCEMENT_COLOR("clanchat.announcement-color", "e"),
-        CLANCHAT_FORMAT("clanchat.format", "&b[%clan%&b] &4<%nick-color%%player%&4> %rank%: &b%message%"),
-        CLANCHAT_SPYFORMAT("clanchat.spy-format",
-                "&8[Spy] [&bC&8] <%clan%&8> <%nick-color%*&8%player%>&8 %rank%: %message%"),
-        CLANCHAT_RANK("clanchat.rank", "&f[%rank%&f]"), CLANCHAT_LEADER_COLOR("clanchat.leader-color", "4"),
-        CLANCHAT_TRUSTED_COLOR("clanchat.trusted-color", "f"), CLANCHAT_MEMBER_COLOR("clanchat.member-color", "7"),
-        CLANCHAT_BRACKET_COLOR("clanchat.tag-bracket.color", "e"),
-        CLANCHAT_BRACKET_LEFT("clanchat.tag-bracket.left", ""),
-        CLANCHAT_BRACKET_RIGHT("clanchat.tag-bracket.right", ""), CLANCHAT_NAME_COLOR("clanchat.name-color", "e"),
-        CLANCHAT_PLAYER_BRACKET_LEFT("clanchat.player-bracket.left", ""),
-        CLANCHAT_PLAYER_BRACKET_RIGHT("clanchat.player-bracket.right", ""),
-        CLANCHAT_MESSAGE_COLOR("clanchat.message-color", "b"),
-        CLANCHAT_LISTENER_PRIORITY("clanchat.listener-priority", "LOW"),
+        UNIONCHAT_ENABLE("unionchat.enable", true), UNIONCHAT_TAG_BASED("unionchat.tag-based-union-chat", false),
+        UNIONCHAT_ANNOUNCEMENT_COLOR("unionchat.announcement-color", "e"),
+        UNIONCHAT_FORMAT("unionchat.format", "&b[%union%&b] &4<%nick-color%%player%&4>: &b%message%"),
+        UNIONCHAT_SPYFORMAT("unionchat.spy-format",
+                "&8[Spy] [&bC&8] <%union%&8> <%nick-color%*&8%player%>&8: %message%"),
+        UNIONCHAT_TRUSTED_COLOR("unionchat.trusted-color", "f"), UNIONCHAT_MEMBER_COLOR("unionchat.member-color", "7"),
+        UNIONCHAT_BRACKET_COLOR("unionchat.tag-bracket.color", "e"),
+        UNIONCHAT_BRACKET_LEFT("unionchat.tag-bracket.left", ""),
+        UNIONCHAT_BRACKET_RIGHT("unionchat.tag-bracket.right", ""), UNIONCHAT_NAME_COLOR("unionchat.name-color", "e"),
+        UNIONCHAT_PLAYER_BRACKET_LEFT("unionchat.player-bracket.left", ""),
+        UNIONCHAT_PLAYER_BRACKET_RIGHT("unionchat.player-bracket.right", ""),
+        UNIONCHAT_MESSAGE_COLOR("unionchat.message-color", "b"),
+        UNIONCHAT_LISTENER_PRIORITY("unionchat.listener-priority", "LOW"),
         /*
          * ================ > Request Settings ================
          *
@@ -546,10 +514,8 @@ public final class SettingsManager {
          * ================ > Ally Chat Settings ================
          */
         ALLYCHAT_ENABLE("allychat.enable", true),
-        ALLYCHAT_FORMAT("allychat.format", "&b[Ally Chat] &4<%clan%&4> <%nick-color%%player%&4> %rank%: &b%message%"),
-        ALLYCHAT_SPYFORMAT("allychat.spy-format",
-                "&8[Spy] [&cA&8] <%clan%&8> <%nick-color%*&8%player%>&8 %rank%: %message%"),
-        ALLYCHAT_RANK("allychat.rank", "&f[%rank%&f]"), ALLYCHAT_LEADER_COLOR("allychat.leader-color", "4"),
+        ALLYCHAT_FORMAT("allychat.format", "&b[Ally Chat] &4<%union%&4> <%nick-color%%player%&4>: &b%message%"),
+        ALLYCHAT_SPYFORMAT("allychat.spy-format", "&8[Spy] [&cA&8] <%union%&8> <%nick-color%*&8%player%>&8: %message%"),
         ALLYCHAT_TRUSTED_COLOR("allychat.trusted-color", "f"), ALLYCHAT_MEMBER_COLOR("allychat.member-color", "7"),
         ALLYCHAT_BRACKET_COLOR("allychat.tag-bracket.color", "8"),
         ALLYCHAT_BRACKET_lEFT("allychat.tag-bracket.left", ""),
@@ -562,23 +528,19 @@ public final class SettingsManager {
          */
         DISCORDCHAT_ENABLE("discordchat.enable", false), DISCORDCHAT_AUTO_CREATION("discordchat.auto-creation", true),
         DISCORDCHAT_FORMAT_TO("discordchat.discord-format", "%player% » %message%"),
-        DISCORDCHAT_FORMAT("discordchat.format",
-                "&b[&9D&b] &b[%clan%&b] &4<%nick-color%%player%&4> %rank%: &b%message%"),
+        DISCORDCHAT_FORMAT("discordchat.format", "&b[&9D&b] &b[%union%&b] &4<%nick-color%%player%&4>: &b%message%"),
         DISCORDCHAT_SPYFORMAT("discordchat.spy-format",
-                "&8[Spy] [&9D&8] <%clan%&8> <%nick-color%*&8%player%>&8 %rank%: %message%"),
-        DISCORDCHAT_RANK("discordchat.rank", "[%rank%]"), DISCORDCHAT_LEADER_ROLE("discordchat.leader-role", "Leader"),
-        DISCORDCHAT_LEADER_ID("discordchat.leader-id", "0"),
-        DISCORDCHAT_LEADER_COLOR("discordchat.leader-color", "231, 76, 60, 100"),
+                "&8[Spy] [&9D&8] <%union%&8> <%nick-color%*&8%player%>&8: %message%"),
         DISCORDCHAT_TEXT_CATEGORY_FORMAT("discordchat.text.category-format", "SC - TextChannels"),
         DISCORDCHAT_TEXT_CATEGORY_IDS("discordchat.text.category-ids"),
         DISCORDCHAT_TEXT_WHITELIST("discordchat.text.whitelist"),
-        DISCORDCHAT_TEXT_LIMIT("discordchat.text.clans-limit", 100),
+        DISCORDCHAT_TEXT_LIMIT("discordchat.text.unions-limit", 100),
         DISCORDCHAT_MINIMUM_LINKED_PLAYERS("discordchat.min-linked-players-to-create", 3),
         /*
          * ================ > Purge Settings ================
          */
         PURGE_INACTIVE_PLAYER_DAYS("purge.inactive-player-data-days", 30),
-        PURGE_INACTIVE_CLAN_DAYS("purge.inactive-clan-days", 7),
+        PURGE_INACTIVE_UNION_DAYS("purge.inactive-union-days", 7),
         /*
          * ================ > MySQL Settings ================
          */

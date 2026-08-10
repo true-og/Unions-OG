@@ -1,6 +1,6 @@
 package net.trueog.unionsog.loggers;
 
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.UnionPlayer;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,7 +17,7 @@ public class BankOperator {
 
     }
 
-    public BankOperator(@NotNull ClanPlayer sender, double balance) {
+    public BankOperator(@NotNull UnionPlayer sender, double balance) {
 
         this(sender.getName(), balance);
 

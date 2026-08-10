@@ -28,7 +28,7 @@ public class ListTypeCompletion extends AbstractStaticCompletion {
     @Override
     public @NotNull String getId() {
 
-        return "clan_list_type";
+        return "union_list_type";
 
     }
 

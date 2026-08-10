@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 
 import static net.trueog.unionsog.UnionsOG.lang;
-import static net.trueog.unionsog.ui.frames.staff.ClanListFrame.Type;
+import static net.trueog.unionsog.ui.frames.staff.UnionListFrame.Type;
 
 public class PlayerDetailsFrame extends SCFrame {
 
@@ -23,7 +23,7 @@ public class PlayerDetailsFrame extends SCFrame {
 
         super(parent, viewer);
         this.subject = subject;
-        subjectName = UnionsOG.getInstance().getClanManager().getCreateClanPlayer(subject.getUniqueId()).getName();
+        subjectName = UnionsOG.getInstance().getUnionManager().getCreateUnionPlayer(subject.getUniqueId()).getName();
 
     }
 
@@ -45,25 +45,6 @@ public class PlayerDetailsFrame extends SCFrame {
         addPlace();
         addResetKDR();
         addPurge();
-        addPromoteDemote();
-
-    }
-
-    private void addPromoteDemote() {
-
-        SCComponent promoteDemote = new SCComponentImpl(lang("gui.playerdetails.promote.demote.title", getViewer()),
-                Arrays.asList(lang("gui.playerdetails.promote.lore.left.click", getViewer()),
-                        lang("gui.playerdetails.demote.lore.right.click", getViewer())),
-                XMaterial.GUNPOWDER, 28);
-        promoteDemote.setConfirmationRequired(ClickType.LEFT);
-        promoteDemote.setListener(ClickType.LEFT,
-                () -> InventoryController.runSubcommand(getViewer(), "admin promote", true, subjectName));
-        promoteDemote.setPermission(ClickType.LEFT, "unionsog.admin.promote");
-        promoteDemote.setListener(ClickType.RIGHT,
-                () -> InventoryController.runSubcommand(getViewer(), "admin demote", true, subjectName));
-        promoteDemote.setConfirmationRequired(ClickType.RIGHT);
-        add(promoteDemote);
-        promoteDemote.setPermission(ClickType.RIGHT, "unionsog.admin.demote");
 
     }
 
@@ -100,7 +81,7 @@ public class PlayerDetailsFrame extends SCFrame {
                 .withLoreLine(lang("gui.playerdetails.place.lore", getViewer())).build();
         place.setPermission(ClickType.LEFT, "unionsog.mod.place");
         place.setListener(ClickType.LEFT,
-                () -> InventoryDrawer.open(new ClanListFrame(this, getViewer(), Type.PLACE, subject)));
+                () -> InventoryDrawer.open(new UnionListFrame(this, getViewer(), Type.PLACE, subject)));
         add(place);
 
     }

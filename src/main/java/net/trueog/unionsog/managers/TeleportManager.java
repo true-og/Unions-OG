@@ -2,7 +2,7 @@ package net.trueog.unionsog.managers;
 
 import io.papermc.lib.PaperLib;
 import net.trueog.unionsog.*;
-import net.trueog.unionsog.events.ClanPlayerTeleportEvent;
+import net.trueog.unionsog.events.UnionPlayerTeleportEvent;
 import net.trueog.unionsog.utils.VanishUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -45,20 +45,20 @@ public final class TeleportManager {
      *
      * @param player      the Player
      * @param destination the destination
-     * @param clanName    the Clan name
+     * @param unionName   the Union name
      */
-    public void addPlayer(Player player, Location destination, String clanName) {
+    public void addPlayer(Player player, Location destination, String unionName) {
 
         PermissionsManager pm = plugin.getPermissionsManager();
 
-        int secs = UnionsOG.getInstance().getSettingsManager().getInt(CLAN_TELEPORT_DELAY);
+        int secs = UnionsOG.getInstance().getSettingsManager().getInt(UNION_TELEPORT_DELAY);
         if (pm.has(player, "unionsog.mod.bypass") || pm.has(player, "unionsog.vip.teleport-delay")) {
 
             secs = 0;
 
         }
 
-        waitingPlayers.put(player.getUniqueId().toString(), new TeleportState(player, destination, clanName, secs));
+        waitingPlayers.put(player.getUniqueId().toString(), new TeleportState(player, destination, unionName, secs));
 
         if (secs > 0) {
 
@@ -69,33 +69,33 @@ public final class TeleportManager {
     }
 
     /**
-     * Teleports all online and non-vanished members of this {@link Clan} to the
+     * Teleports all online and non-vanished members of this {@link Union} to the
      * specified {@link Location}
      *
      * @param requester the Player requesting the teleport
-     * @param clan      the Clan
+     * @param union     the Union
      * @param location  the Location
      */
-    public void teleport(@NotNull Player requester, @NotNull Clan clan, @NotNull Location location) {
+    public void teleport(@NotNull Player requester, @NotNull Union union, @NotNull Location location) {
 
-        teleport(clan, location, VanishUtils.getNonVanished(requester, clan));
+        teleport(union, location, VanishUtils.getNonVanished(requester, union));
 
     }
 
     /**
-     * Teleports all online and non-vanished members of this {@link Clan} to the
+     * Teleports all online and non-vanished members of this {@link Union} to the
      * specified {@link Location}
      *
-     * @param clan     the Clan
+     * @param union    the Union
      * @param location the Location
      */
-    public void teleport(Clan clan, Location location) {
+    public void teleport(Union union, Location location) {
 
-        teleport(clan, location, VanishUtils.getNonVanished(null, clan));
+        teleport(union, location, VanishUtils.getNonVanished(null, union));
 
     }
 
-    public void teleportToHome(@NotNull Player player, @NotNull Location destination, @NotNull String clanName) {
+    public void teleportToHome(@NotNull Player player, @NotNull Location destination, @NotNull String unionName) {
 
         PaperLib.teleportAsync(player, getSafe(destination), PlayerTeleportEvent.TeleportCause.COMMAND)
                 .thenAccept(result ->
@@ -103,7 +103,7 @@ public final class TeleportManager {
 
                     if (result) {
 
-                        ChatBlock.sendMessage(player, AQUA + lang("now.at.homebase", player, clanName));
+                        ChatBlock.sendMessage(player, AQUA + lang("now.at.homebase", player, unionName));
 
                     } else {
 
@@ -115,15 +115,15 @@ public final class TeleportManager {
 
     }
 
-    public void teleportToHome(@NotNull Player player, @NotNull Clan clan) {
+    public void teleportToHome(@NotNull Player player, @NotNull Union union) {
 
-        if (clan.getHomeLocation() == null) {
+        if (union.getHomeLocation() == null) {
 
             return;
 
         }
 
-        teleportToHome(player, clan.getHomeLocation(), clan.getName());
+        teleportToHome(player, union.getHomeLocation(), union.getName());
 
     }
 
@@ -183,8 +183,8 @@ public final class TeleportManager {
 
         List<Material> itemsList = plugin.getSettingsManager().getItemList();
         PlayerInventory inv = player.getInventory();
-        boolean dropOnHome = plugin.getSettingsManager().is(DROP_ITEMS_ON_CLAN_HOME);
-        boolean keepOnHome = plugin.getSettingsManager().is(KEEP_ITEMS_ON_CLAN_HOME);
+        boolean dropOnHome = plugin.getSettingsManager().is(DROP_ITEMS_ON_UNION_HOME);
+        boolean keepOnHome = plugin.getSettingsManager().is(KEEP_ITEMS_ON_UNION_HOME);
         ItemStack[] contents = inv.getContents();
         for (ItemStack item : contents) {
 
@@ -260,8 +260,8 @@ public final class TeleportManager {
 
         }
 
-        ClanPlayer cp = plugin.getClanManager().getCreateClanPlayer(player.getUniqueId());
-        ClanPlayerTeleportEvent event = new ClanPlayerTeleportEvent(cp, state.getLocation(), state.getDestination());
+        UnionPlayer cp = plugin.getUnionManager().getCreateUnionPlayer(player.getUniqueId());
+        UnionPlayerTeleportEvent event = new UnionPlayerTeleportEvent(cp, state.getLocation(), state.getDestination());
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) {
 
@@ -273,7 +273,7 @@ public final class TeleportManager {
         sendTeleportBlocks(player, loc);
         dropItems(player);
         loc.clone().add(.5, .5, .5);
-        teleportToHome(player, loc, state.getClanName());
+        teleportToHome(player, loc, state.getUnionName());
 
     }
 
@@ -298,9 +298,9 @@ public final class TeleportManager {
 
     }
 
-    private void teleport(Clan clan, Location location, List<ClanPlayer> members) {
+    private void teleport(Union union, Location location, List<UnionPlayer> members) {
 
-        for (ClanPlayer cp : members) {
+        for (UnionPlayer cp : members) {
 
             Player player = cp.toPlayer();
             if (player == null) {
@@ -326,7 +326,7 @@ public final class TeleportManager {
             z = z + zz;
 
             plugin.getTeleportManager().addPlayer(player, new Location(location.getWorld(), x + .5,
-                    location.getBlockY(), z + .5, location.getYaw(), location.getPitch()), clan.getName());
+                    location.getBlockY(), z + .5, location.getYaw(), location.getPitch()), union.getName());
 
         }
 

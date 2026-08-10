@@ -2,7 +2,7 @@ package net.trueog.unionsog.proxy.listeners;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.gson.Gson;
-import net.trueog.unionsog.managers.ClanManager;
+import net.trueog.unionsog.managers.UnionManager;
 import net.trueog.unionsog.proxy.BungeeManager;
 
 public abstract class MessageListener {
@@ -19,9 +19,9 @@ public abstract class MessageListener {
 
     public abstract boolean isBungeeSubchannel();
 
-    protected ClanManager getClanManager() {
+    protected UnionManager getUnionManager() {
 
-        return bungee.getPlugin().getClanManager();
+        return bungee.getPlugin().getUnionManager();
 
     }
 

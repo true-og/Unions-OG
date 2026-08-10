@@ -1,8 +1,7 @@
 package net.trueog.unionsog.ui.frames;
 
 import com.cryptomorin.xseries.XMaterial;
-import net.trueog.unionsog.Clan;
-import net.trueog.unionsog.RankPermission;
+import net.trueog.unionsog.Union;
 import net.trueog.unionsog.UnionsOG;
 import net.trueog.unionsog.ui.*;
 import net.trueog.unionsog.utils.Paginator;
@@ -18,14 +17,14 @@ import static net.trueog.unionsog.UnionsOG.lang;
 
 public class AddAllyFrame extends SCFrame {
 
-    private final List<Clan> notAllies;
+    private final List<Union> notAllies;
     private final Paginator paginator;
 
-    public AddAllyFrame(SCFrame parent, Player viewer, Clan subject) {
+    public AddAllyFrame(SCFrame parent, Player viewer, Union subject) {
 
         super(parent, viewer);
         UnionsOG plugin = UnionsOG.getInstance();
-        notAllies = plugin.getClanManager().getClans().stream()
+        notAllies = plugin.getUnionManager().getUnions().stream()
                 .filter(c -> !c.equals(subject) && !c.isRival(subject.getTag()) && !c.isAlly(subject.getTag()))
                 .collect(Collectors.toList());
         paginator = new Paginator(getSize() - 9, notAllies);
@@ -51,15 +50,15 @@ public class AddAllyFrame extends SCFrame {
         int slot = 9;
         for (int i = paginator.getMinIndex(); paginator.isValidIndex(i); i++) {
 
-            Clan notRival = notAllies.get(i);
+            Union notRival = notAllies.get(i);
             SCComponent c = new SCComponentImpl(
-                    lang("gui.clanlist.clan.title", getViewer(), notRival.getColorTag(), notRival.getName()),
-                    Collections.singletonList(lang("gui.add.ally.clan.lore", getViewer())), XMaterial.CYAN_BANNER,
+                    lang("gui.unionlist.union.title", getViewer(), notRival.getColorTag(), notRival.getName()),
+                    Collections.singletonList(lang("gui.add.ally.union.lore", getViewer())), XMaterial.CYAN_BANNER,
                     slot);
 
             c.setListener(ClickType.LEFT,
                     () -> InventoryController.runSubcommand(getViewer(), "ally add", false, notRival.getTag()));
-            c.setPermission(ClickType.LEFT, RankPermission.ALLY_ADD);
+            c.setPermission(ClickType.LEFT, "unionsog.member.ally-set");
             add(c);
             slot++;
 

@@ -1,7 +1,7 @@
 package net.trueog.unionsog.utils;
 
-import net.trueog.unionsog.Clan;
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.Union;
+import net.trueog.unionsog.UnionPlayer;
 import net.trueog.unionsog.UnionsOG;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -17,18 +17,18 @@ public class VanishUtils {
 
     }
 
-    public static @NotNull List<ClanPlayer> getNonVanished(@Nullable CommandSender viewer, @NotNull Clan clan) {
+    public static @NotNull List<UnionPlayer> getNonVanished(@Nullable CommandSender viewer, @NotNull Union union) {
 
-        return getNonVanished(viewer, clan.getMembers());
+        return getNonVanished(viewer, union.getMembers());
 
     }
 
-    public static @NotNull List<ClanPlayer> getNonVanished(@Nullable CommandSender viewer,
-            @NotNull List<ClanPlayer> clanPlayers)
+    public static @NotNull List<UnionPlayer> getNonVanished(@Nullable CommandSender viewer,
+            @NotNull List<UnionPlayer> unionPlayers)
     {
 
-        ArrayList<ClanPlayer> nonVanished = new ArrayList<>();
-        for (ClanPlayer cp : clanPlayers) {
+        ArrayList<UnionPlayer> nonVanished = new ArrayList<>();
+        for (UnionPlayer cp : unionPlayers) {
 
             if (!isVanished(viewer, cp)) {
 
@@ -42,7 +42,7 @@ public class VanishUtils {
 
     }
 
-    public static boolean isVanished(@Nullable CommandSender viewer, @NotNull ClanPlayer cp) {
+    public static boolean isVanished(@Nullable CommandSender viewer, @NotNull UnionPlayer cp) {
 
         if (isVanished(cp)) {
 
@@ -73,7 +73,7 @@ public class VanishUtils {
 
     }
 
-    public static boolean isVanished(@NotNull ClanPlayer cp) {
+    public static boolean isVanished(@NotNull UnionPlayer cp) {
 
         if (!isOnline(cp)) {
 
@@ -98,7 +98,7 @@ public class VanishUtils {
 
     }
 
-    public static boolean isOnline(@NotNull ClanPlayer player) {
+    public static boolean isOnline(@NotNull UnionPlayer player) {
 
         return UnionsOG.getInstance().getProxyManager().isOnline(player.getName());
 

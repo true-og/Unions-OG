@@ -43,15 +43,15 @@ public class PlayerDeath extends SCListener {
         if (isInvalidKill(victim, attacker))
             return;
 
-        ClanPlayer victimCp = plugin.getClanManager().getCreateClanPlayer(victim.getUniqueId());
-        ClanPlayer attackerCp = plugin.getClanManager().getCreateClanPlayer(attacker.getUniqueId());
+        UnionPlayer victimCp = plugin.getUnionManager().getCreateUnionPlayer(victim.getUniqueId());
+        UnionPlayer attackerCp = plugin.getUnionManager().getCreateUnionPlayer(attacker.getUniqueId());
 
         classifyKill(victimCp, attackerCp);
 
         // record death for victim
         victimCp.addDeath();
-        plugin.getStorageManager().updateClanPlayer(victimCp);
-        plugin.getStorageManager().updateClanPlayer(attackerCp);
+        plugin.getStorageManager().updateUnionPlayer(victimCp);
+        plugin.getStorageManager().updateUnionPlayer(attackerCp);
 
     }
 
@@ -66,32 +66,32 @@ public class PlayerDeath extends SCListener {
 
         }
 
-        Clan victimClan = plugin.getClanManager().getClanByPlayerUniqueId(player.getUniqueId());
-        Clan killerClan = plugin.getClanManager().getClanByPlayerUniqueId(killer.getUniqueId());
-        War war = plugin.getProtectionManager().getWar(victimClan, killerClan);
-        if (war == null || victimClan == null) {
+        Union victimUnion = plugin.getUnionManager().getUnionByPlayerUniqueId(player.getUniqueId());
+        Union killerUnion = plugin.getUnionManager().getUnionByPlayerUniqueId(killer.getUniqueId());
+        War war = plugin.getProtectionManager().getWar(victimUnion, killerUnion);
+        if (war == null || victimUnion == null) {
 
             return;
 
         }
 
-        war.increaseCasualties(victimClan);
+        war.increaseCasualties(victimUnion);
 
     }
 
-    private void classifyKill(@NotNull ClanPlayer victim, @NotNull ClanPlayer attacker) {
+    private void classifyKill(@NotNull UnionPlayer victim, @NotNull UnionPlayer attacker) {
 
-        Clan victimClan = victim.getClan();
-        Clan attackerClan = attacker.getClan();
-        if (victimClan == null || attackerClan == null) {
+        Union victimUnion = victim.getUnion();
+        Union attackerUnion = attacker.getUnion();
+        if (victimUnion == null || attackerUnion == null) {
 
             addKill(Kill.Type.CIVILIAN, attacker, victim);
 
-        } else if (attackerClan.isRival(victim.getTag())) {
+        } else if (attackerUnion.isRival(victim.getTag())) {
 
             addKill(Kill.Type.RIVAL, attacker, victim);
 
-        } else if (attackerClan.isAlly(victimClan.getTag()) || attackerClan.equals(victimClan)) {
+        } else if (attackerUnion.isAlly(victimUnion.getTag()) || attackerUnion.equals(victimUnion)) {
 
             addKill(Kill.Type.ALLY, attacker, victim);
 
@@ -133,8 +133,8 @@ public class PlayerDeath extends SCListener {
         }
 
         AddKillEvent addKillEvent = new AddKillEvent(
-                plugin.getClanManager().getCreateClanPlayer(attacker.getUniqueId()),
-                plugin.getClanManager().getCreateClanPlayer(victim.getUniqueId()));
+                plugin.getUnionManager().getCreateUnionPlayer(attacker.getUniqueId()),
+                plugin.getUnionManager().getCreateUnionPlayer(victim.getUniqueId()));
         Bukkit.getServer().getPluginManager().callEvent(addKillEvent);
         if (addKillEvent.isCancelled()) {
 
@@ -148,7 +148,7 @@ public class PlayerDeath extends SCListener {
 
     }
 
-    private void addKill(Kill.Type type, ClanPlayer attacker, ClanPlayer victim) {
+    private void addKill(Kill.Type type, UnionPlayer attacker, UnionPlayer victim) {
 
         if (type == null || attacker == null || victim == null) {
 
@@ -157,7 +157,7 @@ public class PlayerDeath extends SCListener {
         }
 
         final Kill kill = new Kill(attacker, victim, LocalDateTime.now());
-        if (plugin.getSettingsManager().is(KDR_ENABLE_KILL_DELAY) && plugin.getClanManager().isKillBeforeDelay(kill)) {
+        if (plugin.getSettingsManager().is(KDR_ENABLE_KILL_DELAY) && plugin.getUnionManager().isKillBeforeDelay(kill)) {
 
             return;
 
@@ -194,9 +194,9 @@ public class PlayerDeath extends SCListener {
 
     private void saveKill(Kill kill, Kill.Type type) {
 
-        plugin.getClanManager().addKill(kill);
-        ClanPlayer killer = kill.getKiller();
-        ClanPlayer victim = kill.getVictim();
+        plugin.getUnionManager().addKill(kill);
+        UnionPlayer killer = kill.getKiller();
+        UnionPlayer victim = kill.getVictim();
         killer.addKill(type);
         plugin.getStorageManager().insertKill(killer, victim, type.getShortname(), kill.getTime());
 

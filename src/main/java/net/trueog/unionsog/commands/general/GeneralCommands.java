@@ -6,15 +6,15 @@ import co.aikar.commands.CommandParameter;
 import co.aikar.commands.HelpEntry;
 import co.aikar.commands.annotation.*;
 import net.trueog.unionsog.*;
-import net.trueog.unionsog.commands.ClanInput;
-import net.trueog.unionsog.commands.ClanPlayerInput;
+import net.trueog.unionsog.commands.UnionInput;
+import net.trueog.unionsog.commands.UnionPlayerInput;
 import net.trueog.unionsog.commands.data.*;
-import net.trueog.unionsog.conversation.CreateClanTagPrompt;
+import net.trueog.unionsog.conversation.CreateUnionTagPrompt;
 import net.trueog.unionsog.conversation.RequestCanceller;
 import net.trueog.unionsog.conversation.ResetKdrPrompt;
 import net.trueog.unionsog.conversation.SCConversation;
 import net.trueog.unionsog.events.PlayerResetKdrEvent;
-import net.trueog.unionsog.managers.ClanManager;
+import net.trueog.unionsog.managers.UnionManager;
 import net.trueog.unionsog.managers.RequestManager;
 import net.trueog.unionsog.managers.SettingsManager;
 import net.trueog.unionsog.managers.StorageManager;
@@ -31,12 +31,12 @@ import java.util.HashMap;
 import java.util.List;
 
 import static net.trueog.unionsog.UnionsOG.lang;
-import static net.trueog.unionsog.conversation.CreateClanNamePrompt.NAME_KEY;
-import static net.trueog.unionsog.conversation.CreateClanTagPrompt.TAG_KEY;
+import static net.trueog.unionsog.conversation.CreateUnionNamePrompt.NAME_KEY;
+import static net.trueog.unionsog.conversation.CreateUnionTagPrompt.TAG_KEY;
 import static net.trueog.unionsog.managers.SettingsManager.ConfigField.*;
 import static org.bukkit.ChatColor.*;
 
-@CommandAlias("%clan")
+@CommandAlias("%union")
 @Conditions("%basic_conditions")
 public class GeneralCommands extends BaseCommand {
 
@@ -48,7 +48,7 @@ public class GeneralCommands extends BaseCommand {
     @Dependency
     private UnionsOG plugin;
     @Dependency
-    private ClanManager cm;
+    private UnionManager cm;
     @Dependency
     private SettingsManager settings;
     @Dependency
@@ -57,7 +57,7 @@ public class GeneralCommands extends BaseCommand {
     private RequestManager requestManager;
 
     @Default
-    @Description("{@@command.description.clan}")
+    @Description("{@@command.description.union}")
     @HelpSearchTags("menu gui interface ui")
     public void main(CommandSender sender) {
 
@@ -78,7 +78,7 @@ public class GeneralCommands extends BaseCommand {
     @CommandPermission("unionsog.anyone.locale")
     @Description("{@@command.description.locale}")
     @CommandCompletion("@locales")
-    public void locale(ClanPlayer cp, @Values("@locales") @Name("locale") @Single String locale) {
+    public void locale(UnionPlayer cp, @Values("@locales") @Name("locale") @Single String locale) {
 
         if (!settings.is(LANGUAGE_SELECTOR)) {
 
@@ -88,23 +88,23 @@ public class GeneralCommands extends BaseCommand {
         }
 
         cp.setLocale(Helper.forLanguageTag(locale.replace("_", "-")));
-        plugin.getStorageManager().updateClanPlayer(cp);
+        plugin.getStorageManager().updateUnionPlayer(cp);
 
         ChatBlock.sendMessageKey(cp, "locale.has.been.changed");
 
     }
 
     @Subcommand("%create")
-    @CommandPermission("unionsog.leader.create")
+    @CommandPermission("unionsog.member.create")
     @CommandCompletion("%compl:tag %compl:name")
     @Description("{@@command.description.create}")
     public void create(Player player, @Optional @Name("tag") String tag, @Optional @Name("name") String name) {
 
-        ClanPlayer cp = cm.getAnyClanPlayer(player.getUniqueId());
+        UnionPlayer cp = cm.getAnyUnionPlayer(player.getUniqueId());
 
-        if (cp != null && cp.getClan() != null) {
+        if (cp != null && cp.getUnion() != null) {
 
-            ChatBlock.sendMessage(player, RED + lang("you.must.first.resign", player, cp.getClan().getName()));
+            ChatBlock.sendMessage(player, RED + lang("you.must.first.resign", player, cp.getUnion().getName()));
             return;
 
         }
@@ -112,9 +112,9 @@ public class GeneralCommands extends BaseCommand {
         HashMap<Object, Object> initialData = new HashMap<>();
         initialData.put(TAG_KEY, tag);
         initialData.put(NAME_KEY, name != null ? name : tag != null ? ChatUtils.stripColors(tag) : null);
-        SCConversation conversation = new SCConversation(plugin, player, new CreateClanTagPrompt(), initialData);
+        SCConversation conversation = new SCConversation(plugin, player, new CreateUnionTagPrompt(), initialData);
         conversation.addConversationCanceller(
-                new RequestCanceller(player, RED + lang("clan.create.request.cancelled", player)));
+                new RequestCanceller(player, RED + lang("union.create.request.cancelled", player)));
         conversation.begin();
 
     }
@@ -133,9 +133,9 @@ public class GeneralCommands extends BaseCommand {
     @CommandCompletion("@players")
     @CommandPermission("unionsog.anyone.lookup")
     @Description("{@@command.description.lookup.other}")
-    public void lookup(CommandSender sender, @Name("player") ClanPlayerInput player) {
+    public void lookup(CommandSender sender, @Name("player") UnionPlayerInput player) {
 
-        Lookup l = new Lookup(plugin, sender, player.getClanPlayer().getUniqueId());
+        Lookup l = new Lookup(plugin, sender, player.getUnionPlayer().getUniqueId());
         l.send();
 
     }
@@ -152,15 +152,15 @@ public class GeneralCommands extends BaseCommand {
 
     @Subcommand("%kills")
     @CommandPermission("unionsog.member.kills")
-    @Conditions("rank:name=KILLS")
+    @Conditions("union_member")
     @CommandCompletion("@players")
     @Description("{@@command.description.kills}")
-    public void kills(Player sender, @Optional @Name("player") ClanPlayerInput player) {
+    public void kills(Player sender, @Optional @Name("player") UnionPlayerInput player) {
 
         String name = sender.getName();
         if (player != null) {
 
-            name = player.getClanPlayer().getName();
+            name = player.getUnionPlayer().getName();
 
         }
 
@@ -171,22 +171,22 @@ public class GeneralCommands extends BaseCommand {
 
     @Subcommand("%profile")
     @CommandPermission("unionsog.anyone.profile")
-    @CommandCompletion("@clans:hide_own")
+    @CommandCompletion("@unions:hide_own")
     @Description("{@@command.description.profile.other}")
-    public void profile(CommandSender sender, @Name("clan") ClanInput clan) {
+    public void profile(CommandSender sender, @Name("union") UnionInput union) {
 
-        ClanProfile p = new ClanProfile(plugin, sender, clan.getClan());
+        UnionProfile p = new UnionProfile(plugin, sender, union.getUnion());
         p.send();
 
     }
 
     @Subcommand("%roster")
-    @CommandCompletion("@clans:hide_own")
+    @CommandCompletion("@unions:hide_own")
     @CommandPermission("unionsog.anyone.roster")
     @Description("{@@command.description.roster.other}")
-    public void roster(CommandSender sender, @Name("clan") ClanInput clan) {
+    public void roster(CommandSender sender, @Name("union") UnionInput union) {
 
-        ClanRoster r = new ClanRoster(plugin, sender, clan.getClan());
+        UnionRoster r = new UnionRoster(plugin, sender, union.getUnion());
         r.send();
 
     }
@@ -194,10 +194,10 @@ public class GeneralCommands extends BaseCommand {
     @Subcommand("%ff %allow")
     @CommandPermission("unionsog.member.ff")
     @Description("{@@command.description.ff.allow}")
-    public void allowPersonalFf(Player player, ClanPlayer cp) {
+    public void allowPersonalFf(Player player, UnionPlayer cp) {
 
         cp.setFriendlyFire(true);
-        storage.updateClanPlayer(cp);
+        storage.updateUnionPlayer(cp);
         ChatBlock.sendMessage(player, AQUA + lang("personal.friendly.fire.is.set.to.allowed", player));
 
     }
@@ -205,18 +205,18 @@ public class GeneralCommands extends BaseCommand {
     @Subcommand("%ff %auto")
     @CommandPermission("unionsog.member.ff")
     @Description("{@@command.description.ff.auto}")
-    public void autoPersonalFf(Player player, ClanPlayer cp) {
+    public void autoPersonalFf(Player player, UnionPlayer cp) {
 
         cp.setFriendlyFire(false);
-        storage.updateClanPlayer(cp);
-        ChatBlock.sendMessage(player, AQUA + lang("friendy.fire.is.now.managed.by.your.clan", player));
+        storage.updateUnionPlayer(cp);
+        ChatBlock.sendMessage(player, AQUA + lang("friendy.fire.is.now.managed.by.your.union", player));
 
     }
 
     @Subcommand("%resetkdr %confirm")
     @CommandPermission("unionsog.vip.resetkdr")
     @Description("{@@command.description.resetkdr}")
-    public void resetKdrConfirm(Player player, ClanPlayer cp) {
+    public void resetKdrConfirm(Player player, UnionPlayer cp) {
 
         if (!settings.is(ALLOW_RESET_KDR)) {
 
@@ -239,7 +239,7 @@ public class GeneralCommands extends BaseCommand {
     @Subcommand("%resetkdr")
     @CommandPermission("unionsog.vip.resetkdr")
     @Description("{@@command.description.resetkdr}")
-    public void resetKdr(Player player, ClanPlayer cp) {
+    public void resetKdr(Player player, UnionPlayer cp) {
 
         if (!settings.is(ALLOW_RESET_KDR)) {
 
@@ -256,12 +256,12 @@ public class GeneralCommands extends BaseCommand {
     @CommandAlias("%accept")
     @Description("{@@command.description.accept}")
     @Conditions("can_vote")
-    public void accept(Player player, ClanPlayer cp) {
+    public void accept(Player player, UnionPlayer cp) {
 
-        Clan clan = cp.getClan();
-        if (clan != null) {
+        Union union = cp.getUnion();
+        if (union != null) {
 
-            clan.leaderAnnounce(GREEN + lang("voted.to.accept", player.getName()));
+            union.memberAnnounce(GREEN + lang("voted.to.accept", player.getName()));
 
         }
 
@@ -272,12 +272,12 @@ public class GeneralCommands extends BaseCommand {
     @CommandAlias("%deny")
     @Description("{@@command.description.deny}")
     @Conditions("can_vote")
-    public void deny(Player player, ClanPlayer cp) {
+    public void deny(Player player, UnionPlayer cp) {
 
-        Clan clan = cp.getClan();
-        if (clan != null) {
+        Union union = cp.getUnion();
+        if (union != null) {
 
-            clan.leaderAnnounce(RED + lang("has.voted.to.deny", player.getName()));
+            union.memberAnnounce(RED + lang("has.voted.to.deny", player.getName()));
 
         }
 
@@ -317,14 +317,14 @@ public class GeneralCommands extends BaseCommand {
     @Description("{@@command.description.help}")
     public void help(CommandSender sender, CommandHelp help) {
 
-        boolean inClan = sender instanceof Player
-                && cm.getClanByPlayerUniqueId(((Player) sender).getUniqueId()) != null;
+        boolean inUnion = sender instanceof Player
+                && cm.getUnionByPlayerUniqueId(((Player) sender).getUniqueId()) != null;
         for (HelpEntry helpEntry : help.getHelpEntries()) {
 
             for (@SuppressWarnings("rawtypes")
             CommandParameter parameter : helpEntry.getParameters()) {
 
-                if (parameter.getType().equals(Clan.class) && !inClan) {
+                if (parameter.getType().equals(Union.class) && !inUnion) {
 
                     helpEntry.setSearchScore(0);
 
@@ -340,7 +340,7 @@ public class GeneralCommands extends BaseCommand {
 
     @Subcommand("%mostkilled")
     @CommandPermission("unionsog.mod.mostkilled")
-    @Conditions("rank:name=MOSTKILLED")
+    @Conditions("union_member")
     @Description("{@@command.description.mostkilled}")
     public void mostKilled(Player player) {
 
@@ -364,27 +364,27 @@ public class GeneralCommands extends BaseCommand {
         }
         // TODO: end
 
-        List<Clan> clans = cm.getClans();
-        if (clans.isEmpty()) {
+        List<Union> unions = cm.getUnions();
+        if (unions.isEmpty()) {
 
-            sender.sendMessage(RED + lang("no.clans.have.been.created", sender));
+            sender.sendMessage(RED + lang("no.unions.have.been.created", sender));
             return;
 
         }
 
-        clans.sort(Comparator.comparingDouble(Clan::getBalance).reversed());
+        unions.sort(Comparator.comparingDouble(Union::getBalance).reversed());
 
-        sender.sendMessage(lang("clan.list.balance.header", sender, settings.getColored(SERVER_NAME), clans.size()));
-        String lineFormat = lang("clan.list.balance.line", sender);
+        sender.sendMessage(lang("union.list.balance.header", sender, settings.getColored(SERVER_NAME), unions.size()));
+        String lineFormat = lang("union.list.balance.line", sender);
 
         String leftBracket = settings.getColored(TAG_BRACKET_COLOR) + settings.getColored(TAG_BRACKET_LEFT);
         String rightBracket = settings.getColored(TAG_BRACKET_COLOR) + settings.getColored(TAG_BRACKET_RIGHT);
-        for (int i = 0; i < 10 && i < clans.size(); i++) {
+        for (int i = 0; i < 10 && i < unions.size(); i++) {
 
-            Clan clan = clans.get(i);
-            String name = " " + settings.getColored(PAGE_CLAN_NAME_COLOR) + clan.getName();
-            String line = MessageFormat.format(lineFormat, i + 1, leftBracket, clan.getColorTag(), rightBracket, name,
-                    clan.getBalanceFormatted());
+            Union union = unions.get(i);
+            String name = " " + settings.getColored(PAGE_UNION_NAME_COLOR) + union.getName();
+            String line = MessageFormat.format(lineFormat, i + 1, leftBracket, union.getColorTag(), rightBracket, name,
+                    union.getBalanceFormatted());
             sender.sendMessage(line);
 
         }
@@ -394,12 +394,12 @@ public class GeneralCommands extends BaseCommand {
     @Subcommand("%list")
     @CommandPermission("unionsog.anyone.list")
     @Description("{@@command.description.list}")
-    @CommandCompletion("@clan_list_type @order")
+    @CommandCompletion("@union_list_type @order")
     public void list(CommandSender sender, @Optional String type, @Optional @Single String order,
             @Optional Integer page)
     {
 
-        ClanList list = new ClanList(plugin, sender, type, order, page);
+        UnionList list = new UnionList(plugin, sender, type, order, page);
         list.send();
 
     }

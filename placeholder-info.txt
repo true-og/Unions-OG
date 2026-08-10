@@ -41,7 +41,6 @@ These resolve against the requested player:
 
 - name
 - clean_name
-- is_leader
 - lastseendays
 - total_kills
 - rival_kills
@@ -66,9 +65,6 @@ These resolve against the requested player:
 - is_bb_enabled
 - is_invite_enabled
 - is_tag_enabled
-- rank_displayname
-- has_rank
-- rank
 - is_muted
 - is_mutedally
 
@@ -103,7 +99,6 @@ These resolve against the requested player's union:
 - rivals_count
 - is_permanent
 - onlinemembers_count
-- leader_size
 - total_kdr
 - topclans_position
 - total_deaths

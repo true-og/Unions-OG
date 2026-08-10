@@ -1,6 +1,6 @@
 package net.trueog.unionsog.events;
 
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.UnionPlayer;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -12,17 +12,17 @@ import org.jetbrains.annotations.NotNull;
 public class PlayerResetKdrEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-    private final ClanPlayer clanPlayer;
+    private final UnionPlayer unionPlayer;
     private boolean cancelled;
 
     /**
      * Event called before a player's kill death rate is reset
      *
-     * @param clanPlayer The ClanPlayer whose kill death rate going to be reset
+     * @param unionPlayer The UnionPlayer whose kill death rate going to be reset
      */
-    public PlayerResetKdrEvent(@NotNull ClanPlayer clanPlayer) {
+    public PlayerResetKdrEvent(@NotNull UnionPlayer unionPlayer) {
 
-        this.clanPlayer = clanPlayer;
+        this.unionPlayer = unionPlayer;
 
     }
 
@@ -32,9 +32,9 @@ public class PlayerResetKdrEvent extends Event implements Cancellable {
      * @return The player whose kill death rate going to be reset
      */
     @NotNull
-    public ClanPlayer getClanPlayer() {
+    public UnionPlayer getUnionPlayer() {
 
-        return clanPlayer;
+        return unionPlayer;
 
     }
 

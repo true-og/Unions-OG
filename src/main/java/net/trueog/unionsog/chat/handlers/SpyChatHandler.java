@@ -1,7 +1,7 @@
 package net.trueog.unionsog.chat.handlers;
 
 import net.trueog.unionsog.ChatBlock;
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.UnionPlayer;
 import net.trueog.unionsog.chat.ChatHandler;
 import net.trueog.unionsog.chat.SCMessage;
 import net.trueog.unionsog.utils.ChatUtils;
@@ -32,9 +32,9 @@ public class SpyChatHandler implements ChatHandler {
         message.setContent(ChatUtils.stripColors(message.getContent()));
         String formattedMessage = chatManager.parseChatFormat(format, message);
 
-        List<ClanPlayer> onlineSpies = getOnlineSpies();
+        List<UnionPlayer> onlineSpies = getOnlineSpies();
 
-        // Don't send a duplicate message if a spy is inside the clan
+        // Don't send a duplicate message if a spy is inside the union
         onlineSpies.removeAll(message.getReceivers());
         onlineSpies.forEach(receiver -> ChatBlock.sendMessage(receiver, formattedMessage));
 
@@ -48,12 +48,12 @@ public class SpyChatHandler implements ChatHandler {
 
     }
 
-    private List<ClanPlayer> getOnlineSpies() {
+    private List<UnionPlayer> getOnlineSpies() {
 
         return new ArrayList<>(Bukkit.getOnlinePlayers()).stream().filter(Objects::nonNull)
                 .filter(player -> permissionsManager.has(player, "unionsog.admin.all-seeing-eye"))
-                .map(player -> plugin.getClanManager().getCreateClanPlayer(player.getUniqueId()))
-                .filter(Objects::nonNull).filter(clanPlayer -> !clanPlayer.isMuted()).collect(Collectors.toList());
+                .map(player -> plugin.getUnionManager().getCreateUnionPlayer(player.getUniqueId()))
+                .filter(Objects::nonNull).filter(unionPlayer -> !unionPlayer.isMuted()).collect(Collectors.toList());
 
     }
 

@@ -24,7 +24,7 @@ import static net.trueog.unionsog.managers.SettingsManager.ConfigField.ECONOMY_B
  * 
  * <pre>{@code
  * CSVBankLogger bankLogger = new CSVBankLogger(plugin);
- * bankLogger.log(new BankLog(sender, clan, economyResponse, operation, cause, amount));
+ * bankLogger.log(new BankLog(sender, union, economyResponse, operation, cause, amount));
  * }</pre>
  *
  * @since 2.15.3

@@ -5,12 +5,12 @@ import me.ryanhamshire.GriefPrevention.DataStore;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.ryanhamshire.GriefPrevention.events.ClaimCreatedEvent;
 import me.ryanhamshire.GriefPrevention.events.ClaimResizeEvent;
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.UnionPlayer;
 import net.trueog.unionsog.UnionsOG;
 import net.trueog.unionsog.hooks.protection.Coordinate;
 import net.trueog.unionsog.hooks.protection.Land;
 import net.trueog.unionsog.hooks.protection.ProtectionProvider;
-import net.trueog.unionsog.managers.ClanManager;
+import net.trueog.unionsog.managers.UnionManager;
 import net.trueog.unionsog.managers.ProtectionManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -164,7 +164,7 @@ public class GriefPreventionProvider implements ProtectionProvider, Listener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     private void onResize(ClaimResizeEvent event) {
 
-        ClanManager clanManager = UnionsOG.getInstance().getClanManager();
+        UnionManager unionManager = UnionsOG.getInstance().getUnionManager();
 
         Land originalLand = getLand(event.getFrom());
         Land newLand = getLand(event.getTo());
@@ -176,7 +176,7 @@ public class GriefPreventionProvider implements ProtectionProvider, Listener {
 
         for (UUID owner : originalLand.getOwners()) {
 
-            ClanPlayer cp = clanManager.getAnyClanPlayer(owner);
+            UnionPlayer cp = unionManager.getAnyUnionPlayer(owner);
             if (cp == null)
                 continue;
             for (ProtectionManager.Action action : ProtectionManager.Action.values()) {

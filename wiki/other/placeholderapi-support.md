@@ -13,86 +13,93 @@ Union aliases are accepted under either identifier. For example, `%simpleclans_i
 
 ## Available placeholders
 
-| Placeholder | Result | Description |  |
-| :--- | :--- | :--- | :--- |
-| %simpleclans\_neutral\_kills% | INTEGER |  |  |
-| %simpleclans\_rival\_kills% | INTEGER |  |  |
-| %simpleclans\_civilian\_kills% | INTEGER |  |  |
-| %simpleclans\_total\_kills% | INTEGER |  |  |
-| %simpleclans\_weighted\_kills% | INTEGER |  |  |
-| %simpleclans\_deaths% | INTEGER |  |  |
-| %simpleclans\_kdr% | FLOAT |  |  |
-| %simpleclans\_in\_clan% | BOOLEAN \(YES/NO\) |  |  |
-| %simpleclans\_is\_leader% | BOOLEAN \(YES/NO\) |  |  |
-| %simpleclans\_is\_trusted% | BOOLEAN \(YES/NO\) |  |  |
-| %simpleclans\_is\_member% | BOOLEAN \(YES/NO\) |  |  |
-| %simpleclans\_is\_bb\_enabled% | BOOLEAN \(YES/NO\) |  |  |
-| %simpleclans\_is\_usechatshortcut% | BOOLEAN \(YES/NO\) |  |  |
-| %simpleclans\_is\_allychat% | BOOLEAN \(YES/NO\) |  |  |
-| %simpleclans\_is\_clanchat% | BOOLEAN \(YES/NO\) |  |  |
-| %simpleclans\_is\_globalchat% | BOOLEAN \(YES/NO\) |  |  |
-| %simpleclans\_is\_cape\_enabled% | BOOLEAN \(YES/NO\) |  |  |
-| %simpleclans\_is\_tag\_enabled% | BOOLEAN \(YES/NO\) |  |  |
-| %simpleclans\_is\_friendlyfire\_on% | BOOLEAN \(YES/NO\) |  |  |
-| %simpleclans\_is\_muted% | BOOLEAN \(YES/NO\) |  |  |
-| %simpleclans\_is\_mutedally% | BOOLEAN \(YES/NO\) |  |  |
-| %simpleclans\_join\_date% | DATE | Month, Day, Year, Hour |  |
-| %simpleclans\_inactive\_days% | INTEGER |  |  |
-| %simpleclans\_lastseen% | INTEGER |  |  |
-| %simpleclans\_lastseendays% | INTEGER |  |  |
-| %simpleclans\_tag% | STRING | lowerscored Clan tag without color |  |
-| %simpleclans\_tag\_label% | STRING | Clan tag with correct mayus, color and at the end &c |  |
-| %simpleclans\_rank% | STRING |  |  |
-| %simpleclans\_rank\_displayname% | STRING |  |  |
-| %simpleclans\_clanchat\_player\_color% |  |  |  |
-| %simpleclans\_allychat\_player\_color% |  |  |  |
-| %simpleclans\_clan\_total\_neutral% | INTEGER |  |  |
-| %simpleclans\_clan\_total\_civilian% | INTEGER |  |  |
-| %simpleclans\_clan\_total\_rival% | INTEGER |  |  |
-| %simpleclans\_clan\_total\_kills% | INTEGER |  |  |
-| %simpleclans\_clan\_total\_deaths% | INTEGER |  |  |
-| %simpleclans\_clan\_total\_kdr% | FLOAT |  |  |
-| %simpleclans\_clan\_average\_wk% | INTEGER |  |  |
-| %simpleclans\_clan\_leader\_size% | INTEGER |  |  |
-| %simpleclans\_clan\_balance% | INTEGER |  |  |
-| %simpleclans\_clan\_allow\_withdraw% | BOOLEAN \(YES/NO\) |  |  |
-| %simpleclans\_clan\_allow\_deposit% | BOOLEAN \(YES/NO\) |  |  |
-| %simpleclans\_clan\_size% | INTEGER |  |  |
-| %simpleclans\_clan\_name% | STRING |  |  |
-| %simpleclans\_clan\_color\_tag% |  |  |  |
-| %simpleclans\_clan\_tag% |  |  |  |
-| %simpleclans\_clan\_founded% |  |  |  |
-| %simpleclans\_clan\_friendly\_fire% |  |  |  |
-| %simpleclans\_clan\_is\_unrivable% |  |  |  |
-| %simpleclans\_clan\_is\_anyonline% |  |  |  |
-| %simpleclans\_clan\_is\_verified% |  |  |  |
-| %simpleclans\_clan\_capeurl% |  |  |  |
-| %simpleclans\_clan\_inactivedays% |  |  |  |
-| %simpleclans\_clan\_onlinemembers\_count% |  |  |  |
-| %simpleclans\_clan\_allies\_count% |  |  |  |
-| %simpleclans\_clan\_rivals\_count% |  |  |  |
-| %simpleclanstopclans\_\#\_clan\_total\_neutral% |  |  |  |
-| %simpleclanstopclans\_\#\_clan\_total\_civilian% |  |  |  |
-| %simpleclanstopclans\_\#\_clan\_total\_rival% |  |  |  |
-| %simpleclanstopclans\_\#\_clan\_total\_kills% |  |  |  |
-| %simpleclanstopclans\_\#\_clan\_total\_deaths% |  |  |  |
-| %simpleclanstopclans\_\#\_clan\_total\_kdr% |  |  |  |
-| %simpleclanstopclans\_\#\_clan\_average\_wk% |  |  |  |
-| %simpleclanstopclans\_\#\_clan\_leader\_size% |  |  |  |
-| %simpleclanstopclans\_\#\_clan\_balance% |  |  |  |
-| %simpleclanstopclans\_\#\_clan\_allow\_withdraw% |  |  |  |
-| %simpleclanstopclans\_\#\_clan\_allow\_deposit% |  |  |  |
-| %simpleclanstopclans\_\#\_clan\_size% |  |  |  |
-| %simpleclanstopclans\_\#\_clan\_name% |  |  |  |
-| %simpleclanstopclans\_\#\_clan\_color\_tag% |  |  |  |
-| %simpleclanstopclans\_\#\_clan\_tag% |  |  |  |
-| %simpleclanstopclans\_\#\_clan\_founded% |  |  |  |
-| %simpleclanstopclans\_\#\_clan\_friendly\_fire% |  |  |  |
-| %simpleclanstopclans\_\#\_clan\_is\_unrivable% |  |  |  |
-| %simpleclanstopclans\_\#\_clan\_is\_anyonline% |  |  |  |
-| %simpleclanstopclans\_\#\_clan\_is\_verified% |  |  |  |
-| %simpleclanstopclans\_\#\_clan\_capeurl% |  |  |  |
-| %simpleclanstopclans\_\#\_clan\_inactivedays% |  |  |  |
-| %simpleclanstopclans\_\#\_clan\_onlinemembers\_count% |  |  |  |
-| %simpleclanstopclans\_\#\_clan\_allies\_count% |  |  |  |
-| %simpleclanstopclans\_\#\_clan\_rivals\_count% |  |  |  |
+> Placeholder **names** deliberately keep their upstream `clan` spelling so
+> existing setups keep working. `%simpleclans_clan_name%`,
+> `%simpleunions_clan_name%` and `%simpleunions_union_name%` are all the same
+> value.
+
+### Player placeholders
+
+| Placeholder | Result |
+| :--- | :--- |
+| `%simpleunions_name%` | STRING |
+| `%simpleunions_clean_name%` | STRING |
+| `%simpleunions_tag%` | STRING |
+| `%simpleunions_tag_label%` | STRING |
+| `%simpleunions_in_clan%` | BOOLEAN |
+| `%simpleunions_is_member%` | BOOLEAN |
+| `%simpleunions_is_trusted%` | BOOLEAN |
+| `%simpleunions_neutral_kills%` | INTEGER |
+| `%simpleunions_rival_kills%` | INTEGER |
+| `%simpleunions_civilian_kills%` | INTEGER |
+| `%simpleunions_ally_kills%` | INTEGER |
+| `%simpleunions_total_kills%` | INTEGER |
+| `%simpleunions_weighted_kills%` | INTEGER |
+| `%simpleunions_deaths%` | INTEGER |
+| `%simpleunions_kdr%` | FLOAT |
+| `%simpleunions_join_date%` | DATE |
+| `%simpleunions_inactive_days%` | INTEGER |
+| `%simpleunions_lastseen%` | INTEGER |
+| `%simpleunions_lastseendays%` | INTEGER |
+| `%simpleunions_is_bb_enabled%` | BOOLEAN |
+| `%simpleunions_is_tag_enabled%` | BOOLEAN |
+| `%simpleunions_is_invite_enabled%` | BOOLEAN |
+| `%simpleunions_is_friendlyfire_on%` | BOOLEAN |
+| `%simpleunions_is_muted%` | BOOLEAN |
+| `%simpleunions_is_mutedally%` | BOOLEAN |
+| `%simpleunions_clanchat_player_color%` | STRING |
+| `%simpleunions_allychat_player_color%` | STRING |
+| `%simpleunions_topplayers_position%` | INTEGER |
+
+### Union placeholders
+
+Prefix these with `clan_` or `union_`, for example
+`%simpleunions_union_name%`.
+
+| Placeholder | Result |
+| :--- | :--- |
+| `name` | STRING |
+| `tag` | STRING |
+| `color_tag` | STRING |
+| `bracket_tag` | STRING |
+| `color` | STRING |
+| `size` | INTEGER |
+| `onlinemembers_count` | INTEGER |
+| `allies_count` | INTEGER |
+| `rivals_count` | INTEGER |
+| `founded` | DATE |
+| `inactivedays` | INTEGER |
+| `friendly_fire` | BOOLEAN |
+| `is_anyonline` | BOOLEAN |
+| `is_unrivable` | BOOLEAN |
+| `is_permanent` | BOOLEAN |
+| `balance` | INTEGER |
+| `balance_formatted` | STRING |
+| `allow_deposit` | BOOLEAN |
+| `allow_withdraw` | BOOLEAN |
+| `total_kills` | INTEGER |
+| `total_neutral` | INTEGER |
+| `total_civilian` | INTEGER |
+| `total_rival` | INTEGER |
+| `total_ally` | INTEGER |
+| `total_deaths` | INTEGER |
+| `total_kdr` | FLOAT |
+| `average_wk` | INTEGER |
+| `topclans_position` | INTEGER |
+
+### Leaderboard placeholders
+
+`%simpleunions_topplayers_#_<player placeholder>%` and
+`%simpleunions_topunions_#_union_<union placeholder>%`, where `#` is the
+position. The legacy `topclans` spelling also works.
+
+### Relational placeholders
+
+`%rel_simpleunions_color%` colours a player's name by their relationship to
+the viewer, using the `color.same_clan`, `color.rival` and `color.ally`
+settings in PlaceholderAPI's config.
+
+## Removed placeholders
+
+`is_leader`, `leader_size`, `rank`, `rank_displayname` and `has_rank` no longer
+exist, because unions have no leaders or ranks.

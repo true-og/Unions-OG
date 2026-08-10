@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Map;
 
 import static net.trueog.unionsog.UnionsOG.lang;
-import static net.trueog.unionsog.managers.SettingsManager.ConfigField.PAGE_CLAN_NAME_COLOR;
+import static net.trueog.unionsog.managers.SettingsManager.ConfigField.PAGE_UNION_NAME_COLOR;
 import static net.trueog.unionsog.managers.SettingsManager.ConfigField.PAGE_SEPARATOR;
 
 public class Kills extends Sendable {
@@ -71,7 +71,7 @@ public class Kills extends Sendable {
         chatBlock.setFlexibility(true, false);
         chatBlock.setAlignment("l", "c");
         chatBlock.addRow("  " + headColor + lang("victim", player), lang("killcount", player));
-        ChatBlock.saySingle(player, sm.getColored(PAGE_CLAN_NAME_COLOR) + polled + subColor + " "
+        ChatBlock.saySingle(player, sm.getColored(PAGE_UNION_NAME_COLOR) + polled + subColor + " "
                 + lang("kills", player) + " " + headColor + Helper.generatePageSeparator(sm.getString(PAGE_SEPARATOR)));
         ChatBlock.sendBlank(player);
 

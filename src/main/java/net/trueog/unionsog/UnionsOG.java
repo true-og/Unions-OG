@@ -1,6 +1,7 @@
 package net.trueog.unionsog;
 
 import co.aikar.commands.BukkitCommandIssuer;
+import net.trueog.unionsog.commands.GroupAliasCommand;
 import net.trueog.unionsog.commands.SCCommandManager;
 import net.trueog.unionsog.hooks.papi.UnionsOGExpansion;
 import net.trueog.unionsog.hooks.papi.UnionsOGMiniPlaceholders;
@@ -22,6 +23,7 @@ import net.trueog.unionsog.utils.ChatUtils;
 import net.trueog.unionsog.utils.TagValidator;
 import net.trueog.unionsog.uuid.UUIDMigration;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -50,8 +52,9 @@ public class UnionsOG extends JavaPlugin {
     private static LanguageResource languageResource;
     private static final Logger logger = Logger.getLogger("Unions-OG");
     private SCCommandManager commandManager;
-    private ClanManager clanManager;
+    private UnionManager unionManager;
     private RequestManager requestManager;
+    private ProposalManager proposalManager;
     private StorageManager storageManager;
     private SettingsManager settingsManager;
     private PermissionsManager permissionsManager;
@@ -124,7 +127,7 @@ public class UnionsOG extends JavaPlugin {
 
         permissionsManager = new PermissionsManager();
         requestManager = new RequestManager();
-        clanManager = new ClanManager();
+        unionManager = new UnionManager();
         proxyManager = new BungeeManager(this);
         try {
 
@@ -138,6 +141,7 @@ public class UnionsOG extends JavaPlugin {
 
         }
 
+        proposalManager = new ProposalManager();
         teleportManager = new TeleportManager();
         protectionManager = new ProtectionManager();
         protectionManager.registerListeners();
@@ -151,6 +155,8 @@ public class UnionsOG extends JavaPlugin {
         new UnionBankZeroMigration(this).migrate();
         // TODO: end
 
+        registerGroupAliases();
+
         tagValidator = new TagValidator(settingsManager, permissionsManager);
 
         logStatus();
@@ -161,13 +167,34 @@ public class UnionsOG extends JavaPlugin {
 
     }
 
+    /**
+     * Points other group plugins' command words at {@code /union}.
+     */
+    private void registerGroupAliases() {
+
+        GroupAliasCommand executor = new GroupAliasCommand();
+        for (String alias : GroupAliasCommand.ALIASES) {
+
+            PluginCommand command = getCommand(alias);
+            if (command == null) {
+
+                getLogger().warning("Group alias /" + alias + " is not registered in plugin.yml, skipping it.");
+                continue;
+
+            }
+
+            command.setExecutor(executor);
+            command.setTabCompleter(executor);
+
+        }
+
+    }
+
     private void logStatus() {
 
         getLogger().info("Multithreading: " + settingsManager.is(PERFORMANCE_USE_THREADS));
         getLogger().info("BungeeCord: " + settingsManager.is(PERFORMANCE_USE_BUNGEECORD));
         getLogger().info("HEX support: " + ChatUtils.HEX_COLOR_SUPPORT);
-        getLogger().info(
-                "Help us translate Unions-OG to your language! " + "Access https://crowdin.com/project/simpleclans/");
 
     }
 
@@ -249,11 +276,11 @@ public class UnionsOG extends JavaPlugin {
     }
 
     /**
-     * @return the clanManager
+     * @return the unionManager
      */
-    public ClanManager getClanManager() {
+    public UnionManager getUnionManager() {
 
-        return clanManager;
+        return unionManager;
 
     }
 
@@ -263,6 +290,15 @@ public class UnionsOG extends JavaPlugin {
     public RequestManager getRequestManager() {
 
         return requestManager;
+
+    }
+
+    /**
+     * @return the proposalManager
+     */
+    public ProposalManager getProposalManager() {
+
+        return proposalManager;
 
     }
 
@@ -343,14 +379,14 @@ public class UnionsOG extends JavaPlugin {
     }
 
     @Nullable
-    public static String optionalLang(@NotNull String key, @Nullable ClanPlayer clanPlayer, Object... arguments) {
+    public static String optionalLang(@NotNull String key, @Nullable UnionPlayer unionPlayer, Object... arguments) {
 
         Locale locale = instance.getSettingsManager().getLanguage();
-        if (clanPlayer != null && clanPlayer.getLocale() != null
+        if (unionPlayer != null && unionPlayer.getLocale() != null
                 && instance.getSettingsManager().is(LANGUAGE_SELECTOR))
         {
 
-            locale = clanPlayer.getLocale();
+            locale = unionPlayer.getLocale();
 
         }
 
@@ -376,14 +412,14 @@ public class UnionsOG extends JavaPlugin {
     @Nullable
     public static String optionalLang(@NotNull String key, @Nullable Player player, Object... arguments) {
 
-        ClanPlayer clanPlayer = null;
+        UnionPlayer unionPlayer = null;
         if (player != null) {
 
-            clanPlayer = instance.getClanManager().getAnyClanPlayer(player.getUniqueId());
+            unionPlayer = instance.getUnionManager().getAnyUnionPlayer(player.getUniqueId());
 
         }
 
-        return optionalLang(key, clanPlayer, arguments);
+        return optionalLang(key, unionPlayer, arguments);
 
     }
 
@@ -396,9 +432,9 @@ public class UnionsOG extends JavaPlugin {
     }
 
     @NotNull
-    public static String lang(@NotNull String key, @Nullable ClanPlayer clanPlayer, Object... arguments) {
+    public static String lang(@NotNull String key, @Nullable UnionPlayer unionPlayer, Object... arguments) {
 
-        String lang = optionalLang(key, clanPlayer, arguments);
+        String lang = optionalLang(key, unionPlayer, arguments);
         return (lang == null) ? key : lang;
 
     }

@@ -1,7 +1,6 @@
 package net.trueog.unionsog.commands.data;
 
 import net.trueog.unionsog.*;
-import net.trueog.unionsog.utils.ChatUtils;
 import net.trueog.unionsog.utils.KDRFormat;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -19,20 +18,20 @@ public class Lookup extends Sendable {
     @NotNull
     private final UUID targetUuid;
     @Nullable
-    private final ClanPlayer target;
+    private final UnionPlayer target;
     @Nullable
-    private final Clan senderClan;
+    private final Union senderUnion;
     @Nullable
-    private final Clan targetClan;
+    private final Union targetUnion;
 
     public Lookup(@NotNull UnionsOG plugin, @NotNull CommandSender sender, @NotNull UUID targetUuid) {
 
         super(plugin, sender);
         this.targetUuid = targetUuid;
-        target = cm.getAnyClanPlayer(targetUuid);
-        ClanPlayer senderCp = !isPlayer() ? null : cm.getClanPlayer(getPlayer().getUniqueId());
-        senderClan = senderCp == null ? null : senderCp.getClan();
-        targetClan = target != null ? target.getClan() : null;
+        target = cm.getAnyUnionPlayer(targetUuid);
+        UnionPlayer senderCp = !isPlayer() ? null : cm.getUnionPlayer(getPlayer().getUniqueId());
+        senderUnion = senderCp == null ? null : senderCp.getUnion();
+        targetUnion = target != null ? target.getUnion() : null;
 
     }
 
@@ -42,9 +41,7 @@ public class Lookup extends Sendable {
         if (target != null) {
 
             String lookup = lang("player.lookup", sender).replace("%player_name%", target.getName())
-                    .replace("%clan_name%", getClanName())
-                    .replace("%player_rank%", ChatUtils.parseColors(target.getRankDisplayName()))
-                    .replace("%player_status%", getPlayerStatus())
+                    .replace("%union_name%", getUnionName()).replace("%player_status%", getPlayerStatus())
                     .replace("%player_kdr%", KDRFormat.format(target.getKDR()))
                     .replace("%player_rival_kills%", String.valueOf(target.getRivalKills()))
                     .replace("%player_neutral_kills%", String.valueOf(target.getNeutralKills()))
@@ -53,7 +50,7 @@ public class Lookup extends Sendable {
                     .replace("%player_deaths%", String.valueOf(target.getDeaths()))
                     .replace("%player_join_date%", target.getJoinDateString())
                     .replace("%player_last_seen%", target.getLastSeenString(sender))
-                    .replace("%player_past_clans%", target.getPastClansString(headColor + ", "))
+                    .replace("%player_past_unions%", target.getPastUnionsString(headColor + ", "))
                     .replace("%player_inactive_days%", String.valueOf(target.getInactiveDays()))
                     .replace("%player_max_inactive_days%",
                             Helper.formatMaxInactiveDays(sm.getInt(PURGE_INACTIVE_PLAYER_DAYS)))
@@ -64,7 +61,7 @@ public class Lookup extends Sendable {
 
             ChatBlock.sendMessage(sender, RED + lang("no.player.data.found", sender));
 
-            if (isOtherPlayer() && senderClan != null) {
+            if (isOtherPlayer() && senderUnion != null) {
 
                 ChatBlock.sendBlank(sender);
                 ChatBlock.sendMessage(sender, lang("kill.type.civilian", sender, DARK_GRAY));
@@ -76,44 +73,32 @@ public class Lookup extends Sendable {
     }
 
     @NotNull
-    private String getClanName() {
+    private String getUnionName() {
 
-        String clanName = lang("none", sender);
-        if (targetClan != null) {
+        String unionName = lang("none", sender);
+        if (targetUnion != null) {
 
-            clanName = lang("player.lookup.clanname").replace("%clan_color_tag%", targetClan.getColorTag())
-                    .replace("%clan_name%", targetClan.getName());
+            unionName = lang("player.lookup.unionname").replace("%union_color_tag%", targetUnion.getColorTag())
+                    .replace("%union_name%", targetUnion.getName());
 
         }
 
-        return clanName;
+        return unionName;
 
     }
 
     @NotNull
     private String getPlayerStatus() {
 
-        if (target == null || targetClan == null) {
+        if (target == null || targetUnion == null) {
 
             return lang("free.agent", sender);
-
-        }
-
-        if (target.isLeader()) {
-
-            return sm.getColored(PAGE_LEADER_COLOR) + lang("leader", sender);
 
         }
 
         if (target.isTrusted()) {
 
             return sm.getColored(PAGE_TRUSTED_COLOR) + lang("trusted", sender);
-
-        }
-
-        if (!target.getRankId().isEmpty()) {
-
-            return sm.getColored(PAGE_TRUSTED_COLOR) + lang("in.rank", sender);
 
         }
 
@@ -129,19 +114,19 @@ public class Lookup extends Sendable {
 
             String killType = GRAY + lang("neutral", sender);
 
-            if (targetClan == null) {
+            if (targetUnion == null) {
 
                 killType = DARK_GRAY + lang("civilian", sender);
 
-            } else if (senderClan != null) {
+            } else if (senderUnion != null) {
 
-                if (senderClan.isRival(targetClan.getTag())) {
+                if (senderUnion.isRival(targetUnion.getTag())) {
 
                     killType = WHITE + lang("rival", sender);
 
                 }
 
-                if (senderClan.equals(targetClan) || senderClan.isAlly(targetClan.getTag())) {
+                if (senderUnion.equals(targetUnion) || senderUnion.isAlly(targetUnion.getTag())) {
 
                     killType = RED + lang("ally", sender);
 

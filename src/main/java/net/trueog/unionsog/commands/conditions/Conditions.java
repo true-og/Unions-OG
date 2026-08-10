@@ -3,8 +3,8 @@ package net.trueog.unionsog.commands.conditions;
 import co.aikar.commands.BukkitCommandIssuer;
 import co.aikar.commands.ConditionFailedException;
 import co.aikar.commands.MessageKeys;
-import net.trueog.unionsog.Clan;
-import net.trueog.unionsog.managers.ClanManager;
+import net.trueog.unionsog.Union;
+import net.trueog.unionsog.managers.UnionManager;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,17 +17,17 @@ public class Conditions {
     }
 
     @NotNull
-    public static Clan assertClanMember(@NotNull ClanManager clanManager, @NotNull BukkitCommandIssuer issuer) {
+    public static Union assertUnionMember(@NotNull UnionManager unionManager, @NotNull BukkitCommandIssuer issuer) {
 
         Conditions.assertPlayer(issuer);
-        Clan clan = clanManager.getClanByPlayerUniqueId(issuer.getUniqueId());
-        if (clan == null) {
+        Union union = unionManager.getUnionByPlayerUniqueId(issuer.getUniqueId());
+        if (union == null) {
 
-            throw new ConditionFailedException(lang("not.a.member.of.any.clan", issuer));
+            throw new ConditionFailedException(lang("not.a.member.of.any.union", issuer));
 
         }
 
-        return clan;
+        return union;
 
     }
 

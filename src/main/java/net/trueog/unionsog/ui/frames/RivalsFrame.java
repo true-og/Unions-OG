@@ -1,8 +1,7 @@
 package net.trueog.unionsog.ui.frames;
 
 import com.cryptomorin.xseries.XMaterial;
-import net.trueog.unionsog.Clan;
-import net.trueog.unionsog.RankPermission;
+import net.trueog.unionsog.Union;
 import net.trueog.unionsog.UnionsOG;
 import net.trueog.unionsog.ui.*;
 import net.trueog.unionsog.utils.Paginator;
@@ -19,10 +18,10 @@ public class RivalsFrame extends SCFrame {
 
     private final UnionsOG plugin = UnionsOG.getInstance();
     private final Paginator paginator;
-    private final Clan subject;
+    private final Union subject;
     private final List<String> rivals;
 
-    public RivalsFrame(Player viewer, SCFrame parent, Clan subject) {
+    public RivalsFrame(Player viewer, SCFrame parent, Union subject) {
 
         super(parent, viewer);
         this.subject = subject;
@@ -46,7 +45,7 @@ public class RivalsFrame extends SCFrame {
 
         SCComponent add = new SCComponentImpl(lang("gui.rivals.add.title", getViewer()), null, XMaterial.RED_WOOL, 4);
         add.setListener(ClickType.LEFT, () -> InventoryDrawer.open(new AddRivalFrame(this, getViewer(), subject)));
-        add.setPermission(ClickType.LEFT, RankPermission.RIVAL_ADD);
+        add.setPermission(ClickType.LEFT, "unionsog.member.rival");
         add(add);
 
         add(Components.getPreviousPageComponent(6, this::previousPage, paginator, getViewer()));
@@ -55,15 +54,15 @@ public class RivalsFrame extends SCFrame {
         int slot = 9;
         for (int i = paginator.getMinIndex(); paginator.isValidIndex(i); i++) {
 
-            Clan clan = plugin.getClanManager().getClan(rivals.get(i));
-            if (clan == null)
+            Union union = plugin.getUnionManager().getUnion(rivals.get(i));
+            if (union == null)
                 continue;
             SCComponent c = new SCComponentImpl(
-                    lang("gui.clanlist.clan.title", getViewer(), clan.getColorTag(), clan.getName()),
-                    Collections.singletonList(lang("gui.rivals.clan.lore", getViewer())), XMaterial.RED_BANNER, slot);
+                    lang("gui.unionlist.union.title", getViewer(), union.getColorTag(), union.getName()),
+                    Collections.singletonList(lang("gui.rivals.union.lore", getViewer())), XMaterial.RED_BANNER, slot);
             c.setListener(ClickType.RIGHT,
-                    () -> InventoryController.runSubcommand(getViewer(), "rival remove", false, clan.getTag()));
-            c.setPermission(ClickType.RIGHT, RankPermission.RIVAL_REMOVE);
+                    () -> InventoryController.runSubcommand(getViewer(), "rival remove", false, union.getTag()));
+            c.setPermission(ClickType.RIGHT, "unionsog.member.rival");
             add(c);
             slot++;
 

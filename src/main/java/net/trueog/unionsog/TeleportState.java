@@ -11,15 +11,15 @@ public class TeleportState {
     private final Location origin;
     private final Location destination;
     private int counter;
-    private final String clanName;
+    private final String unionName;
     private boolean processing;
 
-    public TeleportState(Player player, Location destination, String clanName, int counter) {
+    public TeleportState(Player player, Location destination, String unionName, int counter) {
 
         this.offlinePlayer = player;
         this.destination = destination;
         this.origin = player.getLocation();
-        this.clanName = clanName;
+        this.unionName = unionName;
         this.counter = counter;
 
     }
@@ -71,9 +71,9 @@ public class TeleportState {
 
     }
 
-    public String getClanName() {
+    public String getUnionName() {
 
-        return this.clanName;
+        return this.unionName;
 
     }
 

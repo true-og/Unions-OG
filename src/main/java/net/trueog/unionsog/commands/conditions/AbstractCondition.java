@@ -8,7 +8,7 @@ public abstract class AbstractCondition implements IdentifiableCondition {
 
     protected final UnionsOG plugin;
     protected final PermissionsManager permissionsManager;
-    protected final ClanManager clanManager;
+    protected final UnionManager unionManager;
     protected final RequestManager requestManager;
     protected final SettingsManager settingsManager;
     protected final ProtectionManager protectionManager;
@@ -17,7 +17,7 @@ public abstract class AbstractCondition implements IdentifiableCondition {
 
         this.plugin = plugin;
         permissionsManager = plugin.getPermissionsManager();
-        clanManager = plugin.getClanManager();
+        unionManager = plugin.getUnionManager();
         requestManager = plugin.getRequestManager();
         settingsManager = plugin.getSettingsManager();
         protectionManager = plugin.getProtectionManager();

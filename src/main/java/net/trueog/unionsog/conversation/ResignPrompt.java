@@ -1,7 +1,7 @@
 package net.trueog.unionsog.conversation;
 
-import net.trueog.unionsog.Clan;
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.Union;
+import net.trueog.unionsog.UnionPlayer;
 import org.bukkit.conversations.Prompt;
 
 import static net.trueog.unionsog.UnionsOG.lang;
@@ -14,27 +14,20 @@ import static org.bukkit.ChatColor.RED;
 public class ResignPrompt extends ConfirmationPrompt {
 
     @Override
-    protected Prompt confirm(ClanPlayer sender, Clan clan) {
+    protected Prompt confirm(UnionPlayer sender, Union union) {
 
-        if (clan.isPermanent() || !sender.isLeader() || clan.getLeaders().size() > 1) {
+        if (union.isPermanent() || union.getSize() > 1) {
 
-            clan.addBb(sender.getName(), lang("0.has.resigned", sender.getName()));
-            sender.addResignTime(clan.getTag());
-            clan.removePlayerFromClan(sender.getUniqueId());
+            union.addBb(sender.getName(), lang("0.has.resigned", sender.getName()));
+            sender.addResignTime(union.getTag());
+            union.removePlayerFromUnion(sender.getUniqueId());
 
             return new MessagePromptImpl(AQUA + lang("resign.success", sender));
 
-        } else if (sender.isLeader() && clan.getLeaders().size() == 1) {
-
-            clan.disband(sender.toPlayer(), true, false);
-            return new MessagePromptImpl(RED + lang("clan.has.been.disbanded", sender, clan.getName()));
-
-        } else {
-
-            return new MessagePromptImpl(RED
-                    + lang("last.leader.cannot.resign.you.must.appoint.another.leader.or.disband.the.clan", sender));
-
         }
+
+        union.disband(sender.toPlayer(), true, false);
+        return new MessagePromptImpl(RED + lang("union.has.been.disbanded", sender, union.getName()));
 
     }
 

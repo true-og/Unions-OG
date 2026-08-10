@@ -1,7 +1,7 @@
 package net.trueog.unionsog.commands.conditions;
 
 import co.aikar.commands.*;
-import net.trueog.unionsog.Clan;
+import net.trueog.unionsog.Union;
 import net.trueog.unionsog.Flags;
 import net.trueog.unionsog.UnionsOG;
 import org.bukkit.entity.Player;
@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import static net.trueog.unionsog.UnionsOG.lang;
 
-public class TeleportCondition extends AbstractParameterCondition<Clan> {
+public class TeleportCondition extends AbstractParameterCondition<Union> {
 
     public TeleportCondition(@NotNull UnionsOG plugin) {
 
@@ -18,15 +18,15 @@ public class TeleportCondition extends AbstractParameterCondition<Clan> {
     }
 
     @Override
-    public Class<Clan> getType() {
+    public Class<Union> getType() {
 
-        return Clan.class;
+        return Union.class;
 
     }
 
     @Override
     public void validateCondition(ConditionContext<BukkitCommandIssuer> context,
-            BukkitCommandExecutionContext execContext, Clan value) throws InvalidCommandArgument
+            BukkitCommandExecutionContext execContext, Union value) throws InvalidCommandArgument
     {
 
         Player player = execContext.getPlayer();

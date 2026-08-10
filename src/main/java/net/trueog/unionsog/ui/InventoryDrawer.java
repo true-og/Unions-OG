@@ -1,6 +1,5 @@
 package net.trueog.unionsog.ui;
 
-import net.trueog.unionsog.RankPermission;
 import net.trueog.unionsog.UnionsOG;
 import net.trueog.unionsog.events.FrameOpenEvent;
 import net.trueog.unionsog.managers.SettingsManager;
@@ -178,8 +177,8 @@ public class InventoryDrawer {
                 () -> plugin.getServer().getConsoleSender().sendMessage(lang("gui.not.supported")));
         SettingsManager settingsManager = plugin.getSettingsManager();
         settingsManager.set(ENABLE_GUI, false);
-        String commandClan = settingsManager.getString(COMMANDS_CLAN);
-        player.performCommand(commandClan);
+        String commandUnion = settingsManager.getString(COMMANDS_UNION);
+        player.performCommand(commandUnion);
 
     }
 
@@ -191,7 +190,7 @@ public class InventoryDrawer {
             List<String> lore = itemMeta.getLore();
             if (lore != null) {
 
-                Object permission = component.getLorePermission();
+                String permission = component.getLorePermission();
                 if (permission != null) {
 
                     if (!hasPermission(frame.getViewer(), permission)) {
@@ -211,15 +210,9 @@ public class InventoryDrawer {
 
     }
 
-    private static boolean hasPermission(@NotNull Player viewer, @NotNull Object permission) {
+    private static boolean hasPermission(@NotNull Player viewer, @NotNull String permission) {
 
-        if (permission instanceof String) {
-
-            return plugin.getPermissionsManager().has(viewer, (String) permission);
-
-        }
-
-        return plugin.getPermissionsManager().has(viewer, (RankPermission) permission, false);
+        return plugin.getPermissionsManager().has(viewer, permission);
 
     }
 

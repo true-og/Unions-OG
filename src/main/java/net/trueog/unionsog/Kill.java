@@ -4,11 +4,11 @@ import java.time.LocalDateTime;
 
 public class Kill {
 
-    private final ClanPlayer killer;
-    private final ClanPlayer victim;
+    private final UnionPlayer killer;
+    private final UnionPlayer victim;
     private final LocalDateTime time;
 
-    public Kill(ClanPlayer killer, ClanPlayer victim, LocalDateTime time) {
+    public Kill(UnionPlayer killer, UnionPlayer victim, LocalDateTime time) {
 
         this.killer = killer;
         this.victim = victim;
@@ -16,13 +16,13 @@ public class Kill {
 
     }
 
-    public ClanPlayer getKiller() {
+    public UnionPlayer getKiller() {
 
         return killer;
 
     }
 
-    public ClanPlayer getVictim() {
+    public UnionPlayer getVictim() {
 
         return victim;
 

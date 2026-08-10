@@ -1,6 +1,6 @@
 package net.trueog.unionsog.events;
 
-import net.trueog.unionsog.Clan;
+import net.trueog.unionsog.Union;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
@@ -10,21 +10,21 @@ import org.jetbrains.annotations.NotNull;
 public class TagChangeEvent extends PlayerEvent implements Cancellable {
 
     private static final HandlerList HANDLER_LIST = new HandlerList();
-    private final @NotNull Clan clan;
+    private final @NotNull Union union;
     private @NotNull String newTag;
     private boolean cancelled;
 
-    public TagChangeEvent(@NotNull Player player, @NotNull Clan clan, @NotNull String newTag) {
+    public TagChangeEvent(@NotNull Player player, @NotNull Union union, @NotNull String newTag) {
 
         super(player);
-        this.clan = clan;
+        this.union = union;
         this.newTag = newTag;
 
     }
 
-    public @NotNull Clan getClan() {
+    public @NotNull Union getUnion() {
 
-        return clan;
+        return union;
 
     }
 

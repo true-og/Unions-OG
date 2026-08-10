@@ -1,6 +1,6 @@
 package net.trueog.unionsog.hooks.papi.resolvers;
 
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.UnionPlayer;
 import net.trueog.unionsog.UnionsOG;
 import net.trueog.unionsog.hooks.papi.PlaceholderBooleanFormatter;
 import net.trueog.unionsog.hooks.papi.PlaceholderResolver;
@@ -33,18 +33,18 @@ public class MemberStatusResolver extends PlaceholderResolver {
     {
 
         boolean result = false;
-        if (object instanceof ClanPlayer) {
+        if (object instanceof UnionPlayer) {
 
-            ClanPlayer cp = (ClanPlayer) object;
+            UnionPlayer cp = (UnionPlayer) object;
             if (placeholder.equals("is_member")) {
 
-                result = cp.getClan() != null && !cp.isTrusted();
+                result = cp.getUnion() != null && !cp.isTrusted();
 
             }
 
             if (placeholder.equals("is_trusted")) {
 
-                result = cp.getClan() != null && !cp.isLeader() && cp.isTrusted();
+                result = cp.getUnion() != null && cp.isTrusted();
 
             }
 

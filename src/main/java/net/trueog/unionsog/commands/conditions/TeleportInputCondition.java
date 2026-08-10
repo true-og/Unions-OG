@@ -5,10 +5,10 @@ import co.aikar.commands.BukkitCommandIssuer;
 import co.aikar.commands.ConditionContext;
 import co.aikar.commands.InvalidCommandArgument;
 import net.trueog.unionsog.UnionsOG;
-import net.trueog.unionsog.commands.ClanInput;
+import net.trueog.unionsog.commands.UnionInput;
 import org.jetbrains.annotations.NotNull;
 
-public class TeleportInputCondition extends AbstractParameterCondition<ClanInput> {
+public class TeleportInputCondition extends AbstractParameterCondition<UnionInput> {
 
     public TeleportInputCondition(@NotNull UnionsOG plugin) {
 
@@ -17,18 +17,18 @@ public class TeleportInputCondition extends AbstractParameterCondition<ClanInput
     }
 
     @Override
-    public Class<ClanInput> getType() {
+    public Class<UnionInput> getType() {
 
-        return ClanInput.class;
+        return UnionInput.class;
 
     }
 
     @Override
     public void validateCondition(ConditionContext<BukkitCommandIssuer> context,
-            BukkitCommandExecutionContext execContext, ClanInput value) throws InvalidCommandArgument
+            BukkitCommandExecutionContext execContext, UnionInput value) throws InvalidCommandArgument
     {
 
-        new TeleportCondition(plugin).validateCondition(context, execContext, value.getClan());
+        new TeleportCondition(plugin).validateCondition(context, execContext, value.getUnion());
 
     }
 

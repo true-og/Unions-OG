@@ -1,8 +1,7 @@
 package net.trueog.unionsog.ui.frames;
 
 import com.cryptomorin.xseries.XMaterial;
-import net.trueog.unionsog.Clan;
-import net.trueog.unionsog.RankPermission;
+import net.trueog.unionsog.Union;
 import net.trueog.unionsog.UnionsOG;
 import net.trueog.unionsog.ui.*;
 import net.trueog.unionsog.utils.Paginator;
@@ -18,14 +17,14 @@ import static net.trueog.unionsog.UnionsOG.lang;
 
 public class AddRivalFrame extends SCFrame {
 
-    private final List<Clan> notRivals;
+    private final List<Union> notRivals;
     private final Paginator paginator;
 
-    public AddRivalFrame(SCFrame parent, Player viewer, Clan subject) {
+    public AddRivalFrame(SCFrame parent, Player viewer, Union subject) {
 
         super(parent, viewer);
         UnionsOG plugin = UnionsOG.getInstance();
-        notRivals = plugin.getClanManager().getClans().stream()
+        notRivals = plugin.getUnionManager().getUnions().stream()
                 .filter(c -> !c.equals(subject) && !c.isRival(subject.getTag()) && !c.isAlly(subject.getTag()))
                 .collect(Collectors.toList());
         paginator = new Paginator(getSize() - 9, notRivals.size());
@@ -51,16 +50,16 @@ public class AddRivalFrame extends SCFrame {
         int slot = 9;
         for (int i = paginator.getMinIndex(); paginator.isValidIndex(i); i++) {
 
-            Clan notRival = notRivals.get(i);
+            Union notRival = notRivals.get(i);
             SCComponent c = new SCComponentImpl(
-                    lang("gui.clanlist.clan.title", getViewer(), notRival.getColorTag(), notRival.getName()),
-                    Collections.singletonList(lang("gui.add.rival.clan.lore", getViewer())), XMaterial.RED_BANNER,
+                    lang("gui.unionlist.union.title", getViewer(), notRival.getColorTag(), notRival.getName()),
+                    Collections.singletonList(lang("gui.add.rival.union.lore", getViewer())), XMaterial.RED_BANNER,
                     slot);
 
             c.setListener(ClickType.LEFT,
                     () -> InventoryController.runSubcommand(getViewer(), "rival add", false, notRival.getTag()));
             c.setConfirmationRequired(ClickType.LEFT);
-            c.setPermission(ClickType.LEFT, RankPermission.RIVAL_ADD);
+            c.setPermission(ClickType.LEFT, "unionsog.member.rival");
             add(c);
             slot++;
 

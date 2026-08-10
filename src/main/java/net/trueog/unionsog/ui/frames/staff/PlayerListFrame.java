@@ -75,7 +75,7 @@ public class PlayerListFrame extends SCFrame {
         } else {
 
             players = Stream
-                    .concat(UnionsOG.getInstance().getClanManager().getAllClanPlayers().stream()
+                    .concat(UnionsOG.getInstance().getUnionManager().getAllUnionPlayers().stream()
                             .map(cp -> Bukkit.getOfflinePlayer(cp.getUniqueId())), Bukkit.getOnlinePlayers().stream())
                     .distinct().collect(Collectors.toList());
 

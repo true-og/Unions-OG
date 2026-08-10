@@ -19,6 +19,15 @@ import static net.trueog.unionsog.managers.SettingsManager.ConfigField.*;
 import static org.bukkit.ChatColor.RED;
 
 /**
+ * Handles the requests a union sends to <i>another</i> union, plus membership
+ * invitations. The first member of the asked union to answer decides the
+ * outcome.
+ * <p>
+ * Decisions that only concern a union's own members go through the
+ * {@link ProposalManager} instead, where they need a consensus of that union's
+ * members.
+ * </p>
+ *
  * @author phaed
  */
 public final class RequestManager {
@@ -43,93 +52,14 @@ public final class RequestManager {
 
     }
 
-    public void addDemoteRequest(ClanPlayer requester, String demotedName, Clan clan) {
-
-        if (requests.containsKey(clan.getTag())) {
-
-            return;
-
-        }
-
-        String msg = MessageFormat.format(lang("asking.for.the.demotion"), requester.getName(), demotedName);
-
-        ClanPlayer demotedTp = plugin.getClanManager().getAnyClanPlayer(demotedName);
-
-        List<ClanPlayer> acceptors = Helper.stripOffLinePlayers(clan.getLeaders());
-        acceptors.remove(demotedTp);
-
-        Request req = new Request(ClanRequest.DEMOTE, acceptors, requester, demotedName, clan, msg);
-        req.vote(requester.getName(), VoteResult.ACCEPT);
-        requests.put(req.getClan().getTag(), req);
-        ask(req);
-
-    }
-
-    /**
-     * This method asks <i>all</i> leaders about some action <i>inside</i> their
-     * clan.
-     * <p>
-     * Example of possible requests:
-     * </p>
-     * <ul>
-     * <li>Disband request can be asked from all leaders</li>
-     * <li>Rename request can be asked from all leaders</li>
-     * <li>Promote request can be asked from all leaders</li>
-     * </ul>
-     *
-     * <p>
-     * Examples of incompatible requests:
-     * </p>
-     * <ul>
-     * <li>Demote request can be asked from all leaders, <b>except the demoted
-     * one.</b></li>
-     * <li>Invite request has to ask someone <b>outside</b> of leaders clan</li>
-     * </ul>
-     *
-     * @param requester the clan player, who sent the request
-     * @param request   the type of request, see: {@link ClanRequest}
-     * @param target    the target which will be used in request processing
-     * @param key       the language key that would be translated and send the
-     *                  message to all leaders
-     * @param args      the language objects, requires in some language strings.
-     * @throws IllegalArgumentException if passed incompatible request
-     */
-    public void requestAllLeaders(@NotNull ClanPlayer requester, @NotNull ClanRequest request, @NotNull String target,
-            @NotNull String key, @Nullable Object... args)
-    {
-
-        if (request.equals(ClanRequest.INVITE) || request.equals(ClanRequest.DEMOTE)) {
-
-            throw new IllegalArgumentException("Unsupported request: " + request.name());
-
-        }
-
-        Clan clan = requester.getClan();
-        if (clan == null || requests.containsKey(clan.getTag())) {
-
-            return;
-
-        }
-
-        String msg = lang(key, args);
-        List<ClanPlayer> acceptors = Helper.stripOffLinePlayers(clan.getLeaders());
-
-        Request req = new Request(request, acceptors, requester, target, clan, msg);
-        requests.put(clan.getTag(), req);
-        req.vote(requester.getName(), VoteResult.ACCEPT);
-
-        ask(req);
-
-    }
-
     /**
      * Add a member invite request
      *
      * @param requester   the requester
      * @param invitedName the invited Player
-     * @param clan        the Clan
+     * @param union       the Union
      */
-    public void addInviteRequest(ClanPlayer requester, String invitedName, Clan clan) {
+    public void addInviteRequest(UnionPlayer requester, String invitedName, Union union) {
 
         if (requests.containsKey(invitedName.toLowerCase())) {
 
@@ -144,96 +74,76 @@ public final class RequestManager {
 
         }
 
-        String msg = lang("inviting.you.to.join", player, requester.getName(), clan.getName());
-        Request req = new Request(ClanRequest.INVITE, null, requester, invitedName, clan, msg);
+        String msg = lang("inviting.you.to.join", player, requester.getName(), union.getName());
+        Request req = new Request(UnionRequest.INVITE, null, requester, invitedName, union, msg);
         requests.put(invitedName.toLowerCase(), req);
         ask(req);
 
     }
 
-    public void addWarStartRequest(ClanPlayer requester, Clan warClan, Clan requestingClan) {
+    public void addWarEndRequest(UnionPlayer requester, Union warUnion, Union requestingUnion) {
 
-        if (requests.containsKey(warClan.getTag())) {
+        if (requests.containsKey(warUnion.getTag())) {
 
             return;
 
         }
 
-        String msg = MessageFormat.format(lang("proposing.war"), requestingClan.getName(),
-                ChatUtils.stripColors(warClan.getColorTag()));
+        String msg = MessageFormat.format(lang("proposing.to.end.the.war"), requestingUnion.getName(),
+                ChatUtils.stripColors(warUnion.getColorTag()));
 
-        List<ClanPlayer> acceptors = Helper.stripOffLinePlayers(warClan.getLeaders());
+        List<UnionPlayer> acceptors = Helper.stripOffLinePlayers(warUnion.getMembers());
         acceptors.remove(requester);
 
-        Request req = new Request(ClanRequest.START_WAR, acceptors, requester, warClan.getTag(), requestingClan, msg);
+        Request req = new Request(UnionRequest.END_WAR, acceptors, requester, warUnion.getTag(), requestingUnion, msg);
         requests.put(req.getTarget(), req);
         ask(req);
 
     }
 
-    public void addWarEndRequest(ClanPlayer requester, Clan warClan, Clan requestingClan) {
+    public void addAllyRequest(UnionPlayer requester, Union allyUnion, Union requestingUnion) {
 
-        if (requests.containsKey(warClan.getTag())) {
-
-            return;
-
-        }
-
-        String msg = MessageFormat.format(lang("proposing.to.end.the.war"), requestingClan.getName(),
-                ChatUtils.stripColors(warClan.getColorTag()));
-
-        List<ClanPlayer> acceptors = Helper.stripOffLinePlayers(warClan.getLeaders());
-        acceptors.remove(requester);
-
-        Request req = new Request(ClanRequest.END_WAR, acceptors, requester, warClan.getTag(), requestingClan, msg);
-        requests.put(req.getTarget(), req);
-        ask(req);
-
-    }
-
-    public void addAllyRequest(ClanPlayer requester, Clan allyClan, Clan requestingClan) {
-
-        if (requests.containsKey(allyClan.getTag())) {
+        if (requests.containsKey(allyUnion.getTag())) {
 
             return;
 
         }
 
-        String msg = MessageFormat.format(lang("proposing.an.alliance"), requestingClan.getName(),
-                ChatUtils.stripColors(allyClan.getColorTag()));
+        String msg = MessageFormat.format(lang("proposing.an.alliance"), requestingUnion.getName(),
+                ChatUtils.stripColors(allyUnion.getColorTag()));
 
-        List<ClanPlayer> acceptors = Helper.stripOffLinePlayers(allyClan.getLeaders());
+        List<UnionPlayer> acceptors = Helper.stripOffLinePlayers(allyUnion.getMembers());
         acceptors.remove(requester);
 
-        Request req = new Request(ClanRequest.CREATE_ALLY, acceptors, requester, allyClan.getTag(), requestingClan,
+        Request req = new Request(UnionRequest.CREATE_ALLY, acceptors, requester, allyUnion.getTag(), requestingUnion,
                 msg);
         requests.put(req.getTarget(), req);
         ask(req);
 
     }
 
-    public void addRivalryBreakRequest(ClanPlayer requester, Clan rivalClan, Clan requestingClan) {
+    public void addRivalryBreakRequest(UnionPlayer requester, Union rivalUnion, Union requestingUnion) {
 
-        if (requests.containsKey(rivalClan.getTag())) {
+        if (requests.containsKey(rivalUnion.getTag())) {
 
             return;
 
         }
 
-        String msg = MessageFormat.format(lang("proposing.to.end.the.rivalry"), requestingClan.getName(),
-                ChatUtils.stripColors(rivalClan.getColorTag()));
+        String msg = MessageFormat.format(lang("proposing.to.end.the.rivalry"), requestingUnion.getName(),
+                ChatUtils.stripColors(rivalUnion.getColorTag()));
 
-        List<ClanPlayer> acceptors = Helper.stripOffLinePlayers(rivalClan.getLeaders());
+        List<UnionPlayer> acceptors = Helper.stripOffLinePlayers(rivalUnion.getMembers());
         acceptors.remove(requester);
 
-        Request req = new Request(ClanRequest.BREAK_RIVALRY, acceptors, requester, rivalClan.getTag(), requestingClan,
-                msg);
+        Request req = new Request(UnionRequest.BREAK_RIVALRY, acceptors, requester, rivalUnion.getTag(),
+                requestingUnion, msg);
         requests.put(req.getTarget(), req);
         ask(req);
 
     }
 
-    public void accept(ClanPlayer cp) {
+    public void accept(UnionPlayer cp) {
 
         Request req = requests.get(cp.getTag());
 
@@ -256,7 +166,7 @@ public final class RequestManager {
 
     }
 
-    public void deny(ClanPlayer cp) {
+    public void deny(UnionPlayer cp) {
 
         Request req = requests.get(cp.getTag());
 
@@ -283,7 +193,7 @@ public final class RequestManager {
 
         requests.remove(req.getTarget().toLowerCase());
 
-        Clan clan = req.getClan();
+        Union union = req.getUnion();
         Player invited = Bukkit.getPlayerExact(req.getTarget());
         if (invited == null) {
 
@@ -293,26 +203,26 @@ public final class RequestManager {
 
         if (vote.equals(VoteResult.ACCEPT)) {
 
-            ClanPlayer cp = plugin.getClanManager().getCreateClanPlayer(invited.getUniqueId());
-            int maxMembers = plugin.getSettingsManager().getInt(CLAN_MAX_MEMBERS);
+            UnionPlayer cp = plugin.getUnionManager().getCreateUnionPlayer(invited.getUniqueId());
+            int maxMembers = plugin.getSettingsManager().getInt(UNION_MAX_MEMBERS);
 
-            if (maxMembers > 0 && maxMembers > clan.getSize()) {
+            if (maxMembers > 0 && maxMembers > union.getSize()) {
 
-                ChatBlock.sendMessageKey(invited, "accepted.invitation", clan.getName());
-                clan.addBb(lang("joined.the.clan", invited.getName()));
-                plugin.getClanManager().serverAnnounce(lang("has.joined", invited.getName(), clan.getName()));
-                clan.addPlayerToClan(cp);
+                ChatBlock.sendMessageKey(invited, "accepted.invitation", union.getName());
+                union.addBb(lang("joined.the.union", invited.getName()));
+                plugin.getUnionManager().serverAnnounce(lang("has.joined", invited.getName(), union.getName()));
+                union.addPlayerToUnion(cp);
 
             } else {
 
-                ChatBlock.sendMessageKey(invited, "this.clan.has.reached.the.member.limit");
+                ChatBlock.sendMessageKey(invited, "this.union.has.reached.the.member.limit");
 
             }
 
         } else {
 
-            ChatBlock.sendMessageKey(invited, "denied.invitation", clan.getName());
-            clan.leaderAnnounce(RED + lang("membership.invitation", invited.getName()));
+            ChatBlock.sendMessageKey(invited, "denied.invitation", union.getName());
+            union.memberAnnounce(RED + lang("membership.invitation", invited.getName()));
 
         }
 
@@ -320,71 +230,27 @@ public final class RequestManager {
 
     public void processResults(Request req) {
 
-        Clan requestClan = req.getClan();
-        ClanPlayer requester = req.getRequester();
+        Union requestUnion = req.getUnion();
+        UnionPlayer requester = req.getRequester();
 
         String target = req.getTarget();
 
         @Nullable
-        Clan targetClan = plugin.getClanManager().getClan(target);
-
-        ClanPlayer targetCp = plugin.getClanManager().getAnyClanPlayer(target);
-        @Nullable
-        UUID targetUuid = targetCp != null ? targetCp.getUniqueId() : null;
+        Union targetUnion = plugin.getUnionManager().getUnion(target);
 
         List<String> accepts = req.getAccepts();
         List<String> denies = req.getDenies();
 
         switch (req.getType()) {
 
-            case START_WAR:
-                processStartWar(requester, requestClan, targetClan, accepts, denies);
-                break;
             case END_WAR:
-                processEndWar(requester, requestClan, targetClan, accepts, denies);
+                processEndWar(requester, requestUnion, targetUnion, accepts, denies);
                 break;
             case CREATE_ALLY:
-                processCreateAlly(requester, requestClan, targetClan, accepts, denies);
+                processCreateAlly(requester, requestUnion, targetUnion, accepts, denies);
                 break;
             case BREAK_RIVALRY:
-                processBreakRivalry(requester, requestClan, targetClan, accepts, denies);
-                break;
-            case DEMOTE:
-            case PROMOTE:
-                if (!req.votingFinished() || targetUuid == null) {
-
-                    return;
-
-                }
-                target = requestClan.getTag();
-
-                if (req.getType() == ClanRequest.DEMOTE) {
-
-                    processDemote(req, requestClan, targetUuid, denies);
-
-                }
-                if (req.getType() == ClanRequest.PROMOTE) {
-
-                    processPromote(req, requestClan, targetUuid, denies);
-
-                }
-                break;
-            case DISBAND:
-                if (!req.votingFinished()) {
-
-                    return;
-
-                }
-                processDisband(requester, requestClan, denies);
-                break;
-            case RENAME:
-                if (!req.votingFinished()) {
-
-                    return;
-
-                }
-
-                processRename(req);
+                processBreakRivalry(requester, requestUnion, targetUnion, accepts, denies);
                 break;
             default:
                 return;
@@ -397,89 +263,25 @@ public final class RequestManager {
 
     }
 
-    private void processRename(Request request) {
-
-        if (request.getDenies().isEmpty()) {
-
-            request.getClan().setName(request.getTarget());
-
-        } else {
-
-            String deniers = String.join(", ", request.getDenies());
-            request.getClan().leaderAnnounce(RED + lang("rename.refused", deniers));
-
-        }
-
-    }
-
-    private void processDisband(ClanPlayer requester, Clan requestClan, List<String> denies) {
-
-        if (denies.isEmpty()) {
-
-            requestClan.disband(requester.toPlayer(), true, false);
-
-        } else {
-
-            String deniers = String.join(", ", denies);
-            requestClan.leaderAnnounce(RED + lang("clan.deletion", deniers));
-
-        }
-
-    }
-
-    private void processPromote(Request req, Clan requestClan, UUID targetPlayer, List<String> denies) {
-
-        String promotedName = req.getTarget();
-        if (denies.isEmpty()) {
-
-            requestClan.addBb(lang("leaders"), lang("promoted.to.leader", promotedName));
-            requestClan.promote(targetPlayer);
-
-        } else {
-
-            String deniers = String.join(", ", denies);
-            requestClan.leaderAnnounce(RED + lang("denied.the.promotion", deniers, promotedName));
-
-        }
-
-    }
-
-    private void processDemote(Request req, Clan requestClan, UUID targetPlayer, List<String> denies) {
-
-        String demotedName = req.getTarget();
-        if (denies.isEmpty()) {
-
-            requestClan.addBb(lang("leaders"), lang("demoted.back.to.member", demotedName));
-            requestClan.demote(targetPlayer);
-
-        } else {
-
-            String deniers = String.join(", ", denies);
-            requestClan.leaderAnnounce(RED + lang("denied.demotion", deniers, demotedName));
-
-        }
-
-    }
-
-    private void processBreakRivalry(ClanPlayer requester, Clan requestClan, @Nullable Clan targetClan,
+    private void processBreakRivalry(UnionPlayer requester, Union requestUnion, @Nullable Union targetUnion,
             List<String> accepts, List<String> denies)
     {
 
-        if (targetClan != null && requestClan != null) {
+        if (targetUnion != null && requestUnion != null) {
 
             if (!accepts.isEmpty()) {
 
-                requestClan.removeRival(targetClan);
-                targetClan.addBb(requester.getName(),
-                        lang("broken.the.rivalry", accepts.get(0), requestClan.getName()));
-                requestClan.addBb(requester.getName(),
-                        lang("broken.the.rivalry.with", requester.getName(), targetClan.getName()));
+                requestUnion.removeRival(targetUnion);
+                targetUnion.addBb(requester.getName(),
+                        lang("broken.the.rivalry", accepts.get(0), requestUnion.getName()));
+                requestUnion.addBb(requester.getName(),
+                        lang("broken.the.rivalry.with", requester.getName(), targetUnion.getName()));
 
             } else {
 
-                targetClan.addBb(requester.getName(),
-                        lang("denied.to.make.peace", denies.get(0), requestClan.getName()));
-                requestClan.addBb(requester.getName(), lang("peace.agreement.denied", targetClan.getName()));
+                targetUnion.addBb(requester.getName(),
+                        lang("denied.to.make.peace", denies.get(0), requestUnion.getName()));
+                requestUnion.addBb(requester.getName(), lang("peace.agreement.denied", targetUnion.getName()));
 
             }
 
@@ -487,25 +289,26 @@ public final class RequestManager {
 
     }
 
-    private void processCreateAlly(ClanPlayer requester, Clan requestClan, @Nullable Clan targetClan,
+    private void processCreateAlly(UnionPlayer requester, Union requestUnion, @Nullable Union targetUnion,
             List<String> accepts, List<String> denies)
     {
 
-        if (targetClan != null && requestClan != null) {
+        if (targetUnion != null && requestUnion != null) {
 
             if (!accepts.isEmpty()) {
 
-                requestClan.addAlly(targetClan);
+                requestUnion.addAlly(targetUnion);
 
-                targetClan.addBb(requester.getName(),
-                        lang("accepted.an.alliance", accepts.get(0), requestClan.getName()));
-                requestClan.addBb(requester.getName(),
-                        lang("created.an.alliance", requester.getName(), targetClan.getName()));
+                targetUnion.addBb(requester.getName(),
+                        lang("accepted.an.alliance", accepts.get(0), requestUnion.getName()));
+                requestUnion.addBb(requester.getName(),
+                        lang("created.an.alliance", requester.getName(), targetUnion.getName()));
 
             } else {
 
-                targetClan.addBb(requester.getName(), lang("denied.an.alliance", denies.get(0), requestClan.getName()));
-                requestClan.addBb(requester.getName(), lang("the.alliance.was.denied", targetClan.getName()));
+                targetUnion.addBb(requester.getName(),
+                        lang("denied.an.alliance", denies.get(0), requestUnion.getName()));
+                requestUnion.addBb(requester.getName(), lang("the.alliance.was.denied", targetUnion.getName()));
 
             }
 
@@ -513,49 +316,28 @@ public final class RequestManager {
 
     }
 
-    private void processEndWar(ClanPlayer requester, Clan requestClan, @Nullable Clan targetClan, List<String> accepts,
-            List<String> denies)
+    private void processEndWar(UnionPlayer requester, Union requestUnion, @Nullable Union targetUnion,
+            List<String> accepts, List<String> denies)
     {
 
-        if (requestClan != null && targetClan != null) {
+        if (requestUnion != null && targetUnion != null) {
 
             if (!accepts.isEmpty()) {
 
-                War war = plugin.getProtectionManager().getWar(requestClan, targetClan);
+                War war = plugin.getProtectionManager().getWar(requestUnion, targetUnion);
                 plugin.getProtectionManager().removeWar(war, WarEndEvent.Reason.REQUEST);
-                requestClan.removeWarringClan(targetClan);
-                targetClan.removeWarringClan(requestClan);
+                requestUnion.removeWarringUnion(targetUnion);
+                targetUnion.removeWarringUnion(requestUnion);
 
-                targetClan.addBb(requester.getName(),
-                        lang("you.are.no.longer.at.war", accepts.get(0), requestClan.getColorTag()));
-                requestClan.addBb(requester.getName(),
-                        lang("you.are.no.longer.at.war", requestClan.getName(), targetClan.getColorTag()));
-
-            } else {
-
-                targetClan.addBb(requester.getName(), lang("denied.war.end", denies.get(0), requestClan.getName()));
-                requestClan.addBb(requester.getName(), lang("end.war.denied", targetClan.getName()));
-
-            }
-
-        }
-
-    }
-
-    private void processStartWar(ClanPlayer requester, Clan requestClan, @Nullable Clan targetClan,
-            List<String> accepts, List<String> denies)
-    {
-
-        if (requestClan != null && targetClan != null) {
-
-            if (!accepts.isEmpty()) {
-
-                plugin.getProtectionManager().addWar(requester, requestClan, targetClan);
+                targetUnion.addBb(requester.getName(),
+                        lang("you.are.no.longer.at.war", accepts.get(0), requestUnion.getColorTag()));
+                requestUnion.addBb(requester.getName(),
+                        lang("you.are.no.longer.at.war", requestUnion.getName(), targetUnion.getColorTag()));
 
             } else {
 
-                targetClan.addBb(requester.getName(), lang("denied.war.req", denies.get(0), requestClan.getName()));
-                requestClan.addBb(requester.getName(), lang("end.war.denied", targetClan.getName()));
+                targetUnion.addBb(requester.getName(), lang("denied.war.end", denies.get(0), requestUnion.getName()));
+                requestUnion.addBb(requester.getName(), lang("end.war.denied", targetUnion.getName()));
 
             }
 
@@ -572,12 +354,13 @@ public final class RequestManager {
 
         for (Request req : new LinkedList<>(requests.values())) {
 
-            for (ClanPlayer cp : req.getAcceptors()) {
+            for (UnionPlayer cp : req.getAcceptors()) {
 
                 if (cp.getName().equalsIgnoreCase(playerName)) {
 
-                    req.getClan().leaderAnnounce(lang("signed.off.request.cancelled", RED + playerName, req.getType()));
-                    requests.remove(req.getClan().getTag());
+                    req.getUnion()
+                            .memberAnnounce(lang("signed.off.request.cancelled", RED + playerName, req.getType()));
+                    requests.remove(req.getUnion().getTag());
                     break;
 
                 }
@@ -651,15 +434,15 @@ public final class RequestManager {
      */
     public void ask(final Request req) {
 
-        String message = lang("request.message", req.getClan().getColorTag(), req.getMsg());
+        String message = lang("request.message", req.getUnion().getColorTag(), req.getMsg());
         ArrayList<Player> recipients = new ArrayList<>();
-        if (req.getType() == ClanRequest.INVITE) {
+        if (req.getType() == UnionRequest.INVITE) {
 
             recipients.add(Bukkit.getPlayerExact(req.getTarget()));
 
         } else {
 
-            for (ClanPlayer cp : req.getAcceptors()) {
+            for (UnionPlayer cp : req.getAcceptors()) {
 
                 if (cp.getVote() == null) {
 

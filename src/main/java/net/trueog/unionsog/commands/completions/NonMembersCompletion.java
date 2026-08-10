@@ -35,7 +35,7 @@ public class NonMembersCompletion extends AbstractSyncCompletion {
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
 
             boolean vanished = VanishUtils.isVanished(c.getSender(), onlinePlayer);
-            if (clanManager.getClanByPlayerUniqueId(onlinePlayer.getUniqueId()) != null
+            if (unionManager.getUnionByPlayerUniqueId(onlinePlayer.getUniqueId()) != null
                     || (c.hasConfig("ignore_vanished") && vanished))
             {
 

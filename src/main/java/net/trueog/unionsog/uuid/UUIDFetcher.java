@@ -3,7 +3,7 @@ package net.trueog.unionsog.uuid;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.UnionPlayer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,20 +41,20 @@ public final class UUIDFetcher {
     }
 
     /**
-     * Fetches UUIDs for a list of ClanPlayer objects. This method extracts the
-     * names from the ClanPlayer objects and fetches their corresponding UUIDs.
+     * Fetches UUIDs for a list of UnionPlayer objects. This method extracts the
+     * names from the UnionPlayer objects and fetches their corresponding UUIDs.
      *
-     * @param clanPlayers A list of ClanPlayer objects for which to fetch UUIDs
+     * @param unionPlayers A list of UnionPlayer objects for which to fetch UUIDs
      * @return A Map where the keys are player names and the values are their
      *         corresponding UUIDs
      * @throws InterruptedException If the operation is interrupted while waiting
      * @throws ExecutionException   If the computation threw an exception
      */
-    public static Map<String, UUID> fetchUUIDsForClanPlayers(List<ClanPlayer> clanPlayers)
+    public static Map<String, UUID> fetchUUIDsForUnionPlayers(List<UnionPlayer> unionPlayers)
             throws InterruptedException, ExecutionException
     {
 
-        List<String> names = clanPlayers.stream().map(ClanPlayer::getName).collect(Collectors.toList());
+        List<String> names = unionPlayers.stream().map(UnionPlayer::getName).collect(Collectors.toList());
         return fetchUUIDsConcurrently(names);
 
     }

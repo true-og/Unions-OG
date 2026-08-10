@@ -2,8 +2,8 @@ package net.trueog.unionsog.commands.contexts;
 
 import co.aikar.commands.BukkitCommandIssuer;
 import co.aikar.commands.InvalidCommandArgument;
-import net.trueog.unionsog.Clan;
-import net.trueog.unionsog.managers.ClanManager;
+import net.trueog.unionsog.Union;
+import net.trueog.unionsog.managers.UnionManager;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,17 +17,17 @@ public class Contexts {
     }
 
     @NotNull
-    public static Clan assertClanMember(@NotNull ClanManager clanManager, @NotNull BukkitCommandIssuer issuer) {
+    public static Union assertUnionMember(@NotNull UnionManager unionManager, @NotNull BukkitCommandIssuer issuer) {
 
         assertPlayer(issuer);
-        Clan clan = clanManager.getClanByPlayerUniqueId(issuer.getUniqueId());
-        if (clan == null) {
+        Union union = unionManager.getUnionByPlayerUniqueId(issuer.getUniqueId());
+        if (union == null) {
 
-            throw new InvalidCommandArgument(lang("not.a.member.of.any.clan", issuer), false);
+            throw new InvalidCommandArgument(lang("not.a.member.of.any.union", issuer), false);
 
         }
 
-        return clan;
+        return union;
 
     }
 

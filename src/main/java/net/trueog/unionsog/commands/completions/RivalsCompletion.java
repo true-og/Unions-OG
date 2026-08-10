@@ -2,7 +2,7 @@ package net.trueog.unionsog.commands.completions;
 
 import co.aikar.commands.BukkitCommandCompletionContext;
 import co.aikar.commands.InvalidCommandArgument;
-import net.trueog.unionsog.Clan;
+import net.trueog.unionsog.Union;
 import net.trueog.unionsog.UnionsOG;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -25,10 +25,10 @@ public class RivalsCompletion extends AbstractSyncCompletion {
         Player player = c.getPlayer();
         if (player != null) {
 
-            Clan clan = clanManager.getClanByPlayerUniqueId(player.getUniqueId());
-            if (clan != null) {
+            Union union = unionManager.getUnionByPlayerUniqueId(player.getUniqueId());
+            if (union != null) {
 
-                return clan.getRivals();
+                return union.getRivals();
 
             }
 

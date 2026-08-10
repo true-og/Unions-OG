@@ -1,12 +1,12 @@
 package net.trueog.unionsog.listeners;
 
 import net.trueog.unionsog.ChatBlock;
-import net.trueog.unionsog.Clan;
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.Union;
+import net.trueog.unionsog.UnionPlayer;
 import net.trueog.unionsog.UnionsOG;
 import net.trueog.unionsog.hooks.protection.Land;
 import net.trueog.unionsog.hooks.protection.ProtectionProvider;
-import net.trueog.unionsog.managers.ClanManager;
+import net.trueog.unionsog.managers.UnionManager;
 import net.trueog.unionsog.managers.ProtectionManager;
 import net.trueog.unionsog.managers.SettingsManager;
 import org.bukkit.Bukkit;
@@ -48,7 +48,7 @@ public class LandProtection implements Listener {
 
     private final UnionsOG plugin;
     private final ProtectionManager protectionManager;
-    private final ClanManager clanManager;
+    private final UnionManager unionManager;
     private final SettingsManager settingsManager;
     private final EventPriority priority;
 
@@ -56,7 +56,7 @@ public class LandProtection implements Listener {
 
         this.plugin = plugin;
         protectionManager = plugin.getProtectionManager();
-        clanManager = plugin.getClanManager();
+        unionManager = plugin.getUnionManager();
         settingsManager = plugin.getSettingsManager();
         priority = EventPriority.valueOf(settingsManager.getString(WAR_LISTENERS_PRIORITY));
 
@@ -344,30 +344,23 @@ public class LandProtection implements Listener {
             Player player = provider.getPlayer(event);
             if (player == null)
                 return;
-            Clan clan = clanManager.getClanByPlayerUniqueId(player.getUniqueId());
-            if ((clan == null || !clan.isLeader(player)) && settingsManager.is(LAND_CREATION_ONLY_LEADERS)) {
+            Union union = unionManager.getUnionByPlayerUniqueId(player.getUniqueId());
+            if (settingsManager.is(LAND_CREATION_ONLY_ONE_PER_UNION)) {
 
-                cancelWithMessage(player, event, "only.leaders.can.create.lands");
-                return;
+                if (union == null) {
 
-            }
-
-            if (settingsManager.is(LAND_CREATION_ONLY_ONE_PER_CLAN)) {
-
-                if (clan == null) {
-
-                    cancelWithMessage(player, event, "only.clan.members.can.create.lands");
+                    cancelWithMessage(player, event, "only.union.members.can.create.lands");
                     return;
 
                 }
 
-                for (ClanPlayer member : clan.getMembers()) {
+                for (UnionPlayer member : union.getMembers()) {
 
                     Set<Land> lands = protectionManager.getLandsOf(Bukkit.getOfflinePlayer(member.getUniqueId()),
                             player.getWorld());
                     if (lands.size() > 0) {
 
-                        cancelWithMessage(player, event, "only.one.land.per.clan");
+                        cancelWithMessage(player, event, "only.one.land.per.union");
                         return;
 
                     }

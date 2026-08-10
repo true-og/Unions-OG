@@ -17,15 +17,42 @@ authors:
   - Phaed
   - RoinujNosde
 website: https://github.com/true-og/Unions-OG
+commands:
+  clan:
+    description: Tells the player to use /union instead
+    usage: /union
+  clans:
+    description: Tells the player to use /union instead
+    usage: /union
+  factions:
+    description: Tells the player to use /union instead
+    usage: /union
+  guilds:
+    description: Tells the player to use /union instead
+    usage: /union
+  party:
+    description: Tells the player to use /union instead
+    usage: /union
+  tribe:
+    description: Tells the player to use /union instead
+    usage: /union
+  nation:
+    description: Tells the player to use /union instead
+    usage: /union
+  crew:
+    description: Tells the player to use /union instead
+    usage: /union
+  squad:
+    description: Tells the player to use /union instead
+    usage: /union
+  gang:
+    description: Tells the player to use /union instead
+    usage: /union
 permissions:
   unionsog.admin.reload:
     description: Can reload configuration
   unionsog.admin.purge:
     description: Can purge a player
-  unionsog.admin.promote:
-    description: Can promote players to union leaders
-  unionsog.admin.demote:
-    description: Can demote union leaders to normal players
   unionsog.admin.permanent:
     description: Can toggle union permanent status
   unionsog.admin.all-seeing-eye:
@@ -48,6 +75,8 @@ permissions:
     description: Can kick any player
   unionsog.mod.globalff:
     description: Can turn off global friendly fire protection
+  unionsog.mod.home:
+    description: Can set any union's home
   unionsog.mod.hometp:
     description: Can teleport to all union homes
   unionsog.mod.bypass:
@@ -116,35 +145,41 @@ permissions:
     description: Can reset his kdr
   unionsog.vip.teleport-delay:
     description: Bypasses the teleport delay
-  unionsog.leader.create:
+  unionsog.member.create:
     description: Can create unions
-  unionsog.leader.home-set:
-    description: Can set home base
-  unionsog.leader.regroup.home:
-    description: Can tp entire union to homebase
-  unionsog.leader.regroup.me:
-    description: Can tp their entire union to themself
-  unionsog.leader.ally:
-    description: Can ally his union with other unions
-  unionsog.leader.rival:
+  unionsog.member.ally-set:
+    description: Can add and remove his union's allies
+    default: true
+  unionsog.member.rival:
     description: Can start a rivalry with another union
-  unionsog.leader.modtag:
+  unionsog.member.modtag:
     description: Can modify his union's tag
     children:
-      unionsog.leader.color: true
-  unionsog.leader.color:
+      unionsog.member.color: true
+  unionsog.member.color:
     description: Can set his union's color
-  unionsog.leader.description:
+  unionsog.member.description:
     description: Can modify his union's description
-  unionsog.leader.bb-clear:
+  unionsog.member.bb-clear:
     description: Can clear his union's bb
-  unionsog.leader.setbanner:
+  unionsog.member.setbanner:
     description: Can set his union's banner
-  unionsog.leader.discord.create:
-    description: Can create discord channel for his union
-  unionsog.leader.rename:
+  unionsog.member.rename:
     description: Can rename his union's name
-    default: false
+  unionsog.member.disband:
+    description: Can propose disbanding his union
+  unionsog.member.vote:
+    description: Can vote on his union's proposals
+  unionsog.member.war:
+    description: Can propose a war and answer war requests
+  unionsog.member.home-set:
+    description: Can propose moving his union's home base
+  unionsog.member.regroup.home:
+    description: Can tp entire union to homebase
+  unionsog.member.regroup.me:
+    description: Can tp their entire union to themself
+  unionsog.member.discord.create:
+    description: Can create discord channel for his union
   unionsog.member.land:
     description: Can use land commands
   unionsog.member.kills:
@@ -171,53 +206,15 @@ permissions:
     description: Can open the staff gui
   unionsog.mod.locale:
     description: Can set players language
-  unionsog.leader.invite:
+  unionsog.member.invite:
     description: Can invite players into his union
-  unionsog.leader.kick:
-    description: Can kick players form his tea,
-  unionsog.leader.promote:
-    description: Can promote players to union leaders
-  unionsog.leader.promotable:
-    description: Can be promoted to union leader
-  unionsog.leader.demote:
-    description: Can demote union leaders to normal players
-  unionsog.leader.ff:
+  unionsog.member.kick:
+    description: Can kick players from his union
+  unionsog.member.union-ff:
     description: Can toggle his union's friendly fire
-  unionsog.leader.disband:
-    description: Can disband his own union
-  unionsog.leader.settrust:
-    description: Can set trust levels for members
-  unionsog.leader.war:
-    description: Can start wars
-  unionsog.leader.coloredrank:
-    description: Can set colored ranks
     default: true
-  unionsog.leader.coloredtag:
+  unionsog.member.coloredtag:
     description: Can use color codes in tags
-  unionsog.leader.rank.list:
-    description: Can list the ranks
-  unionsog.leader.rank.create:
-    description: Can create a new rank
-  unionsog.leader.rank.assign:
-    description: Can assign a rank to a user
-  unionsog.leader.rank.unassign:
-    description: Can unassign a player from a rank
-  unionsog.leader.rank.delete:
-    description: Can delete a rank
-  unionsog.leader.rank.permissions.available:
-    description: Can list the available permissions
-  unionsog.leader.rank.permissions.list:
-    description: Can list the permissions of a rank
-  unionsog.leader.rank.permissions.add:
-    description: Can add permissions to a rank
-  unionsog.leader.rank.permissions.remove:
-    description: Can remove permissions from a rank
-  unionsog.leader.rank.setdisplayname:
-    description: Can set the rank displayname
-  unionsog.leader.rank.setdefault:
-    description: Can set the default rank
-  unionsog.leader.rank.removedefault:
-    description: Can remove the default rank
   unionsog.member.bank:
     description: Can use banks
   unionsog.admin.*:
@@ -227,8 +224,6 @@ permissions:
       unionsog.admin.reload: true
       unionsog.admin.all-seeing-eye: true
       unionsog.admin.resetkdr: true
-      unionsog.admin.demote: true
-      unionsog.admin.promote: true
       unionsog.admin.permanent: true
       unionsog.admin.bank.status: true
       unionsog.admin.bank.take: true
@@ -309,44 +304,26 @@ permissions:
       unionsog.member.kills: true
       unionsog.member.bank: true
       unionsog.member.chat.color: true
-  unionsog.leader.*:
-    description: Permissions for those who can be union leaders
-    default: true
-    children:
-      unionsog.leader.create: true
-      unionsog.leader.ally: true
-      unionsog.leader.rival: true
-      unionsog.leader.modtag: true
-      unionsog.leader.color: true
-      unionsog.leader.cape: true
-      unionsog.leader.invite: true
-      unionsog.leader.kick: true
-      unionsog.leader.promote: true
-      unionsog.leader.promotable: true
-      unionsog.leader.demote: true
-      unionsog.leader.ff: true
-      unionsog.leader.withdraw-toggle: true
-      unionsog.leader.deposit-toggle: true
-      unionsog.leader.disband: true
-      unionsog.leader.settrust: true
-      unionsog.leader.war: true
-      unionsog.leader.home-set: true
-      unionsog.leader.regroup.home: true
-      unionsog.leader.regroup.me: true
-      unionsog.leader.setrank: true
-      unionsog.leader.coloredtag: true
-      unionsog.leader.coloredrank: true
-      unionsog.leader.bb-clear: true
-      unionsog.leader.rank.setdisplayname: true
-      unionsog.leader.rank.setdefault: true
-      unionsog.leader.rank.removedefault: true
-      unionsog.leader.rank.list: true
-      unionsog.leader.rank.create: true
-      unionsog.leader.rank.assign: true
-      unionsog.leader.rank.unassign: true
-      unionsog.leader.rank.delete: true
-      unionsog.leader.rank.permissions.available: true
-      unionsog.leader.rank.permissions.add: true
-      unionsog.leader.rank.permissions.remove: true
-      unionsog.leader.rank.permissions.list: true
-      unionsog.leader.discord.create: true
+      unionsog.member.rename: true
+      unionsog.member.disband: true
+      unionsog.member.vote: true
+      unionsog.member.war: true
+      unionsog.member.home-set: true
+      unionsog.member.regroup.home: true
+      unionsog.member.regroup.me: true
+      unionsog.member.discord.create: true
+      unionsog.member.create: true
+      unionsog.member.ally-set: true
+      unionsog.member.rival: true
+      unionsog.member.modtag: true
+      unionsog.member.color: true
+      unionsog.member.cape: true
+      unionsog.member.invite: true
+      unionsog.member.kick: true
+      unionsog.member.union-ff: true
+      unionsog.member.withdraw-toggle: true
+      unionsog.member.deposit-toggle: true
+      unionsog.member.coloredtag: true
+      unionsog.member.bb-clear: true
+      unionsog.member.setbanner: true
+      unionsog.member.description: true

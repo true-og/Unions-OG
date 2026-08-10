@@ -1,7 +1,7 @@
 package net.trueog.unionsog.listeners;
 
 import net.trueog.unionsog.ChatBlock;
-import net.trueog.unionsog.Clan;
+import net.trueog.unionsog.Union;
 import net.trueog.unionsog.UnionsOG;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -37,24 +37,24 @@ public class PvPOnlyInWar extends SCListener {
 
         }
 
-        Clan attackerClan = plugin.getClanManager().getClanByPlayerUniqueId(attacker.getUniqueId());
-        Clan victimClan = plugin.getClanManager().getClanByPlayerUniqueId(victim.getUniqueId());
+        Union attackerUnion = plugin.getUnionManager().getUnionByPlayerUniqueId(attacker.getUniqueId());
+        Union victimUnion = plugin.getUnionManager().getUnionByPlayerUniqueId(victim.getUniqueId());
 
         if (plugin.getSettingsManager().is(PVP_ONLY_WHILE_IN_WAR)) {
 
-            process(event, attacker, victim, attackerClan, victimClan);
+            process(event, attacker, victim, attackerUnion, victimUnion);
 
         }
 
     }
 
-    private void process(EntityDamageEvent event, Player attacker, Player victim, @Nullable Clan attackerClan,
-            @Nullable Clan victimClan)
+    private void process(EntityDamageEvent event, Player attacker, Player victim, @Nullable Union attackerUnion,
+            @Nullable Union victimUnion)
     {
 
-        if (attackerClan == null || victimClan == null) {
+        if (attackerUnion == null || victimUnion == null) {
 
-            ChatBlock.sendMessageKey(attacker, "must.be.in.clan.to.pvp", victim.getName());
+            ChatBlock.sendMessageKey(attacker, "must.be.in.union.to.pvp", victim.getName());
             event.setCancelled(true);
             return;
 
@@ -67,9 +67,9 @@ public class PvPOnlyInWar extends SCListener {
 
         }
 
-        if (!attackerClan.isWarring(victimClan)) {
+        if (!attackerUnion.isWarring(victimUnion)) {
 
-            ChatBlock.sendMessageKey(attacker, "clans.not.at.war.pvp.denied", victimClan.getName());
+            ChatBlock.sendMessageKey(attacker, "unions.not.at.war.pvp.denied", victimUnion.getName());
             event.setCancelled(true);
 
         }

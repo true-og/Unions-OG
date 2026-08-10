@@ -1,6 +1,6 @@
 package net.trueog.unionsog.hooks.papi.resolvers;
 
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.UnionPlayer;
 import net.trueog.unionsog.UnionsOG;
 import net.trueog.unionsog.hooks.papi.PlaceholderResolver;
 import net.trueog.unionsog.managers.SettingsManager;
@@ -37,14 +37,14 @@ public class PlayerColorResolver extends PlaceholderResolver {
             @NotNull String placeholder, @NotNull Map<String, String> config)
     {
 
-        ClanPlayer cp = object instanceof ClanPlayer ? ((ClanPlayer) object) : null;
+        UnionPlayer cp = object instanceof UnionPlayer ? ((UnionPlayer) object) : null;
         if (cp == null)
             return "";
         switch (placeholder) {
 
             case "clanchat_player_color": {
 
-                return getClanChatColor(cp);
+                return getUnionChatColor(cp);
 
             }
             case "allychat_player_color": {
@@ -59,23 +59,17 @@ public class PlayerColorResolver extends PlaceholderResolver {
 
     }
 
-    private String getClanChatColor(ClanPlayer player) {
-
-        if (player.isLeader()) {
-
-            return settings.getColored(CLANCHAT_LEADER_COLOR);
-
-        }
+    private String getUnionChatColor(UnionPlayer player) {
 
         if (player.isTrusted()) {
 
-            return settings.getColored(CLANCHAT_TRUSTED_COLOR);
+            return settings.getColored(UNIONCHAT_TRUSTED_COLOR);
 
         }
 
-        if (player.getClan() != null) {
+        if (player.getUnion() != null) {
 
-            return settings.getColored(CLANCHAT_MEMBER_COLOR);
+            return settings.getColored(UNIONCHAT_MEMBER_COLOR);
 
         }
 
@@ -83,13 +77,7 @@ public class PlayerColorResolver extends PlaceholderResolver {
 
     }
 
-    private String getAllyChatColor(ClanPlayer player) {
-
-        if (player.isLeader()) {
-
-            return settings.getColored(ALLYCHAT_LEADER_COLOR);
-
-        }
+    private String getAllyChatColor(UnionPlayer player) {
 
         if (player.isTrusted()) {
 
@@ -97,7 +85,7 @@ public class PlayerColorResolver extends PlaceholderResolver {
 
         }
 
-        if (player.getClan() != null) {
+        if (player.getUnion() != null) {
 
             return settings.getColored(ALLYCHAT_MEMBER_COLOR);
 

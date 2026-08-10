@@ -1,8 +1,8 @@
 package net.trueog.unionsog.ui.frames;
 
 import com.cryptomorin.xseries.XMaterial;
-import net.trueog.unionsog.Clan;
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.Union;
+import net.trueog.unionsog.UnionPlayer;
 import net.trueog.unionsog.Helper;
 import net.trueog.unionsog.UnionsOG;
 import net.trueog.unionsog.ui.*;
@@ -34,23 +34,22 @@ public class Components {
             boolean openDetails)
     {
 
-        ClanPlayer cp = UnionsOG.getInstance().getClanManager().getCreateClanPlayer(subject.getUniqueId());
+        UnionPlayer cp = UnionsOG.getInstance().getUnionManager().getCreateUnionPlayer(subject.getUniqueId());
 
         return getPlayerComponent(frame, viewer, cp, slot, openDetails);
 
     }
 
-    public static SCComponent getPlayerComponent(SCFrame frame, Player viewer, ClanPlayer cp, int slot,
+    public static SCComponent getPlayerComponent(SCFrame frame, Player viewer, UnionPlayer cp, int slot,
             boolean openDetails)
     {
 
         UnionsOG pl = UnionsOG.getInstance();
         String status = getPlayerStatus(viewer, cp);
         SCComponent c = new SCComponentImpl(lang("gui.playerdetails.player.title", viewer, cp.getName()), Arrays.asList(
-                cp.getClan() == null ? lang("gui.playerdetails.player.lore.noclan", viewer)
-                        : lang("gui.playerdetails.player.lore.clan", viewer, cp.getClan().getColorTag(),
-                                cp.getClan().getName()),
-                lang("gui.playerdetails.player.lore.rank", viewer, ChatUtils.parseColors(cp.getRankDisplayName())),
+                cp.getUnion() == null ? lang("gui.playerdetails.player.lore.nounion", viewer)
+                        : lang("gui.playerdetails.player.lore.union", viewer, cp.getUnion().getColorTag(),
+                                cp.getUnion().getName()),
                 lang("gui.playerdetails.player.lore.status", viewer, status),
                 lang("gui.playerdetails.player.lore.kdr", viewer, new DecimalFormat("#.#").format(cp.getKDR())),
                 lang("gui.playerdetails.player.lore.kill.totals", viewer, cp.getRivalKills(), cp.getNeutralKills(),
@@ -58,8 +57,8 @@ public class Components {
                 lang("gui.playerdetails.player.lore.deaths", viewer, cp.getDeaths()),
                 lang("gui.playerdetails.player.lore.join.date", viewer, cp.getJoinDateString()),
                 lang("gui.playerdetails.player.lore.last.seen", viewer, cp.getLastSeenString(viewer)),
-                lang("gui.playerdetails.player.lore.past.clans", viewer,
-                        cp.getPastClansString(lang("gui.playerdetails.player.lore.past.clans.separator", viewer))),
+                lang("gui.playerdetails.player.lore.past.unions", viewer,
+                        cp.getPastUnionsString(lang("gui.playerdetails.player.lore.past.unions.separator", viewer))),
                 lang("gui.playerdetails.player.lore.inactive", viewer, cp.getInactiveDays(),
                         pl.getSettingsManager().getInt(PURGE_INACTIVE_PLAYER_DAYS))),
                 XMaterial.PLAYER_HEAD, slot);
@@ -87,17 +86,11 @@ public class Components {
     }
 
     @NotNull
-    private static String getPlayerStatus(Player viewer, ClanPlayer cp) {
+    private static String getPlayerStatus(Player viewer, UnionPlayer cp) {
 
-        if (cp.getClan() == null) {
+        if (cp.getUnion() == null) {
 
             return lang("free.agent", viewer);
-
-        }
-
-        if (cp.isLeader()) {
-
-            return lang("leader", viewer);
 
         }
 
@@ -107,72 +100,65 @@ public class Components {
 
         }
 
-        if (!cp.getRankId().isEmpty()) {
-
-            return lang("in.rank", viewer);
-
-        }
-
         return lang("untrusted", viewer);
 
     }
 
-    public static SCComponent getClanComponent(@NotNull SCFrame frame, @NotNull Player viewer, @Nullable Clan clan,
+    public static SCComponent getUnionComponent(@NotNull SCFrame frame, @NotNull Player viewer, @Nullable Union union,
             int slot, boolean openDetails)
     {
 
         UnionsOG pl = UnionsOG.getInstance();
         String name;
         List<String> lore;
-        if (clan != null) {
+        if (union != null) {
 
-            name = lang("gui.clandetails.clan.title", viewer, clan.getColorTag(), clan.getName());
+            name = lang("gui.uniondetails.union.title", viewer, union.getColorTag(), union.getName());
             lore = Arrays.asList(
-                    lang("gui.clandetails.clan.lore.description", viewer,
-                            clan.getDescription() != null && !clan.getDescription().isEmpty() ? clan.getDescription()
+                    lang("gui.uniondetails.union.lore.description", viewer,
+                            union.getDescription() != null && !union.getDescription().isEmpty() ? union.getDescription()
                                     : lang("no.description", viewer)),
-                    lang("gui.clandetails.clan.lore.status", viewer, Helper.getFormattedClanStatus(clan, viewer)),
-                    lang("gui.clandetails.clan.lore.leaders", viewer, clan.getLeadersString("", ", ")),
-                    lang("gui.clandetails.clan.lore.online.members", viewer,
-                            VanishUtils.getNonVanished(viewer, clan).size(), clan.getMembers().size()),
-                    lang("gui.clandetails.clan.lore.kdr", viewer, KDRFormat.format(clan.getTotalKDR())),
-                    lang("gui.clandetails.clan.lore.kill.totals", viewer, clan.getTotalRival(), clan.getTotalNeutral(),
-                            clan.getTotalCivilian()),
-                    lang("gui.clandetails.clan.lore.deaths", viewer, clan.getTotalDeaths()),
-                    lang("gui.clandetails.clan.lore.allies", viewer,
-                            clan.getAllies().isEmpty() ? lang("none", viewer)
-                                    : clan.getAllyString(lang("gui.clandetails.clan.lore.allies.separator", viewer),
+                    lang("gui.uniondetails.union.lore.status", viewer, Helper.getFormattedUnionStatus(union, viewer)),
+                    lang("gui.uniondetails.union.lore.online.members", viewer,
+                            VanishUtils.getNonVanished(viewer, union).size(), union.getMembers().size()),
+                    lang("gui.uniondetails.union.lore.kdr", viewer, KDRFormat.format(union.getTotalKDR())),
+                    lang("gui.uniondetails.union.lore.kill.totals", viewer, union.getTotalRival(),
+                            union.getTotalNeutral(), union.getTotalCivilian()),
+                    lang("gui.uniondetails.union.lore.deaths", viewer, union.getTotalDeaths()),
+                    lang("gui.uniondetails.union.lore.allies", viewer,
+                            union.getAllies().isEmpty() ? lang("none", viewer)
+                                    : union.getAllyString(lang("gui.uniondetails.union.lore.allies.separator", viewer),
                                             viewer)),
-                    lang("gui.clandetails.clan.lore.rivals", viewer,
-                            clan.getRivals().isEmpty() ? lang("none", viewer)
-                                    : clan.getRivalString(lang("gui.clandetails.clan.lore.rivals.separator", viewer),
+                    lang("gui.uniondetails.union.lore.rivals", viewer,
+                            union.getRivals().isEmpty() ? lang("none", viewer)
+                                    : union.getRivalString(lang("gui.uniondetails.union.lore.rivals.separator", viewer),
                                             viewer)),
-                    lang("gui.clandetails.clan.lore.founded", viewer, clan.getFoundedString()),
-                    lang("gui.clandetails.clan.lore.inactive", viewer, clan.getInactiveDays(),
-                            Helper.formatMaxInactiveDays(clan.getMaxInactiveDays())));
+                    lang("gui.uniondetails.union.lore.founded", viewer, union.getFoundedString()),
+                    lang("gui.uniondetails.union.lore.inactive", viewer, union.getInactiveDays(),
+                            Helper.formatMaxInactiveDays(union.getMaxInactiveDays())));
 
         } else {
 
-            name = lang("gui.clandetails.free.agent.title", viewer);
-            double price = pl.getSettingsManager().is(ECONOMY_PURCHASE_CLAN_CREATE)
+            name = lang("gui.uniondetails.free.agent.title", viewer);
+            double price = pl.getSettingsManager().is(ECONOMY_PURCHASE_UNION_CREATE)
                     ? pl.getSettingsManager().getDouble(ECONOMY_CREATION_PRICE)
                     : 0;
             lore = new ArrayList<>();
             if (price != 0) {
 
-                lore.add(lang("gui.clandetails.free.agent.create.clan.price.lore", frame.getViewer(),
+                lore.add(lang("gui.uniondetails.free.agent.create.union.price.lore", frame.getViewer(),
                         CurrencyFormat.format(price, viewer)));
 
             }
 
-            lore.add(lang("gui.clandetails.free.agent.create.clan.lore", frame.getViewer()));
+            lore.add(lang("gui.uniondetails.free.agent.create.union.lore", frame.getViewer()));
 
         }
 
         ItemStack item;
-        if (clan != null && clan.getBanner() != null) {
+        if (union != null && union.getBanner() != null) {
 
-            item = clan.getBanner();
+            item = union.getBanner();
 
         } else {
 
@@ -181,20 +167,20 @@ public class Components {
         }
 
         SCComponent c = new SCComponentImpl.Builder(item).withLore(lore).withDisplayName(name).withSlot(slot).build();
-        if (openDetails && clan != null) {
+        if (openDetails && union != null) {
 
-            c.setListener(ClickType.LEFT, () -> InventoryDrawer.open(new ClanDetailsFrame(frame, viewer, clan)));
+            c.setListener(ClickType.LEFT, () -> InventoryDrawer.open(new UnionDetailsFrame(frame, viewer, union)));
 
         }
 
-        if (clan == null) {
+        if (union == null) {
 
-            c.setPermission(ClickType.LEFT, "unionsog.leader.create");
+            c.setPermission(ClickType.LEFT, "unionsog.member.create");
             c.setListener(ClickType.LEFT, () -> InventoryController.runSubcommand(viewer, "create", false));
 
         }
 
-        if (clan != null && clan.isMember(viewer)) {
+        if (union != null && union.isMember(viewer)) {
 
             c.setLorePermission("unionsog.member.profile");
 

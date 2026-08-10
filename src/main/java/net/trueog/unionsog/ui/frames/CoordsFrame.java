@@ -1,9 +1,8 @@
 package net.trueog.unionsog.ui.frames;
 
 import com.cryptomorin.xseries.XMaterial;
-import net.trueog.unionsog.Clan;
-import net.trueog.unionsog.ClanPlayer;
-import net.trueog.unionsog.RankPermission;
+import net.trueog.unionsog.Union;
+import net.trueog.unionsog.UnionPlayer;
 import net.trueog.unionsog.ui.InventoryDrawer;
 import net.trueog.unionsog.ui.SCComponent;
 import net.trueog.unionsog.ui.SCComponentImpl;
@@ -25,14 +24,13 @@ import static net.trueog.unionsog.UnionsOG.lang;
 
 public class CoordsFrame extends SCFrame {
 
-    private final List<ClanPlayer> allMembers;
+    private final List<UnionPlayer> allMembers;
     private final Paginator paginator;
 
-    public CoordsFrame(Player viewer, SCFrame parent, Clan subject) {
+    public CoordsFrame(Player viewer, SCFrame parent, Union subject) {
 
         super(parent, viewer);
         allMembers = VanishUtils.getNonVanished(getViewer(), subject);
-        allMembers.sort((cp1, cp2) -> Boolean.compare(cp1.isLeader(), cp2.isLeader()));
 
         paginator = new Paginator(getSize() - 9, allMembers);
 
@@ -56,7 +54,7 @@ public class CoordsFrame extends SCFrame {
         int slot = 9;
         for (int i = paginator.getMinIndex(); paginator.isValidIndex(i); i++) {
 
-            ClanPlayer cp = allMembers.get(i);
+            UnionPlayer cp = allMembers.get(i);
             Location cpLoc = Objects.requireNonNull(cp.toPlayer()).getLocation();
             int distance = (int) Math.ceil(cpLoc.toVector().distance(getViewer().getLocation().toVector()));
 
@@ -71,7 +69,7 @@ public class CoordsFrame extends SCFrame {
             Components.setOwningPlayer(c.getItem(), offlinePlayer);
             c.setListener(ClickType.LEFT,
                     () -> InventoryDrawer.open(new PlayerDetailsFrame(getViewer(), this, offlinePlayer)));
-            c.setLorePermission(RankPermission.COORDS);
+            c.setLorePermission("unionsog.member.coords");
             add(c);
             slot++;
 

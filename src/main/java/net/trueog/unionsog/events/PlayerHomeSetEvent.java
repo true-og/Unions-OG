@@ -1,7 +1,7 @@
 package net.trueog.unionsog.events;
 
-import net.trueog.unionsog.Clan;
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.Union;
+import net.trueog.unionsog.UnionPlayer;
 import org.bukkit.Location;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -15,13 +15,13 @@ public class PlayerHomeSetEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
     private boolean cancelled;
-    private final Clan clan;
-    private final ClanPlayer cp;
+    private final Union union;
+    private final UnionPlayer cp;
     private final Location loc;
 
-    public PlayerHomeSetEvent(Clan clan, ClanPlayer cp, Location loc) {
+    public PlayerHomeSetEvent(Union union, UnionPlayer cp, Location loc) {
 
-        this.clan = clan;
+        this.union = union;
         this.cp = cp;
         this.loc = loc;
 
@@ -41,13 +41,13 @@ public class PlayerHomeSetEvent extends Event implements Cancellable {
 
     }
 
-    public Clan getClan() {
+    public Union getUnion() {
 
-        return this.clan;
+        return this.union;
 
     }
 
-    public ClanPlayer getClanPlayer() {
+    public UnionPlayer getUnionPlayer() {
 
         return this.cp;
 

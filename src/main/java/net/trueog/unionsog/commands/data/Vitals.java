@@ -6,7 +6,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
-import java.util.List;
 
 import static net.trueog.unionsog.UnionsOG.lang;
 import static net.trueog.unionsog.managers.SettingsManager.ConfigField.*;
@@ -14,12 +13,12 @@ import static org.bukkit.ChatColor.*;
 
 public class Vitals extends Sendable {
 
-    private final Clan clan;
+    private final Union union;
 
-    public Vitals(@NotNull UnionsOG plugin, @NotNull CommandSender sender, @NotNull Clan clan) {
+    public Vitals(@NotNull UnionsOG plugin, @NotNull CommandSender sender, @NotNull Union union) {
 
         super(plugin, sender);
-        this.clan = clan;
+        this.union = union;
 
     }
 
@@ -28,14 +27,11 @@ public class Vitals extends Sendable {
 
         configureAndSendHeader();
 
-        List<ClanPlayer> members = Helper.stripOffLinePlayers(clan.getLeaders());
-        members.addAll(Helper.stripOffLinePlayers(clan.getNonLeaders()));
-
-        addRows(members);
+        addRows(Helper.stripOffLinePlayers(union.getMembers()));
 
         chatBlock.addRow(" -- Allies -- ", "", "", "", "", "");
 
-        addRows(clan.getAllAllyMembers());
+        addRows(union.getAllAllyMembers());
 
         sendBlock();
 
@@ -45,7 +41,7 @@ public class Vitals extends Sendable {
 
         ChatBlock.sendBlank(sender);
         ChatBlock.saySingle(sender,
-                sm.getColored(PAGE_CLAN_NAME_COLOR) + clan.getName() + subColor + " " + lang("vitals", sender) + " "
+                sm.getColored(PAGE_UNION_NAME_COLOR) + union.getName() + subColor + " " + lang("vitals", sender) + " "
                         + headColor + Helper.generatePageSeparator(sm.getString(PAGE_SEPARATOR)));
         ChatBlock.sendBlank(sender);
         ChatBlock.sendMessage(sender, headColor + lang("weapons", sender) + ": "
@@ -65,17 +61,16 @@ public class Vitals extends Sendable {
 
     }
 
-    private void addRows(Collection<ClanPlayer> players) {
+    private void addRows(Collection<UnionPlayer> players) {
 
-        for (ClanPlayer cpm : players) {
+        for (UnionPlayer cpm : players) {
 
             Player p = cpm.toPlayer();
 
             if (p != null) {
 
-                String name = (cpm.isLeader() ? sm.getColored(PAGE_LEADER_COLOR)
-                        : (cpm.isTrusted() ? sm.getColored(PAGE_TRUSTED_COLOR) : sm.getColored(PAGE_UNTRUSTED_COLOR)))
-                        + cpm.getName();
+                String name = (cpm.isTrusted() ? sm.getColored(PAGE_TRUSTED_COLOR)
+                        : sm.getColored(PAGE_UNTRUSTED_COLOR)) + cpm.getName();
                 String health = cm.getBar(p.getHealth());
                 String hunger = cm.getBar(p.getFoodLevel());
                 String armor = cm.getArmorString(p.getInventory());

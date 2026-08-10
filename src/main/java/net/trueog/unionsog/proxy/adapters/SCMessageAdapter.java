@@ -3,7 +3,7 @@ package net.trueog.unionsog.proxy.adapters;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.UnionPlayer;
 import net.trueog.unionsog.UnionsOG;
 import net.trueog.unionsog.chat.SCMessage;
 import net.trueog.unionsog.chat.SCMessage.Source;
@@ -41,10 +41,10 @@ public class SCMessageAdapter extends TypeAdapter<SCMessage> {
 
         in.beginObject();
         in.nextName();
-        ClanPlayer.Channel channel = ClanPlayer.Channel.valueOf(in.nextString());
+        UnionPlayer.Channel channel = UnionPlayer.Channel.valueOf(in.nextString());
         in.nextName();
         UUID uuid = UUID.fromString(in.nextString());
-        ClanPlayer sender = plugin.getClanManager().getAnyClanPlayer(uuid);
+        UnionPlayer sender = plugin.getUnionManager().getAnyUnionPlayer(uuid);
         in.nextName();
         String content = in.nextString();
         in.endObject();

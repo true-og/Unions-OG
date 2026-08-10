@@ -46,8 +46,8 @@ public final class LegacyUnionsDatabaseMigration {
     private static final Pattern HEX_COLOR_CODE = Pattern
             .compile("(?i)(?:[&\u00a7]#[0-9A-F]{6}|[&\u00a7]x(?:[&\u00a7][0-9A-F]){6})");
 
-    private static final Set<String> SOURCE_UNION_COLUMNS = Set.of("id", "name", "tag", "leader", "description", "motd",
-            "color", "home");
+    private static final Set<String> SOURCE_UNION_COLUMNS = Set.of("id", "name", "tag", "description", "motd", "color",
+            "home");
     private static final Set<String> SOURCE_PLAYER_COLUMNS = Set.of("uuid", "party");
 
     private final Connection connection;
@@ -55,17 +55,15 @@ public final class LegacyUnionsDatabaseMigration {
     private final String targetPlayersTable;
     private final String targetKillsTable;
     private final String historyTable;
-    private final String ranksJson;
     private final Function<UUID, @Nullable String> playerNameResolver;
     private final long migrationTime;
 
-    public LegacyUnionsDatabaseMigration(Connection connection, String targetTablePrefix, String ranksJson,
+    public LegacyUnionsDatabaseMigration(Connection connection, String targetTablePrefix,
             Function<UUID, @Nullable String> playerNameResolver)
     {
 
         this.connection = Objects.requireNonNull(connection, "connection");
         Objects.requireNonNull(targetTablePrefix, "targetTablePrefix");
-        this.ranksJson = Objects.requireNonNull(ranksJson, "ranksJson");
         this.playerNameResolver = Objects.requireNonNull(playerNameResolver, "playerNameResolver");
         validateTargetTablePrefix(targetTablePrefix);
         targetUnionsTable = validateIdentifier(targetTablePrefix + "clans");
@@ -105,9 +103,9 @@ public final class LegacyUnionsDatabaseMigration {
                         "packed_allies", "packed_rivals", "packed_bb", "cape_url", "flags", "balance", "fee_enabled",
                         "fee_value", "ranks", "banner"));
         validateColumns(targetPlayersTable,
-                Set.of("uuid", "name", "leader", "tag", "friendly_fire", "neutral_kills", "rival_kills",
-                        "civilian_kills", "ally_kills", "deaths", "last_seen", "join_date", "trusted", "flags",
-                        "packed_past_clans", "resign_times", "locale"));
+                Set.of("uuid", "name", "tag", "friendly_fire", "neutral_kills", "rival_kills", "civilian_kills",
+                        "ally_kills", "deaths", "last_seen", "join_date", "trusted", "flags", "packed_past_clans",
+                        "resign_times", "locale"));
         validateColumns(targetKillsTable, Set.of("kill_id"));
         createHistoryTable();
 
@@ -140,8 +138,7 @@ public final class LegacyUnionsDatabaseMigration {
             connection.commit();
 
             return new Result(false, legacyUnions.size(), legacyPlayers.size(), nameAssignment.placeholderCount(),
-                    tagAssignment.adjustedCount(), playerCounts.orphanedMemberships(),
-                    playerCounts.unionsWithoutLeaders());
+                    tagAssignment.adjustedCount(), playerCounts.orphanedMemberships());
 
         } catch (SQLException | RuntimeException ex) {
 
@@ -269,7 +266,7 @@ public final class LegacyUnionsDatabaseMigration {
 
     private List<LegacyUnion> readLegacyUnions() throws SQLException {
 
-        final String sql = "SELECT `id`, `name`, `tag`, `leader`, `description`, `motd`, `color`, `home` FROM "
+        final String sql = "SELECT `id`, `name`, `tag`, `description`, `motd`, `color`, `home` FROM "
                 + quote(SOURCE_UNIONS_TABLE) + " ORDER BY `id`;";
         final List<LegacyUnion> unions = new ArrayList<>();
         try (Statement statement = connection.createStatement(); ResultSet result = statement.executeQuery(sql)) {
@@ -277,8 +274,7 @@ public final class LegacyUnionsDatabaseMigration {
             while (result.next()) {
 
                 final UUID id = requiredUuid(result.getString("id"), SOURCE_UNIONS_TABLE + ".id");
-                final UUID leader = optionalUuid(result.getString("leader"), SOURCE_UNIONS_TABLE + ".leader");
-                unions.add(new LegacyUnion(id, result.getString("name"), result.getString("tag"), leader,
+                unions.add(new LegacyUnion(id, result.getString("name"), result.getString("tag"),
                         result.getString("description"), result.getString("motd"), result.getString("color"),
                         result.getString("home")));
 
@@ -338,7 +334,7 @@ public final class LegacyUnionsDatabaseMigration {
                 statement.setDouble(14, 0);
                 statement.setInt(15, 0);
                 statement.setDouble(16, 0);
-                statement.setString(17, ranksJson);
+                statement.setString(17, "");
                 statement.setNull(18, Types.LONGVARCHAR);
                 statement.addBatch();
 
@@ -361,13 +357,12 @@ public final class LegacyUnionsDatabaseMigration {
 
         }
 
-        final Set<UUID> unionsWithLeaders = new HashSet<>();
         int orphanedMemberships = 0;
         final String sql = "INSERT INTO " + quote(targetPlayersTable)
-                + " (`uuid`, `name`, `leader`, `tag`, `friendly_fire`, `neutral_kills`, `rival_kills`,"
+                + " (`uuid`, `name`, `tag`, `friendly_fire`, `neutral_kills`, `rival_kills`,"
                 + " `civilian_kills`, `ally_kills`, `deaths`, `last_seen`, `join_date`, `trusted`, `flags`,"
                 + " `packed_past_clans`, `resign_times`, `locale`) VALUES"
-                + " (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+                + " (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
 
             for (LegacyPlayer player : players) {
@@ -380,32 +375,24 @@ public final class LegacyUnionsDatabaseMigration {
 
                 }
 
-                final boolean leader = union != null && player.uuid().equals(union.leader());
-                if (leader) {
-
-                    unionsWithLeaders.add(union.id());
-
-                }
-
                 final String tag = union != null ? tags.get(union.id()).toLowerCase(Locale.ROOT) : "";
 
                 statement.setString(1, player.uuid().toString());
                 statement.setString(2, names.get(player.uuid()));
-                statement.setInt(3, leader ? 1 : 0);
-                statement.setString(4, tag);
+                statement.setString(3, tag);
+                statement.setInt(4, 0);
                 statement.setInt(5, 0);
                 statement.setInt(6, 0);
                 statement.setInt(7, 0);
                 statement.setInt(8, 0);
                 statement.setInt(9, 0);
-                statement.setInt(10, 0);
+                statement.setLong(10, migrationTime);
                 statement.setLong(11, migrationTime);
-                statement.setLong(12, migrationTime);
-                statement.setInt(13, leader ? 1 : 0);
-                statement.setString(14, "{}");
-                statement.setString(15, "");
-                statement.setString(16, "{}");
-                statement.setNull(17, Types.VARCHAR);
+                statement.setInt(12, 1);
+                statement.setString(13, "{}");
+                statement.setString(14, "");
+                statement.setString(15, "{}");
+                statement.setNull(16, Types.VARCHAR);
                 statement.addBatch();
 
             }
@@ -414,7 +401,7 @@ public final class LegacyUnionsDatabaseMigration {
 
         }
 
-        return new PlayerImportCounts(orphanedMemberships, unions.size() - unionsWithLeaders.size());
+        return new PlayerImportCounts(orphanedMemberships);
 
     }
 
@@ -825,19 +812,19 @@ public final class LegacyUnionsDatabaseMigration {
     }
 
     public record Result(boolean alreadyApplied, int unions, int players, int placeholderNames, int adjustedTags,
-            int orphanedMemberships, int unionsWithoutLeaders)
+            int orphanedMemberships)
     {
 
         private static Result previouslyApplied() {
 
-            return new Result(true, 0, 0, 0, 0, 0, 0);
+            return new Result(true, 0, 0, 0, 0, 0);
 
         }
 
     }
 
-    private record LegacyUnion(UUID id, @Nullable String name, @Nullable String tag, @Nullable UUID leader,
-            @Nullable String description, @Nullable String motd, @Nullable String color, @Nullable String home)
+    private record LegacyUnion(UUID id, @Nullable String name, @Nullable String tag, @Nullable String description,
+            @Nullable String motd, @Nullable String color, @Nullable String home)
     {
 
     }
@@ -854,7 +841,7 @@ public final class LegacyUnionsDatabaseMigration {
 
     }
 
-    private record PlayerImportCounts(int orphanedMemberships, int unionsWithoutLeaders) {
+    private record PlayerImportCounts(int orphanedMemberships) {
 
     }
 

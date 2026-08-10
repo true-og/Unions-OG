@@ -1,12 +1,12 @@
 // TODO: start - delete this class, its call in UnionsOG#onEnable, the union bank
 // command exclusion in SCCommandManager#registerCommands, and the bank entries in
-// the union and staff ClanDetailsFrame once DiamondBank-OG supports union bank
+// the union and staff UnionDetailsFrame once DiamondBank-OG supports union bank
 // accounts. Union banks are disabled until then.
 package net.trueog.unionsog.migrations;
 
-import net.trueog.unionsog.Clan;
+import net.trueog.unionsog.Union;
 import net.trueog.unionsog.UnionsOG;
-import net.trueog.unionsog.events.ClanBalanceUpdateEvent;
+import net.trueog.unionsog.events.UnionBalanceUpdateEvent;
 import net.trueog.unionsog.loggers.BankLogger;
 import net.trueog.unionsog.loggers.BankOperator;
 import net.trueog.unionsog.managers.SettingsManager;
@@ -43,12 +43,12 @@ public class UnionBankZeroMigration implements Migration {
         }
 
         int zeroed = 0;
-        for (Clan clan : plugin.getClanManager().getClans()) {
+        for (Union union : plugin.getUnionManager().getUnions()) {
 
-            if (clan.getBalance() != 0) {
+            if (union.getBalance() != 0) {
 
-                clan.setBalance(BankOperator.INTERNAL, ClanBalanceUpdateEvent.Cause.INTERNAL, BankLogger.Operation.SET,
-                        0);
+                union.setBalance(BankOperator.INTERNAL, UnionBalanceUpdateEvent.Cause.INTERNAL,
+                        BankLogger.Operation.SET, 0);
                 zeroed++;
 
             }

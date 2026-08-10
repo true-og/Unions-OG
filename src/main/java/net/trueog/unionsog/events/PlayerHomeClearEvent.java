@@ -1,7 +1,7 @@
 package net.trueog.unionsog.events;
 
-import net.trueog.unionsog.Clan;
-import net.trueog.unionsog.ClanPlayer;
+import net.trueog.unionsog.Union;
+import net.trueog.unionsog.UnionPlayer;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -11,24 +11,24 @@ public class PlayerHomeClearEvent extends Event implements Cancellable {
 
     private static final HandlerList HANDLER_LIST = new HandlerList();
 
-    private final Clan clan;
-    private final ClanPlayer cp;
+    private final Union union;
+    private final UnionPlayer cp;
     private boolean cancelled;
 
-    public PlayerHomeClearEvent(Clan clan, ClanPlayer cp) {
+    public PlayerHomeClearEvent(Union union, UnionPlayer cp) {
 
-        this.clan = clan;
+        this.union = union;
         this.cp = cp;
 
     }
 
-    public Clan getClan() {
+    public Union getUnion() {
 
-        return clan;
+        return union;
 
     }
 
-    public ClanPlayer getCp() {
+    public UnionPlayer getCp() {
 
         return cp;
 

@@ -2,7 +2,7 @@ package net.trueog.unionsog.chat.handlers;
 
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
 import github.scarsz.discordsrv.util.DiscordUtil;
-import net.trueog.unionsog.Clan;
+import net.trueog.unionsog.Union;
 import net.trueog.unionsog.chat.ChatHandler;
 import net.trueog.unionsog.chat.SCMessage;
 import net.trueog.unionsog.hooks.discord.DiscordHook;
@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 import java.util.Optional;
 
-import static net.trueog.unionsog.ClanPlayer.Channel.CLAN;
+import static net.trueog.unionsog.UnionPlayer.Channel.UNION;
 import static net.trueog.unionsog.chat.SCMessage.Source;
 import static net.trueog.unionsog.chat.SCMessage.Source.SPIGOT;
 import static net.trueog.unionsog.managers.SettingsManager.ConfigField.DISCORDCHAT_FORMAT_TO;
@@ -26,7 +26,7 @@ public class DiscordChatHandler implements ChatHandler {
     @Override
     public void sendMessage(@NotNull SCMessage message) {
 
-        if (message.getChannel() != CLAN) {
+        if (message.getChannel() != UNION) {
 
             return;
 
@@ -35,15 +35,15 @@ public class DiscordChatHandler implements ChatHandler {
         String format = settingsManager.getString(DISCORDCHAT_FORMAT_TO);
         String formattedMessage = ChatUtils.stripColors(chatManager.parseChatFormat(format, message));
 
-        Clan clan = message.getSender().getClan();
-        if (clan == null) {
+        Union union = message.getSender().getUnion();
+        if (union == null) {
 
             return;
 
         }
 
         DiscordHook discordHook = Objects.requireNonNull(chatManager.getDiscordHook(), "DiscordHook cannot be null");
-        Optional<TextChannel> channel = discordHook.getCachedChannel(clan.getTag());
+        Optional<TextChannel> channel = discordHook.getCachedChannel(union.getTag());
         channel.ifPresent(textChannel -> DiscordUtil.sendMessage(textChannel, formattedMessage));
 
     }
