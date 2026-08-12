@@ -121,7 +121,7 @@ union:
     homebase-teleport-wait-secs: 5
     homebase-can-be-set-only-once: true
     min-size-to-set-rival: 3
-    max-length: 25
+    max-length: 16
     max-description-length: 120
     min-description-length: 10
     max-members: 25

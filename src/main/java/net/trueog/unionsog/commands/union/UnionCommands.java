@@ -411,7 +411,6 @@ public class UnionCommands extends BaseCommand {
     @Subcommand("%rename")
     @CommandPermission("unionsog.member.rename")
     @Conditions("union_member")
-    @CommandCompletion("@nothing")
     @Description("{@@command.description.rename}")
     public void rename(Player player, Union union, @Name("name") String unionName) {
 
