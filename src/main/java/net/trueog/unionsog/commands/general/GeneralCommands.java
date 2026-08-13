@@ -8,6 +8,7 @@ import co.aikar.commands.annotation.*;
 import net.trueog.unionsog.*;
 import net.trueog.unionsog.commands.UnionInput;
 import net.trueog.unionsog.commands.UnionPlayerInput;
+import net.trueog.unionsog.commands.conditions.SettingEnabledCondition;
 import net.trueog.unionsog.commands.data.*;
 import net.trueog.unionsog.conversation.CreateUnionTagPrompt;
 import net.trueog.unionsog.conversation.RequestCanceller;
@@ -24,11 +25,17 @@ import net.trueog.unionsog.utils.ChatUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Executable;
 import java.text.MessageFormat;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 import static net.trueog.unionsog.UnionsOG.lang;
 import static net.trueog.unionsog.conversation.CreateUnionNamePrompt.NAME_KEY;
@@ -44,6 +51,10 @@ public class GeneralCommands extends BaseCommand {
     // exist.
     private static final boolean UNION_BANKS_ENABLED = false;
     // TODO: end
+
+    /** Condition ids that decide whether a command is usable at all. */
+    private static final String MEMBERS_ONLY = "union_member";
+    private static final String NON_MEMBERS_ONLY = "not_union_member";
 
     @Dependency
     private UnionsOG plugin;
@@ -76,16 +87,10 @@ public class GeneralCommands extends BaseCommand {
 
     @Subcommand("%locale")
     @CommandPermission("unionsog.anyone.locale")
+    @Conditions("setting:field=LANGUAGE_SELECTOR,message=locale.is.prohibited")
     @Description("{@@command.description.locale}")
     @CommandCompletion("@locales")
     public void locale(UnionPlayer cp, @Values("@locales") @Name("locale") @Single String locale) {
-
-        if (!settings.is(LANGUAGE_SELECTOR)) {
-
-            ChatBlock.sendMessageKey(cp, "locale.is.prohibited");
-            return;
-
-        }
 
         cp.setLocale(Helper.forLanguageTag(locale.replace("_", "-")));
         plugin.getStorageManager().updateUnionPlayer(cp);
@@ -96,18 +101,10 @@ public class GeneralCommands extends BaseCommand {
 
     @Subcommand("%create")
     @CommandPermission("unionsog.member.create")
+    @Conditions("not_union_member")
     @CommandCompletion("%compl:tag %compl:name")
     @Description("{@@command.description.create}")
     public void create(Player player, @Optional @Name("tag") String tag, @Optional @Name("name") String name) {
-
-        UnionPlayer cp = cm.getAnyUnionPlayer(player.getUniqueId());
-
-        if (cp != null && cp.getUnion() != null) {
-
-            ChatBlock.sendMessage(player, RED + lang("you.must.first.resign", player, cp.getUnion().getName()));
-            return;
-
-        }
 
         HashMap<Object, Object> initialData = new HashMap<>();
         initialData.put(TAG_KEY, tag);
@@ -215,15 +212,9 @@ public class GeneralCommands extends BaseCommand {
 
     @Subcommand("%resetkdr %confirm")
     @CommandPermission("unionsog.vip.resetkdr")
+    @Conditions("setting:field=ALLOW_RESET_KDR")
     @Description("{@@command.description.resetkdr}")
     public void resetKdrConfirm(Player player, UnionPlayer cp) {
-
-        if (!settings.is(ALLOW_RESET_KDR)) {
-
-            ChatBlock.sendMessage(player, RED + lang("disabled.command", player));
-            return;
-
-        }
 
         PlayerResetKdrEvent event = new PlayerResetKdrEvent(cp);
         Bukkit.getServer().getPluginManager().callEvent(event);
@@ -238,18 +229,11 @@ public class GeneralCommands extends BaseCommand {
 
     @Subcommand("%resetkdr")
     @CommandPermission("unionsog.vip.resetkdr")
+    @Conditions("setting:field=ALLOW_RESET_KDR")
     @Description("{@@command.description.resetkdr}")
     public void resetKdr(Player player, UnionPlayer cp) {
 
-        if (!settings.is(ALLOW_RESET_KDR)) {
-
-            ChatBlock.sendMessage(player, RED + lang("disabled.command", player));
-
-        } else {
-
-            new SCConversation(plugin, player, new ResetKdrPrompt(cm), 60).begin();
-
-        }
+        new SCConversation(plugin, player, new ResetKdrPrompt(cm), 60).begin();
 
     }
 
@@ -321,20 +305,149 @@ public class GeneralCommands extends BaseCommand {
                 && cm.getUnionByPlayerUniqueId(((Player) sender).getUniqueId()) != null;
         for (HelpEntry helpEntry : help.getHelpEntries()) {
 
-            for (@SuppressWarnings("rawtypes")
-            CommandParameter parameter : helpEntry.getParameters()) {
+            // ACF hides only what the issuer lacks the permission for.
+            // Union membership rules out more than that.
+            if (!isRunnable(helpEntry, inUnion)) {
 
-                if (parameter.getType().equals(Union.class) && !inUnion) {
-
-                    helpEntry.setSearchScore(0);
-
-                }
+                helpEntry.setSearchScore(0);
 
             }
 
         }
 
         help.showHelp();
+
+    }
+
+    /**
+     * Whether the issuer could actually run a help entry's command, judged by the
+     * conditions the command declares rather than by a list kept in step by hand.
+     *
+     * @param entry   the help entry
+     * @param inUnion whether the issuer is in a union
+     */
+    private boolean isRunnable(HelpEntry entry, boolean inUnion) {
+
+        Set<String> conditions = new HashSet<>();
+        boolean membersOnly = false;
+
+        for (@SuppressWarnings("rawtypes")
+        CommandParameter parameter : entry.getParameters()) {
+
+            // An issuer resolved Union only exists for a member.
+            membersOnly |= Union.class.equals(parameter.getType());
+            addConditions(conditions, parameter.getConditions());
+
+            Executable method = parameter.getParameter().getDeclaringExecutable();
+            addConditions(conditions, declaredConditions(method));
+
+            // ACF walks a nested command class up to its parent when it
+            // validates conditions, so the enclosing classes count too.
+            for (Class<?> scope = method.getDeclaringClass(); scope != null; scope = scope.getEnclosingClass()) {
+
+                addConditions(conditions, declaredConditions(scope));
+
+            }
+
+        }
+
+        if (membersOnly && !inUnion) {
+
+            return false;
+
+        }
+
+        for (String condition : conditions) {
+
+            if (!holds(condition, inUnion)) {
+
+                return false;
+
+            }
+
+        }
+
+        return true;
+
+    }
+
+    /**
+     * Whether one declared condition lets the issuer through. Conditions that
+     * depend on a target or a location cannot be judged here and are taken to hold,
+     * since they do not make a command permanently unusable.
+     *
+     * @param condition one ACF condition, arguments included
+     * @param inUnion   whether the issuer is in a union
+     */
+    private boolean holds(String condition, boolean inUnion) {
+
+        int argument = condition.indexOf(':');
+        String id = (argument == -1 ? condition : condition.substring(0, argument)).toLowerCase(Locale.ENGLISH);
+
+        if (MEMBERS_ONLY.equals(id)) {
+
+            return inUnion;
+
+        }
+
+        if (NON_MEMBERS_ONLY.equals(id)) {
+
+            return !inUnion;
+
+        }
+
+        if (SettingEnabledCondition.ID.equals(id)) {
+
+            return SettingEnabledCondition.isEnabled(settings, argumentOf(condition.substring(argument + 1)));
+
+        }
+
+        return true;
+
+    }
+
+    /**
+     * Reads the {@code field} argument out of an ACF condition's comma separated
+     * key/value list.
+     */
+    private static String argumentOf(String arguments) {
+
+        for (String pair : arguments.split(",")) {
+
+            String[] keyValue = pair.split("=", 2);
+            if (keyValue.length == 2 && SettingEnabledCondition.FIELD.equals(keyValue[0].trim())) {
+
+                return keyValue[1].trim();
+
+            }
+
+        }
+
+        return "";
+
+    }
+
+    private static @Nullable String declaredConditions(AnnotatedElement element) {
+
+        Conditions conditions = element.getAnnotation(Conditions.class);
+        return conditions != null ? conditions.value() : null;
+
+    }
+
+    /** Splits an ACF condition list into its conditions, arguments included. */
+    private static void addConditions(Set<String> collected, @Nullable String conditions) {
+
+        if (conditions == null || conditions.isEmpty()) {
+
+            return;
+
+        }
+
+        for (String condition : conditions.split("\\|")) {
+
+            collected.add(condition.trim());
+
+        }
 
     }
 
@@ -349,6 +462,10 @@ public class GeneralCommands extends BaseCommand {
 
     }
 
+    // TODO: start - drop the @Private with UnionBankZeroMigration. The ranking
+    // answers "disabled" until union banks exist, so it stays out of the help.
+    @Private
+    // TODO: end
     @Subcommand("%list %balance")
     @CommandPermission("unionsog.anyone.list.balance")
     @Description("{@@command.description.list.balance}")

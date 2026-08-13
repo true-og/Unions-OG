@@ -7,6 +7,8 @@ import net.trueog.unionsog.utils.VanishUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -76,9 +78,41 @@ public final class TeleportManager {
      * @param union     the Union
      * @param location  the Location
      */
+    /**
+     * Regroups a {@link Union} at the specified {@link Location}.
+     * <p>
+     * Every other member is asked first and is only moved once they agree, since
+     * being teleported away is theirs to refuse. The requester asked for it, so
+     * they go without being asked.
+     * </p>
+     *
+     * @param requester the Player requesting the teleport
+     * @param union     the Union
+     * @param location  the Location
+     */
     public void teleport(@NotNull Player requester, @NotNull Union union, @NotNull Location location) {
 
-        teleport(union, location, VanishUtils.getNonVanished(requester, union));
+        UnionPlayer asker = plugin.getUnionManager().getUnionPlayer(requester);
+        int asked = 0;
+
+        for (UnionPlayer cp : VanishUtils.getNonVanished(requester, union)) {
+
+            if (cp.equals(asker)) {
+
+                queueRegroup(requester, union, location);
+                continue;
+
+            }
+
+            if (asker != null && plugin.getRequestManager().addRegroupRequest(asker, cp, union, location)) {
+
+                asked++;
+
+            }
+
+        }
+
+        ChatBlock.sendMessage(requester, AQUA + lang("regroup.asked.0.members", requester, asked));
 
     }
 
@@ -104,6 +138,7 @@ public final class TeleportManager {
                     if (result) {
 
                         ChatBlock.sendMessage(player, AQUA + lang("now.at.homebase", player, unionName));
+                        celebrateArrival(player);
 
                     } else {
 
@@ -124,6 +159,27 @@ public final class TeleportManager {
         }
 
         teleportToHome(player, union.getHomeLocation(), union.getName());
+
+    }
+
+    /**
+     * Marks an arrival at a union home with a short burst of particles.
+     * <p>
+     * Spawned through the world rather than the player so that everyone in range
+     * sees it, the arriving member included. Both particles date back to 1.8 and
+     * carry no particle data, which is what ViaVersion needs to translate them
+     * instead of dropping them, so legacy clients see the burst too.
+     * </p>
+     *
+     * @param player the arriving member
+     */
+    private void celebrateArrival(@NotNull Player player) {
+
+        World world = player.getWorld();
+        Location centre = player.getLocation().add(0, 1, 0);
+
+        world.spawnParticle(Particle.VILLAGER_HAPPY, centre, 40, 0.4, 0.6, 0.4, 0);
+        world.spawnParticle(Particle.FIREWORKS_SPARK, centre, 20, 0.3, 0.4, 0.3, 0.04);
 
     }
 
@@ -309,26 +365,40 @@ public final class TeleportManager {
 
             }
 
-            int x = location.getBlockX();
-            int z = location.getBlockZ();
-            sendTeleportBlocks(player, location);
-
-            Random r = new Random();
-            int xx = r.nextInt(2) - 1;
-            int zz = r.nextInt(2) - 1;
-            if (xx == 0 && zz == 0) {
-
-                xx = 1;
-
-            }
-
-            x = x + xx;
-            z = z + zz;
-
-            plugin.getTeleportManager().addPlayer(player, new Location(location.getWorld(), x + .5,
-                    location.getBlockY(), z + .5, location.getYaw(), location.getPitch()), union.getName());
+            queueRegroup(player, union, location);
 
         }
+
+    }
+
+    /**
+     * Queues one member's regroup teleport, spread a block off the destination so
+     * that a union does not land in a single square.
+     *
+     * @param player   the member to move
+     * @param union    the Union
+     * @param location the destination
+     */
+    public void queueRegroup(@NotNull Player player, @NotNull Union union, @NotNull Location location) {
+
+        int x = location.getBlockX();
+        int z = location.getBlockZ();
+        sendTeleportBlocks(player, location);
+
+        Random r = new Random();
+        int xx = r.nextInt(2) - 1;
+        int zz = r.nextInt(2) - 1;
+        if (xx == 0 && zz == 0) {
+
+            xx = 1;
+
+        }
+
+        x = x + xx;
+        z = z + zz;
+
+        addPlayer(player, new Location(location.getWorld(), x + .5, location.getBlockY(), z + .5, location.getYaw(),
+                location.getPitch()), union.getName());
 
     }
 

@@ -72,6 +72,7 @@ public class SCCommandManager extends PaperCommandManager {
         registerDependency(RequestManager.class, plugin.getRequestManager());
         registerDependency(ProtectionManager.class, plugin.getProtectionManager());
         registerDependency(ChatManager.class, plugin.getChatManager());
+        registerDependency(ProposalManager.class, plugin.getProposalManager());
 
     }
 
@@ -236,7 +237,8 @@ public class SCCommandManager extends PaperCommandManager {
 
             } catch (Exception ex) {
 
-                plugin.getLogger().log(Level.SEVERE, "Error registering command", ex);
+                // A failure here drops every subcommand of the class, so name it.
+                plugin.getLogger().log(Level.SEVERE, "Error registering command class " + c.getName(), ex);
 
             }
 

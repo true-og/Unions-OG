@@ -183,6 +183,9 @@ public final class ProposalManager {
                 subject = lang("proposal.description.start.war",
                         target != null ? target.getName() : proposal.getTarget());
                 break;
+            case RENAME:
+                subject = lang("proposal.description.rename", proposal.getTarget());
+                break;
             case DISBAND:
             default:
                 subject = lang("proposal.description.disband");
@@ -287,6 +290,15 @@ public final class ProposalManager {
                 }
 
                 plugin.getProtectionManager().addWar(proposer, union, target);
+                break;
+
+            }
+            case RENAME: {
+
+                union.addBb(proposer != null ? proposer.getName() : union.getName(),
+                        lang("union.renamed.to.0", proposal.getTarget()));
+                union.setName(proposal.getTarget());
+                plugin.getStorageManager().updateUnion(union);
                 break;
 
             }

@@ -1,11 +1,15 @@
 package net.trueog.unionsog.managers;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.trueog.unionsog.*;
 import net.trueog.unionsog.events.RequestEvent;
 import net.trueog.unionsog.events.RequestFinishedEvent;
 import net.trueog.unionsog.events.WarEndEvent;
 import net.trueog.unionsog.utils.ChatUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
@@ -78,6 +82,44 @@ public final class RequestManager {
         Request req = new Request(UnionRequest.INVITE, null, requester, invitedName, union, msg);
         requests.put(invitedName.toLowerCase(), req);
         ask(req);
+
+    }
+
+    /**
+     * Asks one member whether they want to be teleported, so that a regroup moves
+     * only the members who agree to it.
+     *
+     * @param requester   the member asking for the regroup
+     * @param member      the member being asked
+     * @param union       the Union
+     * @param destination where the member would end up
+     * @return whether the member was asked
+     */
+    public boolean addRegroupRequest(@NotNull UnionPlayer requester, @NotNull UnionPlayer member, @NotNull Union union,
+            @NotNull Location destination)
+    {
+
+        Player player = member.toPlayer();
+        if (player == null) {
+
+            return false;
+
+        }
+
+        // One pending question per player, the same as an invitation.
+        if (requests.containsKey(member.getCleanName())) {
+
+            return false;
+
+        }
+
+        String msg = lang("asking.to.teleport.you", player, requester.getName());
+        Request req = new Request(UnionRequest.REGROUP, null, requester, player.getName(), union, msg);
+        req.setDestination(destination);
+        requests.put(member.getCleanName(), req);
+        ask(req);
+
+        return true;
 
     }
 
@@ -158,7 +200,7 @@ public final class RequestManager {
 
             if (req != null) {
 
-                processInvite(req, VoteResult.ACCEPT);
+                answer(req, VoteResult.ACCEPT);
 
             }
 
@@ -181,7 +223,73 @@ public final class RequestManager {
 
             if (req != null) {
 
-                processInvite(req, VoteResult.DENY);
+                answer(req, VoteResult.DENY);
+
+            }
+
+        }
+
+    }
+
+    /**
+     * Settles a request that was put to one player, who answers only for
+     * themselves.
+     *
+     * @param req  the Request
+     * @param vote their answer
+     */
+    private void answer(@NotNull Request req, @NotNull VoteResult vote) {
+
+        if (req.getType() == UnionRequest.REGROUP) {
+
+            processRegroup(req, vote);
+
+        } else {
+
+            processInvite(req, vote);
+
+        }
+
+    }
+
+    /**
+     * Teleports a member who agreed to be regrouped, and tells the member who asked
+     * either way.
+     *
+     * @param req  the Request
+     * @param vote the answer
+     */
+    private void processRegroup(@NotNull Request req, @NotNull VoteResult vote) {
+
+        requests.remove(req.getTarget().toLowerCase());
+
+        Player member = Bukkit.getPlayerExact(req.getTarget());
+        Location destination = req.getDestination();
+        if (member == null || destination == null) {
+
+            return;
+
+        }
+
+        Player requester = req.getRequester().toPlayer();
+
+        if (vote.equals(VoteResult.ACCEPT)) {
+
+            ChatBlock.sendMessageKey(member, "accepted.the.teleport", req.getRequester().getName());
+            if (requester != null) {
+
+                ChatBlock.sendMessageKey(requester, "accepted.your.teleport", member.getName());
+
+            }
+
+            plugin.getTeleportManager().queueRegroup(member, req.getUnion(), destination);
+
+        } else {
+
+            ChatBlock.sendMessageKey(member, "denied.the.teleport", req.getRequester().getName());
+            if (requester != null) {
+
+                ChatBlock.sendMessageKey(requester, "denied.your.teleport", member.getName());
 
             }
 
@@ -436,7 +544,7 @@ public final class RequestManager {
 
         String message = lang("request.message", req.getUnion().getColorTag(), req.getMsg());
         ArrayList<Player> recipients = new ArrayList<>();
-        if (req.getType() == UnionRequest.INVITE) {
+        if (req.getType().isAddressedToPlayer()) {
 
             recipients.add(Bukkit.getPlayerExact(req.getTarget()));
 
@@ -458,13 +566,46 @@ public final class RequestManager {
 
             if (recipient != null) {
 
-                recipient.spigot().sendMessage(ChatUtils.toBaseComponents(recipient, message));
+                sendRequestMessage(recipient, message, req);
 
             }
 
         }
 
         Bukkit.getScheduler().runTask(plugin, () -> Bukkit.getPluginManager().callEvent(new RequestEvent(req)));
+
+    }
+
+    /**
+     * Sends a request message with clickable accept/deny buttons using MiniMessage
+     *
+     * @param player  the player to send the message to
+     * @param message the request message
+     * @param req     the request (to determine which command to run)
+     */
+    private void sendRequestMessage(Player player, String message, Request req) {
+
+        MiniMessage miniMessage = MiniMessage.miniMessage();
+        String acceptCommand = plugin.getSettingsManager().getString(COMMANDS_ACCEPT);
+        String denyCommand = plugin.getSettingsManager().getString(COMMANDS_DENY);
+
+        // Create the clickable buttons using MiniMessage
+        Component requestComponent = miniMessage.deserialize(message).append(Component.newline())
+                .append(Component.text("       "))
+                .append(Component.text("[ACCEPT]").color(net.kyori.adventure.text.format.NamedTextColor.GREEN)
+                        .decorate(net.kyori.adventure.text.format.TextDecoration.BOLD)
+                        .clickEvent(ClickEvent.runCommand("/" + acceptCommand))
+                        .hoverEvent(net.kyori.adventure.text.event.HoverEvent
+                                .showText(miniMessage.deserialize("<green>Click here to accept</green>"))))
+                .append(Component.text(" or "))
+                .append(Component.text("[DENY]").color(net.kyori.adventure.text.format.NamedTextColor.RED)
+                        .decorate(net.kyori.adventure.text.format.TextDecoration.BOLD)
+                        .clickEvent(ClickEvent.runCommand("/" + denyCommand))
+                        .hoverEvent(net.kyori.adventure.text.event.HoverEvent
+                                .showText(miniMessage.deserialize("<red>Click here to deny</red>"))))
+                .append(Component.newline());
+
+        player.sendMessage(requestComponent);
 
     }
 

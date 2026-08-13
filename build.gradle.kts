@@ -29,7 +29,7 @@ kotlin { jvmToolchain(17) }
 /* ----------------------------- Metadata ------------------------------ */
 group = "net.trueog.unionsog" // Declare bundle identifier.
 
-version = "2.4" // Declare plugin version (will be in .jar).
+version = "2.5" // Declare plugin version (will be in .jar).
 
 val apiVersion = "1.19" // Declare minecraft server target version.
 
@@ -79,6 +79,9 @@ dependencies {
     compileOnly("me.clip:placeholderapi:2.11.3")
     compileOnly("org.jetbrains:annotations:24.0.1")
     implementation("io.papermc:paperlib:1.0.8-SNAPSHOT")
+    implementation("net.kyori:adventure-api:4.14.0")
+    implementation("net.kyori:adventure-text-minimessage:4.14.0")
+    implementation("net.kyori:adventure-platform-bukkit:4.3.0")
     implementation("co.aikar:acf-paper:0.5.1-SNAPSHOT")
     implementation("com.github.cryptomorin:XSeries:11.2.0.1")
     compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.3.0-SNAPSHOT") { isTransitive = false }

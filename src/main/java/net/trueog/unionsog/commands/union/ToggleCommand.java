@@ -46,7 +46,7 @@ public class ToggleCommand extends BaseCommand {
     //
     // @Subcommand("%deposit")
     // @CommandPermission("unionsog.member.deposit-toggle")
-    // @Conditions("leader")
+    // @Conditions("union_member")
     // @Description("{@@command.description.toggle.deposit}")
     // public void deposit(Player player, Union union) {
     //
@@ -59,7 +59,7 @@ public class ToggleCommand extends BaseCommand {
     //
     // @Subcommand("%withdraw")
     // @CommandPermission("unionsog.member.withdraw-toggle")
-    // @Conditions("leader")
+    // @Conditions("union_member")
     // @Description("{@@command.description.toggle.withdraw}")
     // public void withdraw(Player player, Union union) {
     //

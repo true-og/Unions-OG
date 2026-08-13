@@ -4,6 +4,18 @@ This changelog records only changes made by the Unions-OG soft fork relative
 to upstream [SimpleClans](https://github.com/RoinujNosde/SimpleClans). Changes
 inherited unchanged from SimpleClans are intentionally omitted.
 
+## [2.5] - 2026-08-13
+
+### Added
+
+- Clickable chat buttons for request responses. Accept and deny regroup requests
+  now display green `[ACCEPT]` and red `[DENY]` buttons in chat that players can
+  click instead of typing commands. Hover text explains each button's action.
+  Command-based responses still work for full backward compatibility.
+- Adventure/MiniMessage dependency for rich text rendering and interactive chat
+  components.
+- Fix union commands and help menu
+
 ## [2.4] - 2026-08-10
 
 ### Added

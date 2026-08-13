@@ -27,6 +27,7 @@ public class BbCommand extends BaseCommand {
 
     @Subcommand("%bb")
     @CommandPermission("unionsog.member.bb")
+    @Conditions("union_member")
     @Description("{@@command.description.bb.display}")
     public void display(Player sender) {
 

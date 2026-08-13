@@ -1,5 +1,6 @@
 package net.trueog.unionsog;
 
+import org.bukkit.Location;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ public final class Request {
     private UnionRequest type;
     private UnionPlayer requester;
     private int askCount;
+    private Location destination;
 
     public Request(UnionRequest type, @Nullable List<UnionPlayer> acceptors, UnionPlayer requester, String target,
             Union union, String msg)
@@ -38,6 +40,27 @@ public final class Request {
         this.requester = requester;
 
         cleanVotes();
+
+    }
+
+    /**
+     * Where a {@link UnionRequest#REGROUP} would put the player it is asking, so
+     * that the teleport can wait for their answer.
+     *
+     * @return the destination, null for requests that do not teleport anybody
+     */
+    public @Nullable Location getDestination() {
+
+        return destination;
+
+    }
+
+    /**
+     * @param destination the destination to set
+     */
+    public void setDestination(@Nullable Location destination) {
+
+        this.destination = destination;
 
     }
 

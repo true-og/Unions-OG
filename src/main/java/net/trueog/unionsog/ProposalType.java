@@ -18,7 +18,11 @@ public enum ProposalType {
     /**
      * Declare war on another union. The target is that union's tag.
      */
-    START_WAR;
+    START_WAR,
+    /**
+     * Rename the union. The target is the new name.
+     */
+    RENAME;
 
     public static @org.jetbrains.annotations.Nullable ProposalType fromName(
             @org.jetbrains.annotations.Nullable String name)

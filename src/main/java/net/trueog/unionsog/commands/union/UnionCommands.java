@@ -412,7 +412,7 @@ public class UnionCommands extends BaseCommand {
     @CommandPermission("unionsog.member.rename")
     @Conditions("union_member")
     @Description("{@@command.description.rename}")
-    public void rename(Player player, Union union, @Name("name") String unionName) {
+    public void rename(Player player, UnionPlayer cp, Union union, @Name("name") String unionName) {
 
         if (unionName.contains("&")) {
 
@@ -449,11 +449,8 @@ public class UnionCommands extends BaseCommand {
 
         }
 
-        union.addBb(player.getName(), lang("union.renamed.to.0", unionName));
-        union.setName(unionName);
-        storage.updateUnion(union);
-
-        ChatBlock.sendMessageKey(player, "you.have.successfully.renamed.your.union", unionName);
+        // The union is only renamed once its members vote it through.
+        proposalManager.propose(cp, union, ProposalType.RENAME, unionName);
 
     }
 
