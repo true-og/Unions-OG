@@ -537,11 +537,6 @@ public final class SettingsManager {
         DISCORDCHAT_TEXT_LIMIT("discordchat.text.unions-limit", 100),
         DISCORDCHAT_MINIMUM_LINKED_PLAYERS("discordchat.min-linked-players-to-create", 3),
         /*
-         * ================ > Purge Settings ================
-         */
-        PURGE_INACTIVE_PLAYER_DAYS("purge.inactive-player-data-days", 30),
-        PURGE_INACTIVE_UNION_DAYS("purge.inactive-union-days", 7),
-        /*
          * ================ > MySQL Settings ================
          */
         MYSQL_USERNAME("mysql.username", ""), MYSQL_HOST("mysql.host", "localhost"), MYSQL_PORT("mysql.port", 3306),

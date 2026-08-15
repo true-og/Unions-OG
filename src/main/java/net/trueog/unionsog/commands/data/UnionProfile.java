@@ -38,8 +38,7 @@ public class UnionProfile extends Sendable {
                 .replace("%union_allies%", union.getAllyString(subColor + ", ", sender))
                 .replace("%union_rivals%", union.getRivalString(subColor + ", ", sender))
                 .replace("%union_founded%", union.getFoundedString())
-                .replace("%union_inactive_days%", String.valueOf(union.getInactiveDays()))
-                .replace("%union_max_inactive_days%", Helper.formatMaxInactiveDays(union.getMaxInactiveDays()));
+                .replace("%union_inactive_days%", String.valueOf(union.getInactiveDays()));
         sender.sendMessage(message);
 
     }

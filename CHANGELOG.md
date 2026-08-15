@@ -4,6 +4,10 @@ This changelog records only changes made by the Unions-OG soft fork relative
 to upstream [SimpleClans](https://github.com/RoinujNosde/SimpleClans). Changes
 inherited unchanged from SimpleClans are intentionally omitted.
 
+## [2.5.1] - 2026-08-15
+
+- Inactivity purges removed. Unions and player data are no longer deleted on startup.
+
 ## [2.5] - 2026-08-13
 
 ### Added

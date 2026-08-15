@@ -369,26 +369,6 @@ public final class Helper {
 
     }
 
-    /**
-     * Formats max inactive days to an infinity symbol if it's negative or 0
-     *
-     * @param max inactive days
-     * @return formatted message
-     */
-    public static String formatMaxInactiveDays(int max) {
-
-        if (max <= 0) {
-
-            return "∞";
-
-        } else {
-
-            return String.valueOf(max);
-
-        }
-
-    }
-
     @NotNull
     public static String getFormattedUnionStatus(Union union, CommandSender sender) {
 

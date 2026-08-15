@@ -462,19 +462,6 @@ discordchat:
         unions-limit: 100
 ```
 
-## Purge Data
-
-* `inactive-player-data-days`
-* `inactive-union-days`
-
-### Example
-
-```yaml
-purge:
-    inactive-player-data-days: 30
-    inactive-union-days: 7
-```
-
 ## mySQL Settings
 
 * `username`

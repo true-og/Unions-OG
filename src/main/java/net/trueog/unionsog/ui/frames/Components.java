@@ -44,7 +44,6 @@ public class Components {
             boolean openDetails)
     {
 
-        UnionsOG pl = UnionsOG.getInstance();
         String status = getPlayerStatus(viewer, cp);
         SCComponent c = new SCComponentImpl(lang("gui.playerdetails.player.title", viewer, cp.getName()), Arrays.asList(
                 cp.getUnion() == null ? lang("gui.playerdetails.player.lore.nounion", viewer)
@@ -59,9 +58,8 @@ public class Components {
                 lang("gui.playerdetails.player.lore.last.seen", viewer, cp.getLastSeenString(viewer)),
                 lang("gui.playerdetails.player.lore.past.unions", viewer,
                         cp.getPastUnionsString(lang("gui.playerdetails.player.lore.past.unions.separator", viewer))),
-                lang("gui.playerdetails.player.lore.inactive", viewer, cp.getInactiveDays(),
-                        pl.getSettingsManager().getInt(PURGE_INACTIVE_PLAYER_DAYS))),
-                XMaterial.PLAYER_HEAD, slot);
+                lang("gui.playerdetails.player.lore.inactive", viewer, cp.getInactiveDays())), XMaterial.PLAYER_HEAD,
+                slot);
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(cp.getUniqueId());
         setOwningPlayer(c.getItem(), offlinePlayer);
         if (viewer.getUniqueId().equals(cp.getUniqueId())) {
@@ -134,8 +132,7 @@ public class Components {
                                     : union.getRivalString(lang("gui.uniondetails.union.lore.rivals.separator", viewer),
                                             viewer)),
                     lang("gui.uniondetails.union.lore.founded", viewer, union.getFoundedString()),
-                    lang("gui.uniondetails.union.lore.inactive", viewer, union.getInactiveDays(),
-                            Helper.formatMaxInactiveDays(union.getMaxInactiveDays())));
+                    lang("gui.uniondetails.union.lore.inactive", viewer, union.getInactiveDays()));
 
         } else {
 

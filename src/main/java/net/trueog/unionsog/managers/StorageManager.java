@@ -274,7 +274,6 @@ public final class StorageManager {
         plugin.getUnionManager().cleanData();
 
         List<Union> unions = retrieveUnions();
-        purgeUnions(unions);
 
         for (Union union : unions) {
 
@@ -295,7 +294,6 @@ public final class StorageManager {
         }
 
         List<UnionPlayer> cps = retrieveUnionPlayers();
-        purgeUnionPlayers(cps);
 
         for (UnionPlayer cp : cps) {
 
@@ -344,81 +342,6 @@ public final class StorageManager {
             plugin.getUnionManager().importUnionPlayer(cp);
 
             plugin.getLogger().info("ClanPlayer Reloaded: " + player.getName() + ", UUID: " + player.getUniqueId());
-
-        }
-
-    }
-
-    private void purgeUnions(List<Union> unions) {
-
-        List<Union> purge = new ArrayList<>();
-
-        for (Union union : unions) {
-
-            if (union.isPermanent()) {
-
-                continue;
-
-            }
-
-            int purgeUnion = plugin.getSettingsManager().getInt(PURGE_INACTIVE_UNION_DAYS);
-            if (union.getInactiveDays() > purgeUnion && purgeUnion > 0) {
-
-                purge.add(union);
-
-            }
-
-        }
-
-        for (Union union : purge) {
-
-            plugin.getLogger().info(lang("purging.union", union.getName()));
-            for (UnionPlayer member : union.getMembers()) {
-
-                union.removePlayerFromUnion(member.getUniqueId());
-
-            }
-
-            deleteUnion(union);
-            unions.remove(union);
-
-        }
-
-    }
-
-    private void purgeUnionPlayers(List<UnionPlayer> cps) {
-
-        int purgePlayers = plugin.getSettingsManager().getInt(PURGE_INACTIVE_PLAYER_DAYS);
-        if (purgePlayers < 1) {
-
-            return;
-
-        }
-
-        List<UnionPlayer> purge = new ArrayList<>();
-
-        for (UnionPlayer cp : cps) {
-
-            // let the union be purged first
-            if (cp.getUnion() != null) {
-
-                continue;
-
-            }
-
-            if (cp.getInactiveDays() > purgePlayers) {
-
-                purge.add(cp);
-
-            }
-
-        }
-
-        for (UnionPlayer cp : purge) {
-
-            plugin.getLogger().info(lang("purging.player.data", cp.getName()));
-            deleteUnionPlayer(cp);
-            cps.remove(cp);
 
         }
 

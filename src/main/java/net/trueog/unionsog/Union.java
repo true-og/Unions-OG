@@ -390,22 +390,6 @@ public class Union implements Serializable, Comparable<Union> {
     }
 
     /**
-     * Returns the max number of days the union can be inactive A {@literal <=} 0
-     * means it won't be purged
-     */
-    public int getMaxInactiveDays() {
-
-        if (isPermanent()) {
-
-            return -1;
-
-        }
-
-        return UnionsOG.getInstance().getSettingsManager().getInt(PURGE_INACTIVE_UNION_DAYS);
-
-    }
-
-    /**
      * (used internally)
      *
      * @param lastUsed the lastUsed to set
