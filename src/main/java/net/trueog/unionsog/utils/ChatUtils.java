@@ -89,6 +89,46 @@ public class ChatUtils {
 
     }
 
+    /**
+     * Replaces the visible characters of a colored string with the characters of a
+     * plain one, keeping every color code in place. The plain string is expected to
+     * match the colored string's stripped text ignoring case; leftover characters
+     * on either side are kept as they are.
+     *
+     * @param colored the colored string to take the color codes from
+     * @param plain   the plain string to take the characters from
+     * @return the colored string with the plain string's characters
+     */
+    public static String applyCase(@NotNull String colored, @NotNull String plain) {
+
+        Pattern pattern = HEX_COLOR_SUPPORT ? HEX_STRIP_COLOR_PATTERN : STRIP_COLOR_PATTERN;
+        Matcher matcher = pattern.matcher(colored);
+        StringBuilder result = new StringBuilder();
+        int from = 0;
+        int at = 0;
+        while (matcher.find()) {
+
+            for (int i = from; i < matcher.start(); i++) {
+
+                result.append(at < plain.length() ? plain.charAt(at++) : colored.charAt(i));
+
+            }
+
+            result.append(matcher.group());
+            from = matcher.end();
+
+        }
+
+        for (int i = from; i < colored.length(); i++) {
+
+            result.append(at < plain.length() ? plain.charAt(at++) : colored.charAt(i));
+
+        }
+
+        return result.toString();
+
+    }
+
     public static String getLastColorCode(String msg) {
 
         if (msg.length() < 2) {

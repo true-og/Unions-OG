@@ -200,6 +200,25 @@ public class Union implements Serializable, Comparable<Union> {
     }
 
     /**
+     * Renames the union. When the new name is just the tag in a different case, the
+     * displayed tag is re-cased to match, so a union can fix its capitalization
+     * even though the tag itself can never change.
+     *
+     * @param name the new name
+     */
+    public void rename(String name) {
+
+        if (colorTag != null && Helper.cleanTag(name).equals(tag)) {
+
+            colorTag = ChatUtils.applyCase(colorTag, ChatUtils.stripColors(name));
+
+        }
+
+        this.name = name;
+
+    }
+
+    /**
      * Returns the union's description
      *
      * @return the description or null if it doesn't have one

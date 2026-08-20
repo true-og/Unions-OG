@@ -297,8 +297,14 @@ public final class ProposalManager {
 
                 union.addBb(proposer != null ? proposer.getName() : union.getName(),
                         lang("union.renamed.to.0", proposal.getTarget()));
-                union.setName(proposal.getTarget());
+                union.rename(proposal.getTarget());
                 plugin.getStorageManager().updateUnion(union);
+                for (UnionPlayer member : union.getOnlineMembers()) {
+
+                    plugin.getUnionManager().updateDisplayName(member.toPlayer());
+
+                }
+
                 break;
 
             }

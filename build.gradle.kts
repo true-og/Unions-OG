@@ -91,6 +91,7 @@ dependencies {
     compileOnly("com.github.TechFortress:GriefPrevention:17.0.0")
     compileOnly("com.discordsrv:discordsrv:1.28.0")
     implementation("com.google.code.gson:gson:2.10.1")
+    testImplementation("org.purpurmc.purpur:purpur-api:1.19.4-R0.1-SNAPSHOT")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.3")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.11.3")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.11.3")

@@ -399,8 +399,13 @@ public class StaffCommands extends BaseCommand {
         }
 
         Union union = unionInput.getUnion();
-        union.setName(unionName);
+        union.rename(unionName);
         storage.updateUnion(union);
+        for (UnionPlayer member : union.getOnlineMembers()) {
+
+            cm.updateDisplayName(member.toPlayer());
+
+        }
 
         ChatBlock.sendMessageKey(sender, "you.have.successfully.renamed.the.union", unionName);
 
