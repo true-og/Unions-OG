@@ -338,9 +338,9 @@ public class SCCommandManager extends PaperCommandManager {
     static {
 
         SUBCOMMANDS = Arrays.asList("setbanner", "resetkdr", "place", "home", "war", "regroup", "mostkilled", "kills",
-                "globalff", "reload", "unban", "ban", "disband", "resign", "ff", "unionff", "vote", "yes", "no",
-                "purge", "bank", "kick", "invite", "toggle", "modtag", "bb", "display", "clear", "rival", "ally", "add",
-                "remove", "stats", "coords", "vitals", "rivalries", "alliances", "leaderboard", "allow", "block",
+                "globalff", "reload", "unban", "ban", "disband", "resign", "unionff", "pvp", "on", "off", "vote", "yes",
+                "no", "purge", "bank", "kick", "invite", "toggle", "modtag", "bb", "display", "clear", "rival", "ally",
+                "add", "remove", "stats", "coords", "vitals", "rivalries", "alliances", "leaderboard", "allow", "block",
                 "auto", "check", "delete", "me", "tag", "deposit", "withdraw", "set", "status", "tp", "all", "everyone",
                 "lookup", "roster", "profile", "list", "create", "description", "start", "end", "admin", "help", "mod",
                 "land", "break", "interact", "place_block", "damage", "interact_entity", "container", "permanent",

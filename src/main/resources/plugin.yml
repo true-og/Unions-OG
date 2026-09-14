@@ -124,8 +124,6 @@ permissions:
     description: Can add to his union's bulletin board
   unionsog.member.bb-toggle:
     description: Can toggle bb on/off
-  unionsog.member.ff:
-    description: Can toggle his own friendly fire
   unionsog.member.resign:
     description: Can resign from his union
   unionsog.member.ally:
@@ -296,7 +294,6 @@ permissions:
       unionsog.member.bb-toggle: true
       unionsog.member.cape-toggle: true
       unionsog.member.tag-toggle: true
-      unionsog.member.ff: true
       unionsog.member.resign: true
       unionsog.member.ally: true
       unionsog.member.chat: true

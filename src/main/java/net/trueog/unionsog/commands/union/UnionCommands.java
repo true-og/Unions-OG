@@ -356,7 +356,7 @@ public class UnionCommands extends BaseCommand {
 
     }
 
-    @Subcommand("%unionff %allow")
+    @Subcommand("%unionff|%pvp %allow|%on")
     @CommandPermission("unionsog.member.union-ff")
     @Conditions("union_member")
     @Description("{@@command.description.unionff.allow}")
@@ -368,7 +368,7 @@ public class UnionCommands extends BaseCommand {
 
     }
 
-    @Subcommand("%unionff %block")
+    @Subcommand("%unionff|%pvp %block|%off")
     @CommandPermission("unionsog.member.union-ff")
     @Conditions("union_member")
     @Description("{@@command.description.unionff.block}")

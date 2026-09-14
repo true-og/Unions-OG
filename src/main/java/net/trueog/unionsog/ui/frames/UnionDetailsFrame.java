@@ -187,17 +187,12 @@ public class UnionDetailsFrame extends SCFrame {
 
     private void addFf() {
 
-        String personalFf = cp.isFriendlyFire() ? lang("allowed", getViewer()) : lang("auto", getViewer());
         String unionFf = union.isFriendlyFire() ? lang("allowed", getViewer()) : lang("blocked", getViewer());
         SCComponent ff = new SCComponentImpl(lang("gui.uniondetails.ff.title", getViewer()),
-                Arrays.asList(lang("gui.uniondetails.ff.personal.lore", getViewer(), personalFf),
-                        lang("gui.uniondetails.ff.union.lore", getViewer(), unionFf),
-                        lang("gui.uniondetails.ff.personal.toggle.lore", getViewer()),
+                Arrays.asList(lang("gui.uniondetails.ff.union.lore", getViewer(), unionFf),
                         lang("gui.uniondetails.ff.union.toggle.lore", getViewer())),
                 XMaterial.GOLDEN_SWORD, 32);
 
-        ff.setListener(ClickType.LEFT, this::togglePersonalFf);
-        ff.setPermission(ClickType.LEFT, "unionsog.member.ff");
         ff.setListener(ClickType.RIGHT, this::toggleUnionFf);
         ff.setPermission(ClickType.RIGHT, "unionsog.member.union-ff");
         add(ff);
@@ -218,23 +213,6 @@ public class UnionDetailsFrame extends SCFrame {
         }
 
         InventoryController.runSubcommand(getViewer(), "unionff", true, arg);
-
-    }
-
-    private void togglePersonalFf() {
-
-        String arg;
-        if (cp.isFriendlyFire()) {
-
-            arg = "auto";
-
-        } else {
-
-            arg = "allow";
-
-        }
-
-        InventoryController.runSubcommand(getViewer(), "ff", true, arg);
 
     }
 

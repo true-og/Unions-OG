@@ -188,28 +188,6 @@ public class GeneralCommands extends BaseCommand {
 
     }
 
-    @Subcommand("%ff %allow")
-    @CommandPermission("unionsog.member.ff")
-    @Description("{@@command.description.ff.allow}")
-    public void allowPersonalFf(Player player, UnionPlayer cp) {
-
-        cp.setFriendlyFire(true);
-        storage.updateUnionPlayer(cp);
-        ChatBlock.sendMessage(player, AQUA + lang("personal.friendly.fire.is.set.to.allowed", player));
-
-    }
-
-    @Subcommand("%ff %auto")
-    @CommandPermission("unionsog.member.ff")
-    @Description("{@@command.description.ff.auto}")
-    public void autoPersonalFf(Player player, UnionPlayer cp) {
-
-        cp.setFriendlyFire(false);
-        storage.updateUnionPlayer(cp);
-        ChatBlock.sendMessage(player, AQUA + lang("friendy.fire.is.now.managed.by.your.union", player));
-
-    }
-
     @Subcommand("%resetkdr %confirm")
     @CommandPermission("unionsog.vip.resetkdr")
     @Conditions("setting:field=ALLOW_RESET_KDR")

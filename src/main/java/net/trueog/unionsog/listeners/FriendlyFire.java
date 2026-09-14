@@ -73,9 +73,7 @@ public class FriendlyFire extends SCListener {
 
         }
 
-        if (vcp.isFriendlyFire() || victimUnion.isFriendlyFire()
-                || plugin.getSettingsManager().is(GLOBAL_FRIENDLY_FIRE))
-        {
+        if (victimUnion.isFriendlyFire() || plugin.getSettingsManager().is(GLOBAL_FRIENDLY_FIRE)) {
 
             return;
 

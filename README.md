@@ -57,7 +57,10 @@ say-so: **disband**, **home set**, and **war start**.
 - Uses `/u` for union chat; a bare `/u` toggles the union-chat channel.
 - Adds `/union rename <name>` and `/union color <color>`, both open to any
   member.
-- Union-wide friendly fire is `/union unionff allow|block`.
+- Union-wide friendly fire is `/union unionff allow|block`, aliased as
+  `/union pvp on|off`. The per-player friendly fire opt-in (`/union ff`)
+  is removed, so friendly fire is decided only by the union setting or the
+  staff-wide `globalff` override.
 - Supports both `simpleclans` and `simpleunions` placeholder identifiers in
   PlaceholderAPI and MiniPlaceholders.
 - Uses DiamondBank-OG instead of Vault for player economy access. Union-owned
