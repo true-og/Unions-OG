@@ -2,7 +2,7 @@
 
 * [Introduction](README.md)
 * [Discord Support](https://discord.gg/CkNwgdE)
-* [Bugs and Suggestions](https://github.com/true-og/Unions-OG/issues)
+* [Bugs and Suggestions](https://git.trueog.net/trueog/Unions-OG/issues)
 
 ## How to Setup
 
