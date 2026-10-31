@@ -33,6 +33,6 @@ If the wiki does not have your answer, feel free to join [the discord](https://d
 
 `Issue Tracker`
 
-If you believe you have found a bug in Unions-OG, feel free to make an issue on the [Unions-OG issue tracker!](https://github.com/true-og/Unions-OG/issues) Bugs will be looked into and addressed at the earliest opportunity.
+If you believe you have found a bug in Unions-OG, feel free to make an issue on the [Unions-OG issue tracker!](https://git.trueog.net/trueog/Unions-OG/issues) Bugs will be looked into and addressed at the earliest opportunity.
 
 Bugs in inherited behavior that also occur in unmodified SimpleClans belong on the [upstream issue tracker](https://github.com/RoinujNosde/SimpleClans/issues) instead.
