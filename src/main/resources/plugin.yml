@@ -16,7 +16,7 @@ api-version: '1.13'
 authors:
   - Phaed
   - RoinujNosde
-website: https://github.com/true-og/Unions-OG
+website: https://git.trueog.net/trueog/Unions-OG
 commands:
   clan:
     description: Tells the player to use /union instead
