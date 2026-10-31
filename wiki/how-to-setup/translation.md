@@ -34,4 +34,4 @@ example\) and renames the `clan.*` keys to `union.*`. Upstream translations
 therefore no longer drop in unchanged.
 
 If you have translated a bundle for this fork, open a pull request on the
-[Unions-OG repository](https://github.com/true-og/Unions-OG).
+[Unions-OG repository](https://git.trueog.net/trueog/Unions-OG).
